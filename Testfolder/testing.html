@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travooli - Booking Information</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #605DEC;
+            --dark-blue: #031E2F;
+            --text-dark: #27273F;
+            --text-gray: #7C8DB0;
+            --text-light-gray: #A4B0C7;
+            --white: #FFFFFF;
+            --light-gray: #E6E8E9;
+            --border-color: #A1B0CC;
+            --border-light: #CBD4E6;
+            --footer-icon-color: #6E7491;
+            --green: #007B65;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: var(--dark-blue);
+            color: var(--text-dark);
+            line-height: 1.36;
+        }
+        
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--dark-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 24px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 27px;
+            color: var(--white);
+        }
+        
+        .logo img {
+            height: 24px;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+        }
+        
+        nav a {
+            text-decoration: none;
+            padding: 10px;
+            font-size: 16px;
+        }
+        
+        nav a.active {
+            color: var(--primary-color);
+        }
+        
+        nav a:not(.active) {
+            color: var(--text-light-gray);
+        }
+        
+        .btn {
+            font-family: 'Nunito Sans', sans-serif;
+            font-size: 18px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        nav .btn {
+            font-size: 16px;
+        }
+        
+        /* Main Content */
+        main {
+            background-color: var(--white);
+            padding: 40px;
+        }
+        
+        .section-title {
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .info-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--light-gray);
+        }
+        
+        /* Flight Cart */
+        .flight-cart {
+            border: 1px solid #E9E8FC;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .flight-details {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .airline {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .airline-logo {
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        
+        .airline-name {
+            font-weight: 400;
+            font-size: 16px;
+        }
+        
+        .flight-info {
+            text-align: right;
+        }
+        
+        .duration, .departure-arrival, .layover {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .layover {
+            color: var(--text-gray);
+        }
+        
+        .price-summary {
+            background-color: var(--green);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            color: var(--white);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        
+        .price-labels, .price-values {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .price-labels p, .price-values p {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .passenger-section {
+            margin-bottom: 20px;
+        }
+        
+        .passenger-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--light-gray);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-gray);
+        }
+        
+        .helper-text {
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-top: 2px;
+        }
+        
+        /* Options Selection */
+        .options-container {
+            display: flex;
+            gap: 34px;
+            margin-bottom: 20px;
+        }
+        
+        .option-card {
+            flex: 1;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid rgba(13, 22, 52, 0.05);
+        }
+        
+        .option-card.selected {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+        }
+        
+        .option-title {
+            font-weight: 700;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .option-price {
+            font-weight: 600;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .option-card:not(.selected) .option-title {
+            color: #0D1634;
+        }
+        
+        .option-card:not(.selected) .option-price {
+            color: rgba(37, 40, 49, 0.5);
+        }
+        
+        /* Quantity Selector */
+        .quantity-selector {
+            background-color: var(--primary-color);
+            padding: 0 32px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .quantity-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: flex-end;
+            width: 225px;
+        }
+        
+        .quantity-label {
+            color: var(--white);
+            font-size: 16px;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quantity-btn {
+            width: 24px;
+            height: 24px;
+            background-color: var(--white);
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .quantity-value {
+            color: var(--white);
+            font-size: 18px;
+        }
+        
+        /* Button Row */
+        .button-row {
+            display: flex;
+            gap: 24px;
+            margin-top: 30px;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark-blue);
+            padding: 16px 0;
+        }
+        
+        .footer-divider {
+            border-top: 1px solid var(--border-light);
+            margin-bottom: 17px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 120px;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 20px;
+            padding: 8px;
+        }
+        
+        .social-icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .copyright {
+            color: var(--text-gray);
+            font-size: 18px;
+        }
+        
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--white);
+            min-width: 300px;
+            box-shadow: 0px 12px 24px rgba(27, 59, 119, 0.05),
+                        0px 24px 60px rgba(6, 47, 125, 0.05),
+                        0px 2px 4px rgba(7, 4, 146, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            z-index: 1;
+            padding: 16px;
+        }
+        
+        .dropdown-item {
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f6f6fe;
+        }
+        
+        .dropdown-item.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <h1>Travooli</h1>
+                <img src="images/airplane.svg" alt="Airplane icon">
+            </div>
+            <nav>
+                <a href="#" class="active">Flights</a>
+                <a href="#">Hotels</a>
+                <a href="#">Notifications</a>
+                <a href="#">My Tickets</a>
+                <a href="#">My Reservations</a>
+                <a href="#">Sign in</a>
+                <button class="btn btn-primary">Sign up</button>
+            </nav>
+        </header>
+        
+        <!-- Main Content -->
+        <main>
+            <h2 class="section-title">Your Tickets</h2>
+            
+            <!-- Flight Cart -->
+            <div class="flight-cart">
+                <div class="flight-details">
+                    <div class="airline">
+                        <div class="airline-logo"></div>
+                        <div class="airline-name">Japan Airline</div>
+                    </div>
+                    <div class="flight-info">
+                        <div class="duration">8h 15m</div>
+                        <div class="departure-arrival">11:00 PM - 7:00 PM</div>
+                        <div class="layover">2h 45m in HND</div>
+                    </div>
+                </div>
+                <div class="price-summary">
+                    <div class="price-labels">
+                        <p>Subtotal</p>
+                        <p>Baggage Fees</p>
+                        <p>Multi-meal</p>
+                        <p>Taxes and Fees</p>
+                        <p>Total</p>
+                    </div>
+                    <div class="price-values">
+                        <p>RM 340</p>
+                        <p>RM 20</p>
+                        <p>RM 30</p>
+                        <p>RM 121</p>
+                        <p>RM 491</p>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="info-text">Enter the required information for each traveler and be sure that it exactly matches the government-issued ID presented at the airport.</p>
+            
+            <!-- Passenger Information Section -->
+            <div class="form-section">
+                <h2 class="section-title">Passenger information</h2>
+                <div class="passenger-section">
+                    <h3 class="passenger-title">Passenger (Adult)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="First name*">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Middle">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Last name*">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Suffix">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Date of birth*">
+                            <div class="helper-text">MM/DD/YY</div>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="Email address*">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="tel" class="form-control" placeholder="Phone number*">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Baggage Information Section -->
+            <div class="form-section">
+                <h2 class="section-title">Baggage information</h2>
+                <p class="info-text">Each passenger is allowed one carry-on bag and one personal item for free, along with a complimentary checked bag up to 10 Kg. Bags exceeding 10 Kg will incur additional charges.</p>
+                
+                <div class="options-container">
+                    <div class="option-card">
+                        <div class="option-title">10Kg</div>
+                        <div class="option-price">Free</div>
+                    </div>
+                    <div class="option-card selected">
+                        <div class="option-title">25 Kg</div>
+                        <div class="option-price">RM 20</div>
+                    </div>
+                    <div class="option-card">
+                        <div class="option-title">50 Kg</div>
+                        <div class="option-price">RM 40</div>
+                    </div>
+                </div>
+                
+                <div class="quantity-selector">
+                    <div class="quantity-row">
+                        <div class="quantity-label">Bag quantity:</div>
+                        <div class="quantity-controls">
+                            <div class="quantity-btn">
+                                <img src="images/minus.svg" alt="Decrease">
+                            </div>
+                            <div class="quantity-value">1</div>
+                            <div class="quantity-btn">
+                                <img src="images/plus.svg" alt="Increase">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Meal Add-on Section -->
+            <div class="form-section">
+                <h2 class="section-title">Meal Add-on</h2>
+                <p class="info-text">Choose from our meal add-on options: No Meal for a simple journey, Single Meal for a satisfying dish during your flight, or Multi-Meal to stay nourished on longer trips, ensuring a comfortable and enjoyable experience.</p>
+                
+                <div class="options-container">
+                    <div class="option-card">
+                        <div class="option-title">No meal</div>
+                        <div class="option-price">Free</div>
+                    </div>
+                    <div class="option-card">
+                        <div class="option-title">Single meal</div>
+                        <div class="option-price">RM 15</div>
+                    </div>
+                    <div class="option-card selected">
+                        <div class="option-title">Multi-meal</div>
+                        <div class="option-price">RM 30</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Button Row -->
+            <div class="button-row">
+                <button class="btn btn-outline">Save and close</button>
+                <button class="btn btn-primary">Select seats</button>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer>
+            <div class="footer-divider"></div>
+            <div class="footer-content">
+                <div class="social-icons">
+                    <img src="images/twitter.svg" alt="Twitter" class="social-icon">
+                    <img src="images/instagram.svg" alt="Instagram" class="social-icon">
+                    <img src="images/facebook.svg" alt="Facebook" class="social-icon">
+                </div>
+                <div class="copyright">© 2025 Travooli incorporated</div>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // JavaScript for interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Option card selection
+            const optionCards = document.querySelectorAll('.option-card');
+            optionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from siblings
+                    const parent = this.parentElement;
+                    parent.querySelectorAll('.option-card').forEach(sibling => {
+                        sibling.classList.remove('selected');
+                    });
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Quantity controls
+            const minusBtn = document.querySelector('.quantity-btn:first-child');
+            const plusBtn = document.querySelector('.quantity-btn:last-child');
+            const quantityValue = document.querySelector('.quantity-value');
+            
+            minusBtn.addEventListener('click', function() {
+                let value = parseInt(quantityValue.textContent);
+                if (value > 1) {
+                    quantityValue.textContent = value - 1;
+                }
+            });
+            
+            plusBtn.addEventListener('click', function() {
+                let value = parseInt(quantityValue.textContent);
+                quantityValue.textContent = value + 1;
+            });
+        });
+    </script>
+</body>
+</html>
