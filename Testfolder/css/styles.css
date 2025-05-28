@@ -25,6 +25,22 @@ a {
     color: inherit;
 }
 
+/* Gradient Text Style */
+.gradient-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 80px;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(90deg, #ffb6e6, #ff6ec4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+}
+
 /* Button Styles */
 .btn {
     display: inline-flex;
@@ -188,17 +204,20 @@ input:focus ~ .input-border {
 }
 
 /* Card Section Styles */
-.card-section {
+.flight-recommendations {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 24px;
     padding: 40px 64px;
     width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
     background-color: #031E2F;
     margin-top: -80px;
     position: relative;
     z-index: 1;
+    box-sizing: border-box;
 }
 
 .card-header {
@@ -212,7 +231,9 @@ input:focus ~ .input-border {
 .section-title {
     font-weight: 700;
     font-size: 24px;
-    color: #FFFFFF;
+    color: #6E7491;
+    line-height: 1.364em;
+    font-family: 'Nunito Sans', sans-serif;
 }
 
 .section-title .highlight {
@@ -225,6 +246,13 @@ input:focus ~ .input-border {
     gap: 4px;
     font-size: 24px;
     color: #A1B0CC;
+    font-weight: 400;
+    line-height: 1.364em;
+}
+
+.see-all .icon {
+    width: 32px;
+    height: 32px;
 }
 
 .card-container {
@@ -232,12 +260,14 @@ input:focus ~ .input-border {
     flex-direction: column;
     gap: 40px;
     width: 100%;
+    align-self: stretch;
 }
 
 .card-row {
     display: flex;
     gap: 40px;
     width: 100%;
+    align-self: stretch;
 }
 
 .card {
@@ -251,24 +281,126 @@ input:focus ~ .input-border {
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 16px 40px rgba(0, 0, 0, 0.1),
-                0px 4px 8px rgba(28, 5, 77, 0.15);
+    transform: translateY(-10px);
+    box-shadow: 0px 16px 40px rgba(0, 0, 0, 0.15),
+                0px 4px 12px rgba(28, 5, 77, 0.2);
 }
 
 .card-image {
-    height: 390px;
+    height: 397px;
     width: 100%;
     overflow: hidden;
+    position: relative;
 }
 
 .card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-image img {
+    transform: scale(1.1);
+}
+
+/* Enhanced Card Overlay - with more distinctive styling */
+.card-image:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.2) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.card:hover .card-image:before {
+    opacity: 1;
+}
+
+.card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px;
+    color: #FFFFFF;
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.card:hover .card-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.card-overlay h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-family: 'Poppins', sans-serif;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Overlay icons styling */
+.overlay-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.icon-item {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.icon-item:hover {
+    background-color: rgba(96, 93, 236, 0.7);
+    transform: translateY(-2px);
+}
+
+.icon-item i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.btn-view-flights {
+    display: inline-block;
+    padding: 10px 24px;
+    background-color: #605DEC;
+    color: #FFFFFF;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-view-flights:hover {
+    background-color: #4e4bd0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .card-content {
@@ -276,6 +408,7 @@ input:focus ~ .input-border {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    align-self: stretch;
 }
 
 .card-content .card-header {
@@ -283,12 +416,14 @@ input:focus ~ .input-border {
     justify-content: space-between;
     padding: 0;
     margin-bottom: 4px;
+    align-self: stretch;
 }
 
 .card-title {
     font-weight: 600;
     font-size: 18px;
     color: #6E7491;
+    line-height: 1.364em;
 }
 
 .card-title .highlight {
@@ -299,11 +434,39 @@ input:focus ~ .input-border {
     font-weight: 600;
     font-size: 18px;
     color: #6E7491;
+    text-align: right;
+    width: 72px;
 }
 
 .card-description {
     font-size: 16px;
     color: #7C8DB0;
+    line-height: 1.364em;
+    align-self: stretch;
+}
+
+/* Unique Stays Section Styles */
+.unique-stays {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 40px 64px;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    background-color: #031E2F;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* Adjustments for the unique-stays cards */
+.unique-stays .card-content .card-header {
+    justify-content: flex-start;
+}
+
+.unique-stays .card-title {
+    width: 100%;
 }
 
 /* Responsive Styles */
@@ -315,6 +478,14 @@ input:focus ~ .input-border {
     .hero-title {
         font-size: 62px;
         max-width: 90%;
+    }
+    
+    .flight-recommendations {
+        padding: 40px 32px;
+    }
+    
+    .unique-stays {
+        padding: 40px 32px;
     }
 }
 
@@ -361,9 +532,8 @@ input:focus ~ .input-border {
         flex: 0 0 100%;
     }
     
-    .card-section {
-        padding: 20px;
-        margin-top: 0;
+    .flight-recommendations {
+        padding: 40px 20px;
     }
     
     .hero-title {
@@ -373,6 +543,10 @@ input:focus ~ .input-border {
     .hero {
         height: auto;
         padding-bottom: 40px;
+    }
+    
+    .unique-stays {
+        padding: 40px 20px;
     }
 }
 
@@ -386,5 +560,9 @@ input:focus ~ .input-border {
     .hero {
         height: auto;
         min-height: 500px;
+    }
+    
+    .card-content .card-header {
+        flex-direction: row;
     }
 } 
