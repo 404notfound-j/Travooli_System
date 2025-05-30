@@ -64,7 +64,7 @@
         
         <div class="card-container">
             <div class="card-row">
-                <a href="flights.php?destination=kuala-lumpur" class="card-link">
+                <a href=# class="card-link">
                     <div class="card">
                         <div class="card-image">
                             <img src="background/kuala-lumpur.png" alt="Kuala Lumpur">
@@ -304,6 +304,87 @@
         </div>
     </section>
     
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="testimonial-header">
+            <h3 class="section-title">What <span class="highlight">Travooli</span> users are saying</h3>
+        </div>
+        
+        <div class="testimonial-container">
+            <!-- Testimonial 1 -->
+            <div class="testimonial-card">
+                <div class="testimonial-user">
+                    <img src="background/user-avatar-1.png" alt="Ahmad Zulkifli" class="user-avatar">
+                    <div class="testimonial-content">
+                        <div class="user-info">
+                            <h3 class="user-name">Ahmad Zulkifli</h3>
+                            <p class="user-location">Kuala Lumpur, Malaysia | March 2025</p>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                            What a fantastic experience using Travooli! I booked all of my flights for my family trip to Langkawi through Travooli and everything was perfect. When I needed to adjust my accommodation dates, Travooli support was incredibly helpful and sorted it out immediately.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Testimonial 2 -->
+            <div class="testimonial-card">
+                <div class="testimonial-user">
+                    <img src="background/user-avatar-2.png" alt="Lim Wei Ling" class="user-avatar">
+                    <div class="testimonial-content">
+                        <div class="user-info">
+                            <h3 class="user-name">Lim Wei Ling</h3>
+                            <p class="user-location">Singapore | January 2025</p>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                            My friends and I travel to Malaysia twice a year, and we've always used other booking platforms. Travooli was recommended by a colleague, and I'm so glad we tried it! The process was seamless and the prices were much better than what we typically find elsewhere.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Testimonial 3 -->
+            <div class="testimonial-card">
+                <div class="testimonial-user">
+                    <img src="background/user-avatar-3.png" alt="Amirah Hassan" class="user-avatar">
+                    <div class="testimonial-content">
+                        <div class="user-info">
+                            <h3 class="user-name">Amirah Hassan</h3>
+                            <p class="user-location">Penang, Malaysia | April 2025</p>
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                            When I needed to book flights from Penang to Kota Kinabalu, Travooli had the best user experience so I decided to give it a try. The interface was clean and intuitive, and I found amazing deals that weren't available on other sites. I'll definitely be using Travooli for all my future travels.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <script src="js/script.js"></script>
+
+    <?php include 'u_footer_1.php'; ?>
+    <?php include 'u_footer_2.php'; ?>
 </body>
 </html>

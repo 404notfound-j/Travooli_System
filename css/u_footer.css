@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Footer 1 Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.footer-container {
+    width: 100%;
+    background-color: #031E2F;
+    font-family: 'Nunito Sans', sans-serif;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    padding: 60px 120px 24px;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+/* Logo Section */
+.logo-section {
+    margin-right: 40px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 151px;
+    height: 41px;
+}
+
+.logo-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 27px;
+    color: #605DEC;
+    line-height: 1.5em;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    margin-left: 3px;
+}
+
+/* Footer Columns */
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 16px 16px 0;
+    min-width: 200px;
+}
+
+.column-header {
+    font-weight: 700;
+    font-size: 18px;
+    color: #7C8DB0;
+    margin-bottom: 8px;
+    line-height: 1.36em;
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    padding: 4px 0;
+}
+
+.footer-links a {
+    font-weight: 400;
+    font-size: 16px;
+    color: #6E7491;
+    text-decoration: none;
+    line-height: 1.36em;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #605DEC;
+}
+
+/* Mobile Column */
+.mobile-column {
+    width: 250px;
+}
+
+.app-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.app-store-link, .google-play-link {
+    display: flex;
+    align-items: center;
+    width: 135px;
+    height: 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    position: relative;
+}
+
+.app-store-img, .google-play-img {
+    width: 135px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* Footer Divider */
+.footer-divider {
+    width: 100%;
+    height: 1px;
+    background-color: #CBD4E6;
+    margin: 0;
+}
+
+/* Footer2 Styles */
+.footer-bottom {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 120px;
+    background-color: #031E2F;
+    font-family: 'Nunito Sans', sans-serif;
+}
+
+.social-media-container {
+    display: flex;
+    gap: 20px;
+    padding: 8px;
+}
+
+.social-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    transition: opacity 0.3s ease;
+}
+
+.social-icon:hover {
+    opacity: 0.7;
+}
+
+.copyright {
+    font-size: 18px;
+    font-weight: 400;
+    color: #7C8DB0;
+    line-height: 1.36em;
+    text-align: right;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .footer-content {
+        padding: 60px 60px 24px;
+    }
+    
+    .footer-bottom {
+        padding: 12px 60px;
+    }
+}
+
+@media (max-width: 992px) {
+    .footer-content {
+        padding: 40px 40px 24px;
+    }
+    
+    .footer-column {
+        min-width: 150px;
+    }
+    
+    .footer-bottom {
+        padding: 12px 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        padding: 40px 20px 24px;
+        gap: 20px;
+    }
+    
+    .logo-section {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+    
+    .footer-column {
+        width: 100%;
+        padding: 0;
+    }
+    
+    .footer-bottom {
+        flex-direction: column-reverse;
+        padding: 12px 20px;
+        gap: 12px;
+    }
+    
+    .copyright {
+        text-align: center;
+    }
+    
+    .social-media-container {
+        justify-content: center;
+    }
+} 
