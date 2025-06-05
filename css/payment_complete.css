@@ -1,0 +1,534 @@
+:root {
+--primary-color: #605dec;
+--background-color: #031e2f;
+--border-color: #e6e7ea;
+--grey-400: #7c8db0;
+--grey-600: #6e7491;
+}
+
+body {
+font-family: 'Nunito Sans', sans-serif;
+background-color: var(--background-color);
+}
+
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 4rem 3.5rem;
+}
+
+.title {
+    font: "Nunito Sans", sans-serif;
+    font-size: 26px;
+    color: #605DEC;
+}
+
+.reference {
+    font: "Nunito Sans", sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: #E6E8E9;
+    margin: 1rem 0;
+}
+
+.reference span {
+    color: #605DEC;
+}
+
+.description {
+    max-width: 756px;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #E6E8E9;
+}
+
+.description span {
+    color: #605DEC;
+}
+
+.layout {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.ticket {
+    flex: 1;
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid #eaeaea;
+    display: flex;
+    width: 856px;
+    height: 309px;
+    align-items: flex-start;
+}
+
+.flight-times {
+    width: 246px;
+    height: 309px;
+    background-color: #d2d4fb;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.departure, .arrival {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.departure h2, .arrival h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: #112211;
+}
+
+.departure p, .arrival p {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    color: rgba(17, 34, 17, 0.6);
+}
+
+.flight-path {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.line {
+    width: 2px;
+    height: 26px;
+    background-color: #112211;
+}
+
+.plane-icon {
+    font-size: 1.5rem;
+    color: #112211;
+}
+
+/* Boarding Pass */
+.boarding-pass {
+    flex: 1;
+    background: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.passenger-info {
+    background-color: var(--primary-color);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 100%;
+    object-fit: cover;
+}
+
+.passenger-info h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.class {
+    margin-left: auto;
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+.flight-details {
+    display: flex;
+    gap: 2rem;
+}
+
+.detail {
+    display: flex;
+    max-width: fit-content;
+    gap: 0.5rem;
+    padding: 1.5rem;
+}
+
+.icon {
+    width: 2rem;
+    height: 2rem;
+    background-color: #d2d4fb;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail p {
+    color: rgba(17, 34, 17, 0.6);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.detail span {
+    color: #112211;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.flight-code {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    position: relative;
+    padding-top: 24px;
+}
+
+.flight-code-content {
+    position: absolute;
+    top: 24px;
+    left: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.flight-code h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: #112211;
+}
+
+.flight-code p {
+    color: rgba(4, 47, 64, 0.6);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.barcode {
+    width: 248px;
+    height: 81px;
+    background-color: #d2d4fb;
+    margin-left: auto;
+}
+
+/* Price Breakdown */
+.price-breakdown {
+width: 404px;
+}
+
+.price-breakdown h3 {
+color: var(--primary-color);
+font-size: 1.5rem;
+margin-bottom: 1.5rem;
+font-weight: 700;
+}
+
+.price-items {
+display: flex;
+flex-direction: column;
+gap: 0.813rem;
+}
+
+.price-item, .price-total {
+display: flex;
+justify-content: space-between;
+font-size: 1.125rem;
+color: var(--text-color);
+}
+
+.price-total {
+border-top: 1px solid var(--border-color);
+border-bottom: 1px solid var(--border-color);
+padding: 0.75rem 0;
+margin-top: 1.5rem;
+font-weight: 600;
+}
+
+/* Action Buttons */
+.action-buttons {
+display: flex;
+gap: 1rem;
+justify-content: center;
+margin: 2rem auto;
+max-width: 856px;
+padding: 0 1rem;
+}
+
+.action-buttons button {
+flex: 1;
+padding: 0.75rem;
+font-family: 'DM Sans', sans-serif;
+font-weight: 600;
+font-size: 1rem;
+border-radius: 0.5rem;
+cursor: pointer;
+transition: all 0.3s ease;
+height: 48px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 0.5rem;
+}
+
+.download-btn {
+background-color: var(--primary-color);
+color: white;
+border: none;
+}
+
+.download-btn:hover {
+background-color: #4f4ed3;
+}
+
+.home-btn {
+background-color: transparent;
+color: var(--primary-color);
+border: 2px solid var(--primary-color);
+}
+
+.home-btn:hover {
+background-color: rgba(96, 93, 236, 0.1);
+}
+
+/* Ratings Section */
+.ratings {
+background: white;
+border-radius: 1rem;
+padding: 1rem;
+margin: 2rem auto;
+border: 1px solid var(--border-color);
+max-width: 856px;
+}
+
+.ratings p {
+color: #354259;
+font-family: 'DM Sans', sans-serif;
+font-weight: 600;
+font-size: 0.938rem;
+line-height: 1.25;
+margin-bottom: 1rem;
+}
+
+.stars {
+display: flex;
+gap: 0.625rem;
+margin-bottom: 1rem;
+}
+
+.star {
+color: #cbd4e6;
+font-size: 1.5rem;
+cursor: pointer;
+}
+
+.star:hover {
+color: #ffd700;
+}
+
+textarea {
+width: 100%;
+min-height: 160px;
+padding: 1rem;
+border: 1px solid var(--border-color);
+border-radius: 0.5rem;
+font-family: 'DM Sans', sans-serif;
+margin-bottom: 1rem;
+resize: vertical;
+}
+
+.rating-buttons {
+display: flex;
+gap: 0.75rem;
+}
+
+.rating-buttons button {
+flex: 1;
+padding: 0.75rem;
+border-radius: 0.25rem;
+font-family: 'DM Sans', sans-serif;
+font-weight: 600;
+font-size: 1rem;
+cursor: pointer;
+height: 48px;
+}
+
+.cancel-btn {
+background: white;
+border: 1px solid var(--border-color);
+color: #031330;
+}
+
+.submit-btn {
+background: #5e1ae6;
+border: none;
+color: white;
+}
+
+/* Footer */
+.footer {
+margin-top: auto;
+background-color: #031e2f;
+padding: 4rem 7.5rem 0;
+}
+
+.footer-content {
+display: flex;
+justify-content: space-between;
+margin-bottom: 1rem;
+}
+
+.footer-logo {
+display: flex;
+align-items: center;
+gap: 0.25rem;
+}
+
+.footer-logo h2 {
+font-family: 'Poppins', sans-serif;
+font-weight: 800;
+font-size: 27px;
+color: var(--primary-color);
+}
+
+.footer-links {
+display: flex;
+gap: 1.25rem;
+}
+
+.link-group {
+width: 200px;
+}
+
+.link-group h4 {
+color: var(--grey-600);
+margin-bottom: 0.5rem;
+font-size: 1.125rem;
+font-weight: 700;
+}
+
+.link-group ul {
+list-style: none;
+}
+
+.link-group a {
+color: var(--grey-400);
+text-decoration: none;
+font-size: 1rem;
+line-height: 2;
+}
+
+.app-buttons {
+display: flex;
+flex-direction: column;
+gap: 0.5rem;
+margin-top: 1rem;
+}
+
+.app-store, .google-play {
+width: 135px;
+height: 40px;
+background: black;
+border-radius: 4px;
+display: flex;
+align-items: center;
+justify-content: center;
+border: 1px solid #a1a1a1;
+}
+
+.app-store img, .google-play img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+
+.footer-bottom {
+border-top: 1px solid var(--grey-600);
+padding: 0.75rem 7.5rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+height: 64px;
+}
+
+.social-icons {
+display: flex;
+gap: 1.25rem;
+padding: 0.5rem;
+}
+
+.social-icons img {
+width: 24px;
+height: 24px;
+}
+
+.footer-bottom p {
+color: var(--grey-400);
+font-size: 1.125rem;
+}
+
+@media (max-width: 1200px) {
+.main-content {
+    flex-direction: column;
+    padding: 0 2rem;
+}
+
+.price-breakdown {
+    width: 100%;
+    max-width: 856px;
+    margin: 0 auto;
+}
+
+.footer {
+    padding: 4rem 2rem 0;
+}
+
+.footer-bottom {
+    padding: 0.75rem 2rem;
+}
+}
+
+@media (max-width: 768px) {
+.navigation ul {
+    display: none;
+}
+
+.booking-summary {
+    flex-direction: column;
+}
+
+.flight-times {
+    width: 100%;
+}
+
+.action-buttons {
+    flex-direction: column;
+}
+
+.footer-content {
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.footer-links {
+    flex-wrap: wrap;
+}
+
+.link-group {
+    width: calc(50% - 0.625rem);
+}
+}
