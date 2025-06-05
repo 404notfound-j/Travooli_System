@@ -1,0 +1,510 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;800&display=swap');
+
+body {
+  margin: 0;
+  background: #031E2F;
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif; /* Assuming Inter is also used or a fallback */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 27px;
+  color: #FFFFFF;
+}
+
+.navigation-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.nav-item {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #A4B0C7;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.nav-item.active {
+  color: #605DEC;
+}
+
+.signup-btn {
+  background-color: #605DEC;
+  color: #FAFAFA;
+  padding: 12px 20px;
+  border-radius: 4px;
+  border: none;
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column; /* Default to column for mobile first, adjust with media query */
+  align-items: center;
+  padding: 20px;
+  gap: 40px;
+}
+
+.booking-layout {
+  display: flex;
+  gap: 40px;
+  max-width: 1232px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.price-and-button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* Adjust gap as needed */
+  margin-left: 60px; /* Add left margin to shift it right */
+  /* Add any other necessary styling for alignment within booking-layout */
+}
+
+.passenger-info-section,
+.additional-info-section,
+.price-details-section {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0px 4px 16px 0px rgba(17, 34, 17, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* Reduced gap to bring elements closer */
+}
+
+.passenger-info-section h2,
+.additional-info-section h2,
+.price-details-section h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: #605DEC;
+  margin: 0;
+}
+
+.passenger-info-section strong {
+  font-weight: 600;
+  font-size: 20px;
+  color: #112211;
+  margin-top: 10px;
+}
+
+.info-box .info-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 2em;
+  color: #112211;
+  text-align: justify;
+  margin-bottom: 5px;
+  margin-top: 10px;
+}
+
+.passenger-list,
+.trip-details,
+.price-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.passenger-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid #605DEC;
+  border-radius: 4px;
+  padding: 10px 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+.edit-passenger-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #112211;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+.edit-passenger-btn:hover {
+  color: #605DEC; 
+}
+
+
+
+.passenger-item input[type="checkbox"] {
+  margin-left: 15px;
+  width: 20px; 
+  height: 20px; 
+}
+
+.passenger-details {
+  display: flex;
+  flex-direction: column; 
+  gap: 1px;
+}
+
+.passenger-type {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #6E7491;
+}
+
+.passenger-name {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #112211;
+}
+
+.save-btn {
+  background-color: #605DEC;
+  color: #FAFAFA;
+  padding: 12px 20px;
+  border-radius: 4px;
+  border: none;
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.add-passenger-btn {
+  background-color: #605DEC;
+  color: #FFFFFF;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.3s ease; 
+  margin-top: 20px;
+}
+
+.add-passenger-btn:hover {
+  background-color: #7d83ff; 
+}
+
+.trip-segment {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.segment-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.depart-btn,
+.return-btn {
+  background-color: #DFDFFB;
+  color: #605DEC;
+  padding: 12px 20px;
+  border-radius: 4px;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.route {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #112211;
+}
+
+.passenger-addons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.passenger-addon-item {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  border: 1px solid #605DEC;
+  border-radius: 4px;
+  padding: 7px 0px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.passenger-addon-item .passenger-name {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #112211;
+  margin-left: 17px;
+}
+
+.addon-details {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.addon-type {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #605DEC;
+}
+
+.addon-value {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #6E7491;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.item-name {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #112211;
+}
+
+.item-price {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #112211;
+}
+
+.total-price {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.total-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #112211;
+}
+
+.total-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 25px;
+  color: #605DEC;
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%; 
+}
+.select-seats-btn {
+  background-color: #605DEC;
+  color: #FAFAFA;
+  padding: 12px 20px;
+  border-radius: 4px;
+  border: none;
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; 
+}
+.select-seats-btn:hover {
+  background-color: #7d83ff;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  padding: 16px 0px;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.footer hr {
+  border: 0;
+  border-top: 1px solid #CBD4E6;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 120px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 1440px;
+}
+
+.social-media {
+  display: flex;
+  gap: 20px;
+  padding: 8px;
+}
+
+.copyright {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: #7C8DB0;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .main-content {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 40px;
+  }
+
+  .booking-layout {
+    margin-left: 50px; 
+  }
+
+  .travel-info-container {
+    flex-direction: column;
+    gap: 40px; 
+  }
+
+  .passenger-info-section,
+  .additional-info-section {
+      max-width: 850px;
+  }
+
+  .price-details-section {
+      width: 450px;
+      max-width: 450px; 
+  }
+}
+
+.travel-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.passenger-details {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  gap: -20px;
+}
+
+.passenger-name,
+.passenger-type {
+  display: block;
+}
+
+.passenger-item button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #112211;
+  font-size: 18px;
+}
+/* Hidden by default */
+.hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* Overlay blur */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+
+/* Popup box */
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+}
+
+/* Close button */
+.close-popup {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+

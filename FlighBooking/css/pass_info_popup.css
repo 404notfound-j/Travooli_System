@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Popup Styles for all popups */
+.popup-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #1122110d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.popup {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 16px 0px rgba(17, 34, 17, 0.05);
+    width: 959px;
+    max-width: 95vw;
+    padding: 24px;
+    position: relative;
+}
+.popup-container {
+    width: 900px;
+    margin: 0 auto;
+}
+.popup-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+.popup-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 25px;
+    color: #605DEC;
+    margin-bottom: 16px;
+}
+.popup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.popup-form-row {
+    display: flex;
+    gap: 16px;
+}
+.popup-form-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.popup-form-col-gender,
+.popup-form-col-dob,
+.popup-form-col-country {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+}
+.popup-label {
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.364em;
+    color: #7C8DB0;
+    margin-bottom: 4px;
+    text-align: left;
+    padding-left: 2px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+}
+.popup-input, .popup-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #A1B0CC;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: 'Nunito Sans', sans-serif;
+    background-color: #FFFFFF;
+    box-sizing: border-box;
+    height: 48px;
+}
+.popup-input:focus, .popup-select:focus {
+    border-color: #605DEC;
+    outline: none;
+}
+.popup-helper {
+    font-size: 12px;
+    color: #7C8DB0;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 2px;
+}
+.popup-divider {
+    width: 900px;
+    height: 1px;
+    flex-shrink: 0;
+    background-color: #112211;
+    opacity: 0.25;
+    margin: 23px 0;
+}
+.popup-note {
+    background: rgba(233, 232, 252, 0.85);
+    border-radius: 4px;
+    padding: 16px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #112211;
+    margin-bottom: 24px;
+}
+.popup-note ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+.popup-note li {
+    margin-bottom: 8px;
+}
+.popup-note li:last-child {
+    margin-bottom: 0;
+}
+.popup-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+.popup-save-btn {
+    background: #605DEC;
+    color: #FAFAFA;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-size: 18px;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    height: 48px;
+}
+
+.popup-save-btn:hover {
+    background-color: #1513A0;
+    box-shadow: 0 4px 8px #605dec4d;
+}
+
+.popup-warning {
+    background-color: #ffe0e0;
+    color: #a10000;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ffaaaa;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+
+@media (max-width: 700px) {
+    .popup-form-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
