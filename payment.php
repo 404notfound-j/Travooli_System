@@ -27,7 +27,7 @@
                         <div class="payment-methods">
                             <div class="payment-method selected">
                                 <div class="method-content">
-                                    <img src="/duotone-creditcard.svg" alt="Credit Card" class="method-icon">
+                                    <img src="icon/card.svg" alt="Credit Card" class="method-icon">
                                     <div class="method-name">Debit/Credit Card</div>
                                 </div>
                                 <div class="radio-button selected"></div>
@@ -37,7 +37,7 @@
                             
                             <div class="payment-method">
                                 <div class="method-content">
-                                    <img src="/18---google.svg" alt="Google Pay" class="method-icon">
+                                    <img src="icon/google.svg" alt="Google Pay" class="method-icon">
                                     <div class="method-name">Google Pay</div>
                                 </div>
                                 <div class="radio-button"></div>
@@ -47,7 +47,7 @@
                             
                             <div class="payment-method">
                                 <div class="method-content">
-                                    <img src="/18---apple-mac.svg" alt="Apple Pay" class="method-icon">
+                                    <img src="icon/apple.svg" alt="Apple Pay" class="method-icon">
                                     <div class="method-name">Apple Pay</div>
                                 </div>
                                 <div class="radio-button"></div>
@@ -57,7 +57,7 @@
                             
                             <div class="payment-method">
                                 <div class="method-content">
-                                    <img src="/image-9.png" alt="PayPal" class="method-icon">
+                                    <img src="icon/paypal.svg" alt="PayPal" class="method-icon">
                                     <div class="method-name">Paypal</div>
                                 </div>
                                 <div class="radio-button"></div>
