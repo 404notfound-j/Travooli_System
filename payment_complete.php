@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,500,600,700,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -22,7 +24,7 @@
           A copy of your booking confirmation has been sent to your email address. You can always revisit this information in the My Trips section of our app. Safe travels!
       </p>
 
-      <div class="layout">
+      <section class="layout">
         <div class="ticket">
           <div class="flight-times">
             <div class="departure">
@@ -115,41 +117,56 @@
               <span>RM 121</span>
             </div>
             <div class="price-total">
-              <span>Amount paid</span>
+              <span>Amount Paid</span>
               <span>RM 491</span>
           </div>
         </div>
-      </div>
-    </main>
+      </section>
 
-    <!-- Action Buttons -->
-    <section class="action-buttons">
-      <button class="download-btn">
-        <i class="fas fa-download"></i>
-        Download Ticket
-      </button>
-      <button class="home-btn">
-        <i class="fas fa-home"></i>
-        Back to Homepage
-      </button>
-    </section>
-
+      <section class="action-buttons">
+        <div class="share-btn">
+          <img src="icon/share.svg" alt="btn"> 
+        </div>
+        <button class="download-btn">
+          Download
+        </button>
+        <button class="home-btn">
+          Back to Homepage
+        </button>
+      </section>
     <!-- Ratings Section -->
-    <section class="ratings">
-      <p>Your feedback matters to us. Let us know how we can improve your experience.</p>
-      <div class="stars">
-        <i class="fas fa-star star"></i>
-        <i class="fas fa-star star"></i>
-        <i class="fas fa-star star"></i>
-        <i class="fas fa-star star"></i>
-        <i class="fas fa-star star"></i>
-      </div>
-      <textarea placeholder="Share your thoughts..."></textarea>
-      <div class="rating-buttons">
-        <button class="cancel-btn">Cancel</button>
-        <button class="submit-btn">Submit</button>
-      </div>
-    </section>
+
+      <section class="ratings">
+        <p>Your feedback matters to us. Let us know how we can improve your experience.</p>
+        <div class="stars">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+        <textarea placeholder="Share your thoughts..."></textarea>
+        <div class="rating-buttons">
+          <button class="cancel-btn">Cancel</button>
+          <button class="submit-btn">Submit</button>
+        </div>
+      </section>
+
+      <section class ="cancel-flight">
+        <h1>Cancellation Policy</h1>
+        <p>
+          This flight has a flexible cancellation policy. If you cancel or change your flight up to 24 hours before the departure date, you may be eligible for a refund or minimal fees, depending on your ticket type. Refundable ticket holders are entitled to a full or partial refund.
+        </p>
+        <p>
+          All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.
+        </p> 
+        <button class="cancel-flight-btn">
+          Cancel Flight
+        </button>
+      </section>
+    </main>
   </div>
+  <?php include 'u_footer_1.php'; ?>
+  <?php include 'u_footer_2.php'; ?>
 </body>
 </html>

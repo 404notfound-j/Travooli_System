@@ -1,0 +1,433 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Nunito Sans', Helvetica, sans-serif;
+    background-color: #031e2f;
+    color: #000000;
+}
+
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 4rem 3.5rem;
+}
+
+.content-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 190px;
+}
+
+@media (min-width: 1024px) {
+    .content-grid {
+        flex-direction: row;
+        gap: 32px;
+    }
+    
+    .left-column {
+        flex: 1;
+    }
+    
+    .right-column {
+        width: 450px;
+    }
+}
+
+/* Left Column Styles */
+.section-title {
+    font-family: 'Nunito Sans', Helvetica;
+    font-weight: 700;
+    font-size: 24px;
+    color: #605dec;
+    margin-bottom: 16px;
+}
+
+.section-description {
+    font-family: 'Nunito Sans', Helvetica;
+    font-weight: 400;
+    font-size: 18px;
+    color: #e6e8e9;
+    margin-bottom: 32px;
+    max-width: 682px;
+    line-height: 1.5;
+}
+
+/* Payment Methods */
+.payment-methods-card {
+    background-color: #ffffff;
+    border: 1px solid #e4e7e9;
+    border-radius: 15px;
+    margin-bottom: 32px;
+    overflow: hidden;
+}
+
+.payment-methods {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.payment-method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    width: 126px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.payment-method:hover {
+    background-color: #f8f9fa;
+}
+
+.payment-method.selected {
+    background-color: #f0f0ff;
+}
+
+.method-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.method-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.method-name {
+    font-family: 'Nunito Sans', Helvetica;
+    font-weight: 700;
+    color: #191c1f;
+    font-size: 14px;
+    text-align: center;
+    width: 160px;
+}
+
+.radio-button {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.radio-button.selected {
+    border-color: #605dec;
+}
+
+.radio-button.selected::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: #605dec;
+    border-radius: 50%;
+}
+
+.method-divider {
+    width: 1px;
+    height: 96px;
+    background-color: #e4e7e9;
+    align-self: center;
+}
+
+/* Card Details */
+.card-details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.card-details-title {
+    font-family: 'Nunito Sans', Helvetica;
+    font-weight: 700;
+    font-size: 24px;
+    color: #605dec;
+}
+
+.save-card-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+}
+
+.switch-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #bcbaf7;
+    border: 1px solid #605dec;
+    border-radius: 24px;
+    transition: 0.4s;
+}
+
+.switch-label:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+.switch-input:checked + .switch-label {
+    background-color: #605dec;
+}
+
+.switch-input:checked + .switch-label:before {
+    transform: translateX(20px);
+}
+
+.save-card-text {
+    font-family: 'Nunito Sans', Helvetica;
+    font-weight: 400;
+    font-size: 16px;
+    color: #6e7491;
+    cursor: pointer;
+}
+
+/* Form Styles */
+.card-form {
+    max-width: 480px;
+    margin-bottom: 40px;
+}
+
+.form-input {
+    width: 100%;
+    height: 48px;
+    padding: 8px 12px;
+    background-color: #ffffff;
+    border: 1px solid #a1afcc;
+    border-radius: 4px;
+    font-family: 'Nunito Sans', Helvetica;
+    font-size: 18px;
+    color: #7b8db0;
+    margin-bottom: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #605dec;
+}
+
+.form-input::placeholder {
+    color: #7b8db0;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.expiry-field {
+    width: 240px;
+}
+
+.field-hint {
+    padding: 2px 4px;
+    font-family: 'Nunito Sans', Helvetica;
+    font-size: 12px;
+    color: #7c8db0;
+    margin-top: -12px;
+    margin-bottom: 16px;
+}
+
+.cvv-field {
+    flex: 1;
+}
+
+.cvv-input-wrapper {
+    position: relative;
+}
+
+.cvv-icon {
+    position: absolute;
+    right: 12px;
+    top: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.info-circle {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    top: 7px;
+    left: 7px;
+    border-radius: 9px;
+    border: 2px solid #6d7391;
+}
+
+.info-icon {
+    position: absolute;
+    width: 2px;
+    height: 9px;
+    top: 2px;
+    left: 6px;
+}
+
+/* Policy Section */
+.policy-title {
+    font-family: 'Nunito Sans', Helvetica;
+    font-weight: 600;
+    font-size: 18px;
+    color: #605dec;
+    margin-bottom: 16px;
+}
+
+.policy-content {
+    max-width: 682px;
+    margin-bottom: 40px;
+}
+
+.policy-text {
+    font-family: 'Nunito Sans', Helvetica;
+    font-weight: 400;
+    font-size: 16px;
+    color: #7b8db0;
+    text-align: justify;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.highlight {
+    color: #605dec;
+}
+
+.back-button-container {
+    margin-top: 40px;
+}
+
+.back-button {
+    height: 48px;
+    padding: 12px 20px;
+    border: 1px solid #605dec;
+    background-color: transparent;
+    color: #605dec;
+    border-radius: 4px;
+    font-family: 'Nunito Sans', Helvetica;
+    font-weight: 400;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #605dec;
+    color: white;
+}
+
+/* Right Column - Price Card */
+.price-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    color: var(--blackish-green);
+    box-shadow: var(--cards-shadow);
+}
+
+.price-card h2 {
+    color: var(--purple-blue);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.price-card p {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 650;
+    margin-top: 1rem;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.price-item span:first-child {
+    font-weight: 400;
+}
+
+.price-item span:last-child {
+    font-weight: 600;
+}
+
+hr {
+    border-top: 1px solid rgba(17, 34, 17, 0.25);
+    margin: 1rem 0;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total span:first-child {
+    font-weight: 500;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.total span:last-child {
+    color: var(--purple-blue);
+    font-size: 25px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.proceed-btn {
+    width: 100%;
+    max-width: 200px;
+    background-color: var(--purple-blue);
+    color: var(--grey-100);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-top: 2rem;
+    cursor: pointer;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    float: right;
+    transition: background-color 0.2s ease;
+}
+
+.proceed-btn:hover {
+    background-color: #4f4cee;
+}
