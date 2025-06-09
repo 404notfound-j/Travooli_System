@@ -100,9 +100,6 @@
                                 <div class="cvv-input-wrapper">
                                     <input type="text" class="form-input" placeholder="CVV">
                                     <div class="cvv-icon">
-                                        <div class="info-circle">
-                                            <img src="/union.svg" alt="Info" class="info-icon">
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -110,31 +107,19 @@
                     </div>
 
                     <!-- Cancellation Policy -->
-                    <h4 class="policy-title">Cancellation policy</h4>
-                    
-                    <div class="policy-content">
-                        <p class="policy-text">
-                            This flight has a flexible cancellation policy. If you cancel or
-                            change your flight up to 24 hours before the departure date, you
-                            may be eligible for a refund or minimal fees, depending on your
-                            ticket type. Refundable ticket holders are entitled to a full or
-                            partial refund.
+                    <div class ="cancel-flight">
+                        <h1>Cancellation Policy</h1>
+                        <p>
+                        This flight has a flexible cancellation policy. If you cancel or change your flight up to 24 hours before the departure date, you may be eligible for a refund or minimal fees, depending on your ticket type. Refundable ticket holders are entitled to a full or partial refund.
                         </p>
-                        <p class="policy-text">
-                            All bookings made through 
-                            <span class="highlight">Travel Safe International</span> 
-                            are backed by our satisfaction guarantee. However, cancellation
-                            policies may vary based on the airline and ticket type. For full
-                            details, please review the cancellation policy for this flight
-                            during the booking process.
-                        </p>
-                    </div>
-
-                    <div class="back-button-container">
-                        <button class="back-button">Back to seat select</button>
+                        <p>
+                        All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.
+                        </p> 
+                        <div class="back-button-container">
+                            <button class="back-button">Back to Seat Selection</button>
+                        </div>
                     </div>
                 </div>
-
                 <!-- Right Column -->
                 <div class="right-column">
                     <div class="price-card">

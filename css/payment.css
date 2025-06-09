@@ -1,3 +1,10 @@
+:root {
+    --purple-blue: #605dec;
+    --blackish-green: #112211;
+    --grey-100: #fafafa;
+    --grey-400: #7c8db0;
+}
+
 body {
     font-family: 'Nunito Sans', Helvetica, sans-serif;
     background-color: #031e2f;
@@ -18,7 +25,7 @@ body {
 
 .content-grid {
     flex-direction: row;
-    gap: 32px;
+    gap: 190px;;
 }
 
 .left-column {
@@ -28,6 +35,9 @@ body {
 
 .right-column {
     width: 450px;
+    position: sticky;
+    align-self: flex-start;
+    top: 2rem;
 }
 
 
@@ -35,52 +45,50 @@ body {
 .section-title {
     font-family: 'Nunito Sans', Helvetica;
     font-weight: 700;
-    font-size: 24px;
+    font-size: 26px;
     color: #605dec;
     margin-bottom: 16px;
 }
 
 .section-description {
-    font-family: 'Nunito Sans', Helvetica;
-    font-weight: 400;
+    max-width: 858px;
+    margin-bottom: 2rem;
     font-size: 18px;
+    line-height: 1.6;
     color: #e6e8e9;
-    margin-bottom: 32px;
-    max-width: 682px;
-    line-height: 1.5;
 }
 
 /* Payment Methods */
 .payment-methods-card {
+    padding: 0 0.5rem;
     background-color: #ffffff;
     border: 1px solid #e4e7e9;
     border-radius: 15px;
-    margin-bottom: 32px;
-    overflow: hidden;
+    justify-content: center;
+    margin-bottom: 1rem;
 }
 
 .payment-methods {
     display: flex;
+    flex-direction: row;
+    width: fit-content;
     flex-wrap: wrap;
 }
-
 .payment-method {
+    width: 130px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 24px;
-    width: 126px;
+    margin: 0;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    box-sizing: border-box;
 }
 
 .payment-method:hover {
     background-color: #f8f9fa;
-}
-
-.payment-method.selected {
-    background-color: #f0f0ff;
 }
 
 .method-content {
@@ -276,54 +284,36 @@ body {
     overflow: hidden;
 }
 
-.info-circle {
-    position: relative;
-    width: 18px;
-    height: 18px;
-    top: 7px;
-    left: 7px;
-    border-radius: 9px;
-    border: 2px solid #6d7391;
-}
-
-.info-icon {
-    position: absolute;
-    width: 2px;
-    height: 9px;
-    top: 2px;
-    left: 6px;
-}
-
 /* Policy Section */
-.policy-title {
-    font-family: 'Nunito Sans', Helvetica;
-    font-weight: 600;
-    font-size: 18px;
-    color: #605dec;
-    margin-bottom: 16px;
-}
-
-.policy-content {
+.cancel-flight{
+    margin: 2.5rem 0;
     max-width: 682px;
-    margin-bottom: 40px;
 }
 
-.policy-text {
-    font-family: 'Nunito Sans', Helvetica;
-    font-weight: 400;
+.cancel-flight h1{
+    line-height: 0;
+    color: #605DEC;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+}
+
+.cancel-flight p{
+    color: #7C8DB0;
+    font-family: "Nunito Sans";
     font-size: 16px;
-    color: #7b8db0;
-    text-align: justify;
-    line-height: 1.6;
-    margin-bottom: 8px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin-bottom: 0.8rem;
 }
 
-.highlight {
-    color: #605dec;
+.cancel-flight span{
+    color: #605DEC;
 }
 
 .back-button-container {
-    margin-top: 40px;
+    margin-top: 1.5rem;
 }
 
 .back-button {
@@ -347,6 +337,7 @@ body {
 
 /* Right Column - Price Card */
 .price-card {
+    position: fix;
     background: white;
     padding: 1.5rem;
     border-radius: 16px;
