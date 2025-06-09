@@ -177,9 +177,30 @@ $hotel = $hotels[$hotel_id] ?? $hotels[1];
     </div>
     <hr class="hotel-details-divider">
     <h2 class="hotel-details-section-title">Reviews</h2>
-    <div class="hotel-details-reviews-summary-row">
-        <div class="hotel-details-reviews-score">4.2</div>
-        <div class="hotel-details-reviews-label">Very good</div>
+    <div class="hotel-details-reviews-summary-row" style="display: flex; align-items: flex-start; gap: 28px;">
+        <div class="hotel-details-reviews-score" style="margin-top: 0.5rem;"><?php echo $hotel['rating']; ?></div>
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div class="hotel-details-reviews-stars">
+                <?php
+                $fullStars = floor($hotel['rating']);
+                $halfStar = ($hotel['rating'] - $fullStars) >= 0.25 && ($hotel['rating'] - $fullStars) < 0.75 ? 1 : 0;
+                $emptyStars = 5 - $fullStars - $halfStar;
+                for ($i = 0; $i < $fullStars; $i++) {
+                    echo '<span style="color:#605DEC;font-size:2rem;">★</span>';
+                }
+                if ($halfStar) {
+                    echo '<span style="color:#605DEC;font-size:2rem;position:relative;display:inline-block;width:1.2em;">'
+                        .'<span style="position:absolute;left:0;width:50%;overflow:hidden;">★</span>'
+                        .'<span style="color:#B2B7FF;">★</span>'
+                        .'</span>';
+                }
+                for ($i = 0; $i < $emptyStars; $i++) {
+                    echo '<span style="color:#B2B7FF;font-size:2rem;">★</span>';
+                }
+                ?>
+            </div>
+            <div class="hotel-details-reviews-label" style="margin-top:2px;"><?php echo $hotel['review_label']; ?></div>
+        </div>
     </div>
     <div class="hotel-details-reviews-list">
         <div class="hotel-details-review-item">
