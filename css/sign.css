@@ -6,12 +6,25 @@ body, html {
 
 .signin-bg {
     min-height: 100vh;
-    width: 100vw;
-    background: url('../background/Map.png') no-repeat center center fixed;
+    width: 100%;
+    background: #1a2332 url('../background/Map.png') no-repeat center center;
     background-size: cover;
+    background-attachment: local;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+
+.signin-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(82, 82, 122, 0.2);
+    z-index: 1;
 }
 
 .signin-container {
@@ -29,6 +42,7 @@ body, html {
     position: relative;
     box-sizing: border-box;
     justify-content: flex-start;
+    z-index: 2;
 }
 
 .signin-logo {
@@ -64,7 +78,7 @@ body, html {
 }
 
 .signin-form input {
-    padding: 10px 14px;
+    padding: 20px 14px;
     border: none;
     border-radius: 6px;
     font-size: 15px;
