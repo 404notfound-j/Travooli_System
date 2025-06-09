@@ -1,12 +1,7 @@
-* {
-    margin: 0;
-    padding: 0;
-}
-
 body {
     font-family: 'Nunito Sans', Helvetica, sans-serif;
     background-color: #031e2f;
-    color: #000000;
+    color: #ffffff;
 }
 
 .container {
@@ -21,20 +16,20 @@ body {
     gap: 190px;
 }
 
-@media (min-width: 1024px) {
-    .content-grid {
-        flex-direction: row;
-        gap: 32px;
-    }
-    
-    .left-column {
-        flex: 1;
-    }
-    
-    .right-column {
-        width: 450px;
-    }
+.content-grid {
+    flex-direction: row;
+    gap: 32px;
 }
+
+.left-column {
+    max-width: 690px;
+    flex: 1;
+}
+
+.right-column {
+    width: 450px;
+}
+
 
 /* Left Column Styles */
 .section-title {

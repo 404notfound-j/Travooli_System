@@ -22,7 +22,7 @@
                         Select a payment method below. Tripma processes your payment
                         securely with end-to-end encryption.
                     </p>
-                    
+
                     <div class="payment-methods-card">
                         <div class="payment-methods">
                             <div class="payment-method selected">
@@ -67,7 +67,7 @@
                             
                             <div class="payment-method">
                                 <div class="method-content">
-                                    <img src="/group.png" alt="Amazon Pay" class="method-icon">
+                                    <img src="icon/amazonpay.svg" alt="Amazon Pay" class="method-icon">
                                     <div class="method-name">Amazon Pay</div>
                                 </div>
                                 <div class="radio-button"></div>
