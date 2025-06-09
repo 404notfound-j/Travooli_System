@@ -76,6 +76,7 @@ a {
     align-items: center;
     padding: 8px 0 160px;
     position: relative;
+    overflow: visible;
 }
 
 .hero-content {
@@ -102,6 +103,7 @@ a {
 /* Flight Search Styles */
 .flight-search {
     display: flex;
+    align-items: center;
     width: 1200px;
     background: #FFFFFF;
     border: 1px solid #CBD4E6;
@@ -115,17 +117,32 @@ a {
     bottom: 120px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 100;
 }
 
 .search-input {
     flex: 1;
-    border-right: 1px solid #CBD4E6;
     height: 100%;
     position: relative;
+    z-index: 1;
+    overflow: visible;
 }
 
-.search-input:last-of-type {
-    border-right: none;
+/* Divider Styles */
+.divider {
+    width: 1px;
+    height: 100%;
+    background: #CBD4E6;
+    flex-shrink: 0;
+}
+
+/* Date Picker Wrapper */
+.date-picker-wrapper {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+    overflow: visible;
 }
 
 .input-group {
@@ -154,6 +171,7 @@ input {
     height: 100%;
     background-color: transparent;
     transition: background 0.3s;
+    cursor: pointer;
 }
 
 .input-border {
@@ -179,8 +197,111 @@ input:focus ~ .input-border {
     width: 100%;
 }
 
+.search-input.active {
+    z-index: 9999;
+    overflow: visible;
+}
+
+/* Airport Dropdown Styles */
+.airport-dropdown, .date-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #CBD4E6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0px 8px 24px rgba(27, 59, 119, 0.1),
+                0px 16px 40px rgba(6, 47, 125, 0.08);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 9999;
+    display: none;
+}
+
+.airport-dropdown.show, .date-dropdown.show {
+    display: block;
+}
+
+.airport-option {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #F5F7FA;
+    transition: background-color 0.2s ease;
+}
+
+.airport-option:last-child {
+    border-bottom: none;
+}
+
+.airport-option:hover {
+    background-color: #F8FAFC;
+}
+
+.airport-option.selected {
+    background-color: #EEF4FF;
+    border-left: 3px solid #5891ff;
+}
+
+.airport-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.airport-city {
+    font-weight: 600;
+    font-size: 16px;
+    color: #1E293B;
+}
+
+.airport-code {
+    font-weight: 600;
+    font-size: 14px;
+    color: #5891ff;
+    background-color: #EEF4FF;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.airport-name {
+    font-size: 13px;
+    color: #64748B;
+    margin-top: 2px;
+}
+
+/* Active input styling when dropdown is open */
+.search-input.active .input-border {
+    width: 100%;
+}
+
+.search-input.active input {
+    background: rgba(73, 133, 224, 0.08);
+}
+
+/* Dropdown scroll styling */
+.airport-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.airport-dropdown::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+
+.airport-dropdown::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 3px;
+}
+
+.airport-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
 .search-btn {
     white-space: nowrap;
+    z-index: 1000;
     padding: 0 30px;
     transition: all 0.3s ease;
     background-color: #605DEC;
@@ -710,4 +831,409 @@ input:focus ~ .input-border {
 .testimonial-header.animate {
     opacity: 1;
     transform: translateY(0);
+}
+
+.search-input.active {
+    z-index: 10000;
+}
+
+/* Date Picker Styles */
+.icon-calendar {
+    font-size: 16px;
+    color: #6E7491;
+}
+
+.date-picker-dropdown {
+    position: absolute;
+    top: -20px;
+    left: -208px;
+    background: #FFFFFF;
+    border: 1px solid #CBD4E6;
+    border-radius: 12px;
+    box-shadow: 0px 12px 24px rgba(27, 59, 119, 0.05),
+                0px 24px 60px rgba(6, 47, 125, 0.05),
+                0px 2px 4px rgba(7, 4, 146, 0.1);
+    width: 784px;
+    z-index: 10002;
+    display: none;
+}
+
+.date-picker-dropdown.show {
+    display: block;
+}
+
+.date-picker-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Field Section */
+.field-section {
+    height: 88px;
+    padding: 0;
+}
+
+.trip-options {
+    display: flex;
+    align-items: center;
+    gap: 29px;
+    padding: 20px 24px;
+    height: 100%;
+}
+
+/* Radio Group */
+.radio-group {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.radio-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #6E7491;
+    border-radius: 50%;
+    appearance: none;
+    position: relative;
+    background: #FFFFFF;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"]:checked {
+    border-color: #6E7491;
+}
+
+.radio-option input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: #605DEC;
+    border-radius: 50%;
+}
+
+.radio-option label {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: #6E7491;
+    cursor: pointer;
+}
+
+/* Date Fields */
+.date-fields {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.date-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    width: 195px;
+    height: 48px;
+    background: #FFFFFF;
+    border: 1px solid #CBD4E6;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.date-field.focused {
+    border: 2px solid #605DEC;
+}
+
+.date-field i {
+    font-size: 16px;
+    color: #6E7491;
+}
+
+.date-field input {
+    border: none;
+    outline: none;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 18px;
+    color: #7C8DB0;
+    background: transparent;
+    width: 100%;
+    height: 32px;
+    cursor: pointer;
+}
+
+/* Done Button */
+.btn-done {
+    background: #605DEC;
+    color: #FAFAFA;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    height: 48px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-done:hover {
+    background: #4845CC;
+}
+
+/* Calendar Divider */
+.calendar-divider {
+    height: 1px;
+    background: #CBD4E6;
+    width: 100%;
+}
+
+/* Calendar Section */
+.calendar-section {
+    padding: 8px 8px 16px;
+}
+
+.calendar-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 38px;
+}
+
+.nav-btn {
+    width: 32px;
+    height: 32px;
+    background: #EEEEEE;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.nav-btn i {
+    font-size: 14px;
+    color: #6E7491;
+}
+
+.nav-btn:hover {
+    background: #E0E0E0;
+}
+
+/* Calendar Months */
+.calendar-months {
+    display: flex;
+    gap: 0;
+}
+
+.calendar-month {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+}
+
+.month-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.month-year {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000000;
+    flex: 1;
+}
+
+/* Date Grid */
+.date-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.calendar-row {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+.header-row .calendar-date {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #27273F;
+    text-align: center;
+}
+
+.calendar-date {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: #27273F;
+    cursor: pointer;
+    border-radius: 4px;
+    position: relative;
+}
+
+.calendar-date.day-header {
+    cursor: default;
+    color: #27273F;
+    font-weight: 600;
+}
+
+.calendar-date.available {
+    color: #27273F;
+}
+
+.calendar-date.available:hover {
+    background: #F0F0F0;
+}
+
+.calendar-date.adjacent-month {
+    color: #7C8DB0;
+}
+
+.calendar-date.selected {
+    background: #605DEC;
+    color: #FFFFFF;
+}
+
+.calendar-date.in-range {
+    background: rgba(96, 93, 236, 0.1);
+    color: #605DEC;
+}
+
+/* Active States */
+.date-picker-wrapper.active {
+    z-index: 10002;
+}
+
+.date-picker-wrapper.active .date-picker-dropdown {
+    display: block;
+} 
+
+/* Passenger Dropdown Styles */
+.passenger-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #CBD4E6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0px 8px 24px rgba(27, 59, 119, 0.1),
+                0px 16px 40px rgba(6, 47, 125, 0.08);
+    z-index: 9999;
+    display: none;
+}
+
+.passenger-dropdown.show {
+    display: block;
+}
+
+.passenger-container {
+    padding: 16px;
+}
+
+.passenger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.passenger-row:not(:last-child) {
+    border-bottom: 1px solid #F5F7FA;
+    margin-bottom: 8px;
+    padding-bottom: 16px;
+}
+
+.passenger-label {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: #6E7491;
+    flex: 1;
+}
+
+.passenger-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.counter-btn {
+    width: 32px;
+    height: 32px;
+    background: #FAFAFA;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.counter-btn:hover {
+    background: #F0F0F0;
+}
+
+.counter-btn.disabled {
+    background: #F5F7FA;
+    color: #CBD4E6;
+    cursor: not-allowed;
+}
+
+.counter-btn i {
+    font-size: 12px;
+    color: #605DEC;
+}
+
+.counter-btn.disabled i {
+    color: #CBD4E6;
+}
+
+.counter-value {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: #6E7491;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Active States for Passenger Section */
+#passengerSection.active {
+    z-index: 10000;
+}
+
+#passengerSection.active .input-border {
+    width: 100%;
+}
+
+#passengerSection.active input {
+    background: rgba(73, 133, 224, 0.08);
 } 
