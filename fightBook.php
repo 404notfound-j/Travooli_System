@@ -311,7 +311,7 @@
 </div>
 
 <script src="js/flightBook.js"> </script>
-
+<script src="js/script.js"> </script>
 </body>
 </html>
 
