@@ -9,9 +9,9 @@
 </head>
 <body>
   <header>
-    <?php include 'header.php'; ?>
+    <?php include 'userHeader.php'; ?>
   </header>
-  <div class="container">
+  <div class="Flight-Container">
     <div class="title-section">
       <div>
       <h2 id="flight-airline-plane">Loading flight info...</h2>
@@ -104,8 +104,9 @@
         </div>
       </div>
     </div>
-    <?php include 'feedbackFlight.php'; ?>
-
+</div>
+    <?php include 'feedback.php'; ?>
+    <?php include 'u_footer_1.php'; ?>
 <script src="js/flightDetails.js"></script>
 
 <!-- The script for highlighting seat class buttons can remain or be moved to flightDetails.js -->

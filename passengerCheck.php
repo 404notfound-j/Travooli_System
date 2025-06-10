@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-    <?php include 'header.php'; ?>
+    <?php include 'userHeader.php'; ?>
     </header>
     <div class="main-content">
         <div class="booking-layout">
@@ -68,67 +68,71 @@
                                  <button class="depart-btn">Depart</button>
                                 <span class="route">Kuala Lumpur - Penang</span>
                             </div>
-                            <div class="passenger-addons">
-                                <div class="passenger-addon-item">
-                                     <div class="passenger-name">James Doe</div>
-                                     <div class="addon-details">
-                                         <span class="addon-type">Meal Add-on</span>
-                                         <span class="addon-value">Multi-meal</span>
-                                          <!-- Edit icon placeholder -->
-                                    </div>
-                                     <div class="addon-details">
-                                         <span class="addon-type">Additional Baggage</span>
-                                         <span class="addon-value">1piece, 25kg</span>
-                                          <!-- Edit icon placeholder -->
-                                    </div>
+                            <div class="passenger-addon-item">
+                                <div class="addons-row">
+                                <div class="passenger-name">James Doe</div>
+                                <div class="addon-details">
+                                    <span class="addon-type">Meal Add-on</span>
+                                    <span class="addon-value">Multi-meal</span>
+                                    <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
-                                 <div class="passenger-addon-item">
-                                     <div class="passenger-name">Peter Doe</div>
-                                     <div class="addon-details">
-                                         <span class="addon-type">Meal Add-on</span>
-                                         <span class="addon-value">Multi-meal</span>
-                                          <!-- Edit icon placeholder -->
-                                    </div>
-                                     <div class="addon-details">
-                                         <span class="addon-type">Additional Baggage</span>
-                                         <span class="addon-value">1piece, 25kg</span>
-                                          <!-- Edit icon placeholder -->
-                                    </div>
-                                </div>
+                            <div class="addon-details">
+                                <span class="addon-type">Additional Baggage</span>
+                                <span class="addon-value">1piece, 25kg</span>
+                                <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
                             </div>
                         </div>
+                    </div>
+                            <div class="passenger-addon-item">
+                                <div class="addons-row">
+                                <div class="passenger-name">Peter Doe</div>
+                                <div class="addon-details">
+                                    <span class="addon-type">Meal Add-on</span>
+                                    <span class="addon-value">Multi-meal</span>
+                                    <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
+                                </div>
+                                <div class="addon-details">
+                                    <span class="addon-type">Additional Baggage</span>
+                                    <span class="addon-value">1piece, 25kg</span>
+                                    <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
+                                </div>
+                        </div>
+                    </div>
                         <div class="trip-segment">
                             <div class="segment-header">
                                 <button class="return-btn">Return</button>
                                 <span class="route">Penang - Kuala Lumpur </span>
                             </div>
-                             <div class="passenger-addons">
-                                <div class="passenger-addon-item">
-                                     <div class="passenger-name">James Doe</div>
-                                     <div class="addon-details">
-                                         <span class="addon-type">Meal Add-on</span>
-                                         <span class="addon-value">Multi-meal</span>
-                                          <!-- Edit icon placeholder -->
-                                    </div>
-                                     <div class="addon-details">
-                                         <span class="addon-type">Additional Baggage</span>
-                                         <span class="addon-value">1piece, 25kg</span>
-                                          <!-- Edit icon placeholder -->
-                                    </div>
+                            <div class="passenger-addon-item">
+                                <div class="addons-row">
+                                <div class="passenger-name">James Doe</div>
+                                    <div class="addon-details">
+                                    <span class="addon-type">Meal Add-on</span>
+                                    <span class="addon-value">Multi-meal</span>
+                                    <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
-                                 <div class="passenger-addon-item">
-                                     <div class="passenger-name">Peter Doe</div>
-                                     <div class="addon-details">
-                                         <span class="addon-type">Meal Add-on</span>
-                                         <span class="addon-value">Multi-meal</span>
-                                          <!-- Edit icon placeholder -->
-                                    </div>
-                                     <div class="addon-details">
-                                         <span class="addon-type">Additional Baggage</span>
-                                         <span class="addon-value">1piece, 25kg</span>
-                                          <!-- Edit icon placeholder -->
-                                    </div>
+                                <div class="addon-details">
+                                    <span class="addon-type">Additional Baggage</span>
+                                    <span class="addon-value">1piece, 25kg</span>
+                                    <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                            <div class="passenger-addon-item">
+                                <div class="addons-row">
+                                <div class="passenger-name">Peter Doe</div>
+                                    <div class="addon-details">
+                                    <span class="addon-type">Meal Add-on</span>
+                                    <span class="addon-value">Multi-meal</span>
+                                    <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
+                                <div class="addon-details">
+                                    <span class="addon-type">Additional Baggage</span>
+                                    <span class="addon-value">1piece, 25kg</span>
+                                    <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
+                                </div>
+                                 </div>
+                                </div>       
                             </div>
                         </div>
                     </div>
@@ -178,4 +182,7 @@
 </div>
 </body>
 <script src="js/popupAddFlight.js"></script>
+<script src="js/bag_popup.js"></script>
+<script src="js/meal_popup.js"></script>
 </html>
+

@@ -1,65 +1,85 @@
-// Bag popup functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Get all bag option elements
-    const bagOptions = document.querySelectorAll('.bag-option');
-    
-    // Add click event listener to each bag option
-    bagOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            // Remove 'selected' class from all options
-            bagOptions.forEach(opt => opt.classList.remove('selected'));
-            
-            // Add 'selected' class to clicked option
-            this.classList.add('selected');
-            
-            // Optional: Log the selected bag for debugging
-            const selectedBag = this.getAttribute('data-bag');
-            console.log('Selected bag:', selectedBag);
+document.addEventListener('DOMContentLoaded', function () {
+    const popupOverlay = document.getElementById('popup-overlay');
+    const popupBody = document.getElementById('popup-body');
+  
+    // Handle click on all edit baggage buttons
+    document.querySelectorAll('.edit-baggage-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          // Remove .active from any other button
+          document.querySelectorAll('.edit-baggage-btn').forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+      
+          fetch('bag_popup.php')
+            .then(res => res.text())
+            .then(html => {
+              popupBody.innerHTML = html;
+              popupOverlay.classList.remove('hidden');
+              document.body.classList.add('blurred');
+              setupBagPopupEvents();
+            });
         });
-    });
-    
-    // Handle save button click
-    const saveButton = document.querySelector('.popup-save-btn');
-    if (saveButton) {
-        saveButton.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent form submission for now
-            
-            // Get the currently selected bag
-            const selectedOption = document.querySelector('.bag-option.selected');
-            const selectedBag = selectedOption ? selectedOption.getAttribute('data-bag') : null;
-            const quantity = document.querySelector('.quantity-display').textContent;
-            
-            if (selectedBag) {
-                console.log('Saving bag selection:', selectedBag, 'Quantity:', quantity);
-                
-                // Here you can add your save logic
-                // For example: send to server, update localStorage, etc.
-                
-                // Close the popup after saving
-                const popup = document.querySelector('.popup-bg');
-                if (popup) {
-                    popup.style.display = 'none';
-                }
+      });      
+  
+    function setupBagPopupEvents() {
+      const bagOptions = popupBody.querySelectorAll('.bag-option');
+  
+      bagOptions.forEach(option => {
+        option.addEventListener('click', function () {
+          // Deselect all, then select clicked
+          bagOptions.forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          console.log('Selected bag:', this.getAttribute('data-bag'));
+        });
+      });
+  
+      // Quantity buttons
+      const plusBtn = popupBody.querySelector('.quantity-btn.plus');
+      const minusBtn = popupBody.querySelector('.quantity-btn.minus');
+      const display = popupBody.querySelector('.quantity-display');
+  
+      plusBtn?.addEventListener('click', () => {
+        let val = parseInt(display.textContent);
+        if (val < 10) display.textContent = val + 1;
+      });
+  
+      minusBtn?.addEventListener('click', () => {
+        let val = parseInt(display.textContent);
+        if (val > 1) display.textContent = val - 1;
+      });
+  
+      // Save & Close button
+      const saveBtn = popupBody.querySelector('.popup-save-btn');
+      const closeBtn = popupBody.querySelector('.popup-close');
+  
+      closeBtn?.addEventListener('click', () => {
+        popupOverlay.classList.add('hidden');
+        document.body.classList.remove('blurred');
+      });
+  
+      saveBtn?.addEventListener('click', function (e) {
+        e.preventDefault();
+      
+        const selectedBag = popupBody.querySelector('.bag-option.selected')?.getAttribute('data-bag');
+        const quantity = popupBody.querySelector('.quantity-display')?.textContent;
+      
+        if (selectedBag) {
+          // Find the original button that opened this popup
+          const openerButton = document.querySelector('.edit-baggage-btn.active');
+      
+          if (openerButton) {
+            // Locate the .addon-value element near this button
+            const addonValue = openerButton.closest('.addon-details')?.querySelector('.addon-value');
+            if (addonValue) {
+              addonValue.textContent = `${quantity} piece${quantity > 1 ? 's' : ''}, ${selectedBag}`;
             }
-        });
+      
+            openerButton.classList.remove('active');
+          }
+      
+          popupOverlay.classList.add('hidden');
+          document.body.classList.remove('blurred');
+        }
+      });      
     }
-});
-
-// Quantity increment/decrement functions
-function incrementQuantity() {
-    const display = document.querySelector('.quantity-display');
-    let currentValue = parseInt(display.textContent);
-    if (currentValue < 10) { // Set maximum limit
-        display.textContent = currentValue + 1;
-        console.log('Quantity increased to:', currentValue + 1);
-    }
-}
-
-function decrementQuantity() {
-    const display = document.querySelector('.quantity-display');
-    let currentValue = parseInt(display.textContent);
-    if (currentValue > 1) { // Set minimum limit
-        display.textContent = currentValue - 1;
-        console.log('Quantity decreased to:', currentValue - 1);
-    }
-} 
+  });
+  

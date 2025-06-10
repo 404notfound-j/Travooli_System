@@ -1,0 +1,470 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+.Flight-Container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+}
+.title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.badge {
+  background: #e0e7ff;
+  color: #5c63f2;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 12px;
+  margin-top: 8px;
+}
+.price-cta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.price-cta button {
+  background: #5c63f2;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.price-cta button i {
+  color: white; /* Default icon color */
+}
+.price-cta button.liked i {
+  color: red; /* Color when liked */
+}
+.book-now-btn:hover {
+  background-color: #4a50c2; /* Slightly darker shade of blue for hover */
+}
+.features-header{
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  margin-top: 20px;
+}
+.feature-tags {
+  display: flex;
+  gap: 10px;
+}
+.feature-tags button {
+  background: transparent;
+  border: 1px solid #5c63f2;
+  color: #5c63f2;
+  margin-right: 0;
+  padding: 6px 12px;
+  border-radius: 5px;
+}
+.feature-tags button.selected {
+  background-color: #5c63f2; /* Highlight with background color */
+  color: white; /* Change text color for contrast */
+}
+.policies {
+  background: #5c63f2;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  gap: 30px;
+  margin: 20px 0;
+}
+.policy-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.main-airplane-image {
+  width: 100%; /* Make image width 100% of container */
+  height: auto;
+  border-radius: 12px;
+  margin-top: 20px;
+  display: block; /* Keep as block element */
+}
+.reviews-section {
+  margin-top: 40px;
+}
+.rating-badge {
+  background-color: #e0e7ff; /* Light blue background */
+  color: #5c63f2; /* Blue text color */
+  padding: 8px 12px; /* Add padding */
+  border-radius: 6px; /* Rounded corners */
+  display: inline-block; /* Allow it to sit inline */
+  margin-top: 8px; /* Space from element above */
+  font-weight: bold; /* Make text bold */
+  font-size: 12px; /* Match font size from header badge */
+}
+.rating-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.rating-score {
+  border: 1px solid #5c63f2;
+  color: #5c63f2;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 18px;
+}
+.rating-text {
+  font-size: 18px;
+  color: white;
+}
+.review {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #333;
+}
+.review img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.review-content {
+  flex: 1;
+}
+.review-content .name {
+  font-weight: bold;
+}
+.review-content .rating {
+  color: #ccc;
+  font-size: 12px;
+}
+.flight-box {
+  background: #f5f5f5;
+  color: #111;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
+}
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  padding-bottom: 10px; /* Space below the header row */
+  border-bottom: 1px solid #eee; /* Optional: add a separator line */
+}
+.flight-title {
+  font-size: 18px;
+  color: #111;
+}
+.flight-box .flight-duration { /* Styling for duration in the header */
+  font-size: 14px; /* Adjust font size */
+  color: #555; /* Adjust color */
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+.row-left-side {
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.row-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.airline-info {
+  text-align: left;
+}
+.airline-info .aircraft {
+  font-size: 18px;
+  color: #888;
+  margin-right: 40px;
+}
+.flight-time {
+  text-align: center;
+}
+.flight-time strong {
+  font-size: 18px;
+  display: block;
+}
+.flight-time span {
+  font-size: 14px;
+  color: #666;
+}
+.plane-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.horizontal-line {
+  height: 1px;
+  width: 40px;
+  background: #111;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  background-color: #111;
+  border-radius: 50%;
+}
+.flight-icon-group.separated {
+  display: flex;
+  gap: 16px;
+  border-left: 1px solid #dcdcdc;
+  padding-left: 16px;
+}
+.flight-icon-group.separated i {
+  border-left: 1px solid #dcdcdc;
+  padding-left: 12px;
+  color: #111;
+}
+.flight-duration {
+  color: #444;
+  font-weight: 500;
+}
+.departure-arrival-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+.flight-time-details { /* Container for departure, plane line, arrival */
+  display: flex; /* Arrange children horizontally */
+  align-items: center; /* Vertically align items in the middle */
+  gap: 20px; /* Space between the three main parts */
+  justify-content: center; /* Center the content within this flex item */
+  flex-grow: 1; /* Allows this item to grow and take available space within the parent .row */
+}
+.flight-time-info.inline { /* Container for departure, plane line, arrival */
+  display: flex; /* Arrange children horizontally */
+  align-items: center; /* Vertically align items in the middle */
+  gap: 0px; /* Further reduced space between the three main parts */
+}
+.flight-time-info.inline > div:first-child, /* Selector for the departure time/airport div */
+.flight-time-info.inline > div:last-child { /* Selector for the arrival time/airport div */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center time and airport text */
+}
+.flight-time {
+  align-items: center; /* Center time and airport text horizontally */
+}
+.flight-time strong {
+  font-size: 18px; /* Adjust font size to match image */
+}
+.flight-time span {
+  font-size: 12px; /* Adjust font size to match image */
+  color: #555; /* Adjust color to match image */
+}
+.plane-line {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between dots, line, and plane icon */
+}
+.plane-line .dot {
+  width: 6px; /* Adjusted size based on your existing .dot rule */
+  height: 6px; /* Adjusted size based on your existing .dot rule */
+  background-color: #111; /* Adjusted color based on your existing .dot rule */
+  border-radius: 50%;
+}
+.horizontal-line {
+  height: 1px;
+  width: 40px;
+  background: #111;
+}
+.plane-line i {
+  font-size: 20px; /* Adjusted plane icon size */
+  color: #111; /* Adjusted plane icon color */
+}
+/* Styles for the main row content (airline, times, icons) */
+.flight-box .row {
+  display: flex; /* Arrange children horizontally */
+  justify-content: space-between; /* Distribute space between the three main columns */
+  align-items: center; /* Align items vertically in the middle of the row */
+  padding-top: 15px; /* Space below the header */
+  margin-top: 10px; /* Add margin between the header row and this row */
+  width: 100%; /* Ensure the row takes full width */
+}
+.row-left-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align content to the left */
+}
+.row-center {
+  display: flex;
+  justify-content: center; /* Center the content horizontally within this column */
+  align-items: center; /* Vertically align content within this column */
+  flex-grow: 1; /* Allow this column to take up available space */
+}
+.row-right-side {
+  display: flex;
+  justify-content: flex-end; /* Align content to the right within this column */
+  align-items: center; /* Vertically align content within this column */
+}
+.airline-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align airline name and aircraft to the left */
+}
+.airline-info strong {
+  font-size: 16px; /* Adjust font size to match image */
+}
+.airline-info .aircraft {
+  font-size: 12px; /* Adjust font size to match image */
+  color: #555; /* Adjust color to match image */
+}
+.flight-time-info.inline {
+  display: flex; /* Arrange children horizontally */
+  align-items: center; /* Vertically align items in the middle */
+  gap: 20px; /* Space between the three main parts */
+}
+.flight-time-info.inline > div {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.flight-time {
+  display: flex;
+  flex-direction: column; /* Stack time and airport vertically */
+  align-items: center; /* Center time and airport text horizontally */
+}
+.flight-time strong,
+.flight-time span {
+  margin: 0 !important;
+  padding: 0 2px !important; /* Adjust padding to be very small horizontally */
+}
+.plane-line {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between dots, line, and plane icon */
+}
+.plane-line .dot {
+  width: 6px; /* Adjusted size based on your existing .dot rule */
+  height: 6px; /* Adjusted size based on your existing .dot rule */
+  background-color: #111; /* Adjusted color based on your existing rule */
+  border-radius: 50%;
+}
+.horizontal-line {
+  height: 1px;
+  width: 40px; /* Adjusted line length based on your existing rule */
+  background: #111; /* Adjusted color based on your existing rule */
+}
+.plane-line i {
+  font-size: 20px; /* Adjusted plane icon size */
+  color: #111; /* Adjusted plane icon color */
+}
+/* Styles for the header row */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  padding-bottom: 10px; /* Space below the header row */
+  border-bottom: 1px solid #eee; /* Optional: add a separator line */
+}
+.flight-title {
+  font-size: 18px;
+  color: #111;
+}
+.flight-box .flight-duration { /* Styling for duration in the header */
+  font-size: 14px; /* Adjust font size */
+  color: #555; /* Adjust color */
+}
+/* Styles for the second row (airline info and icons) */
+.details-row-1 {
+  display: flex; /* Arrange children horizontally */
+  justify-content: space-between; /* Space out airline info and icons */
+  align-items: center; /* Vertically align items */
+  padding: 15px 0; /* Add some vertical padding */
+}
+.airline-info-with-logo {
+  display: flex; /* Arrange logo and airline details horizontally */
+  align-items: center; /* Vertically align items */
+  gap: 10px; /* Space between logo and text */
+}
+.airline-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: auto; /* Pushes it to the right inside a flex container */
+}
+.airline-details strong {
+  font-size: 22px; /* Adjust font size */
+  font: bold;
+}
+.airline-details .aircraft {
+  font-size: 12px; /* Adjust font size */
+  color: #555; /* Adjust color */
+}
+.icon-group-row-1 {
+  display: flex; /* Arrange plane icon and service icons horizontally */
+  align-items: center; /* Vertically align items */
+  gap: 15px; /* Adjusted space between plane icon and service icons group */
+}
+.icon-group-row-1 > .fa-solid.fa-plane {
+  font-size: 20px; /* Adjust size */
+  color: #111; /* Adjust color */
+}
+.flight-icon-group.separated {
+  display: flex;
+  gap: 15px; /* Space between service icons */
+  align-items: center; /* Vertically align icons */
+  border-left: none;
+  padding-left: 0;
+}
+.flight-icon-group.separated i {
+  color: #111; /* Adjust icon color */
+}
+.flight-icon-group.separated i:first-child {
+  border-left: 2px solid #dcdcdc; /* Thicker separator line before the first icon */
+  padding-left: 15px; /* Space to the left of the thicker separator */
+}
+.flight-icon-group.separated i:not(:first-child) {
+  border-left: 1px solid #dcdcdc; /* Thinner separator line before each subsequent icon */
+  padding-left: 15px; /* Space to the left of the thinner separator */
+}
+/* Styles for the third row (times and plane line) */
+.details-row-2 {
+  display: flex; /* Arrange children horizontally */
+  justify-content: center; /* Center the group of items */
+  align-items: center; /* Vertically align items */
+  padding-top: 15px; /* Space below the second row */
+  gap: 30px; /* Set gap to 0 to remove space between the three main parts */
+}
+.details-row-2 > div {
+  margin: 0; /* Remove any default margin on the direct children */
+}
+.flight-time-info-left, .flight-time-info-right {
+  display: flex;
+  flex-direction: column; /* Stack time and airport vertically */
+  align-items: center; /* Center content horizontally */
+}
+.flight-time {
+  display: flex;
+  flex-direction: column; /* Stack time and airport vertically */
+  align-items: center; /* Center time and airport text horizontally */
+}
+.flight-time strong,
+.flight-time span {
+  margin: 0 !important;
+  padding: 0 2px !important; /* Adjust padding to be very small horizontally */
+}
+.plane-line-middle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-grow: 0;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 2px !important; /* Add a small horizontal padding */
+}
+.plane-line-middle .dot,
+.horizontal-line,
+.plane-line-middle i {
+  margin: 0 !important;
+  padding: 0 !important;
+}
