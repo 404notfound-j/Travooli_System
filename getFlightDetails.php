@@ -11,7 +11,7 @@ if (empty($flightId)) {
     exit();
 }
 
-$stmt = $conn->prepare("
+$stmt = $connenction->prepare("
     SELECT f.flight_id, f.airline_id, 
            f.departure_time, f.arrival_time,
            f.orig_airport_id, f.dest_airport_id, `date`
@@ -53,7 +53,7 @@ if ($result->num_rows > 0) {
 }
 
 $stmt->close();
-$conn->close();
+$connenction->close();
 
 // Output combined result as JSON
 echo json_encode($flight);

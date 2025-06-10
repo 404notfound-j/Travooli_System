@@ -49,7 +49,7 @@ if ($timeFrom && $timeTo) {
     $params[] = $timeTo;
 }
 
-$stmt = mysqli_prepare($conn, $query);
+$stmt = mysqli_prepare($connection, $query);
 
 if ($stmt === false) {
     http_response_code(500);
@@ -72,5 +72,5 @@ while ($row = mysqli_fetch_assoc($result)) {
 echo json_encode($flights);
 
 mysqli_stmt_close($stmt);
-mysqli_close($conn);
+mysqli_close($connection);
 ?>
