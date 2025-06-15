@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(103, 103, 103, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Modal Dialog */
+.modal-dialog {
+    background: #FFFFFF;
+    border: 1px solid #CBD4E6;
+    border-radius: 12px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    width: auto;
+    max-width: 548px;
+    min-width: 468px;
+    box-shadow: 0px 12px 24px 0px rgba(27, 59, 119, 0.05), 
+                0px 24px 60px 0px rgba(6, 47, 125, 0.05), 
+                0px 2px 4px 0px rgba(7, 4, 146, 0.1);
+}
+
+/* Title Row */
+.title-row {
+    display: flex;
+    flex-direction: row;
+    align-self: stretch;
+    gap: 10px;
+    width: 100%;
+}
+
+.modal-title {
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.364em;
+    text-align: left;
+    color: #6E7491;
+    margin: 0;
+    flex: 1;
+}
+
+/* Description */
+.modal-description {
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.364em;
+    text-align: justify;
+    color: #7C8DB0;
+    width: 468px;
+    margin: 0;
+}
+
+/* Actions */
+.modal-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-self: stretch;
+    gap: 10px;
+    padding: 8px 0px 0px;
+    width: 100%;
+}
+
+.button-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+/* Button Styles */
+.btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    height: 48px;
+    border-radius: 4px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.364em;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: #FFFFFF;
+    border: 1px solid #605DEC;
+    color: #605DEC;
+}
+
+.btn-secondary:hover {
+    background: rgba(96, 93, 236, 0.05);
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: #605DEC;
+    color: #FAFAFA;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #4b49c6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(96, 93, 236, 0.3);
+}
+
+.btn-primary.btn-danger {
+    background: rgba(246, 49, 49, 0.82);
+    color: #FAFAFA;
+    border: none;
+}
+
+.btn-primary.btn-danger:hover {
+    background: rgba(246, 49, 49, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(246, 49, 49, 0.3);
+}
+
+.btn-primary.btn-warning {
+    background: #FF9800;
+    color: #FAFAFA;
+    border: none;
+}
+
+.btn-primary.btn-warning:hover {
+    background: #F57C00;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .modal-dialog {
+        padding: 24px;
+        margin: 20px;
+        max-width: calc(100% - 40px);
+        min-width: auto;
+        width: calc(100% - 40px);
+    }
+    
+    .modal-description {
+        width: 100%;
+    }
+    
+    .modal-title {
+        font-size: 20px;
+    }
+    
+    .modal-description {
+        font-size: 16px;
+    }
+    
+    .btn {
+        font-size: 16px;
+        padding: 10px 16px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-dialog {
+        padding: 20px;
+        margin: 16px;
+        max-width: calc(100% - 32px);
+        width: calc(100% - 32px);
+    }
+    
+    .button-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .modal-title {
+        font-size: 18px;
+    }
+    
+    .modal-description {
+        font-size: 14px;
+    }
+}
+
+

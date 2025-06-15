@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Travooli - Payment Complete</title>
-  <link rel="stylesheet" href="css/payment_complete.css">
+  <link rel="stylesheet" href="css/hotelPaymentComplete.css">
   <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,500,600,700,900&display=swap" rel="stylesheet">
@@ -28,17 +28,15 @@
         <div class="ticket">
           <div class="flight-times">
             <div class="departure">
-              <h2>12:00 pm</h2>
-              <p>Newark(EWR)</p>
+              <h2>Thur, Dec 8</h2>
+              <p>Check-in</p>
             </div>
             <div class="flight-path">
-              <div class="line"></div>
-              <i class="fas fa-plane"></i>
-              <div class="line"></div>
+                <img src="icon/hotelPaymentComplete.svg">
             </div>
             <div class="arrival">
-              <h2>12:00 pm</h2>
-              <p>Newark(EWR)</p>
+              <h2>Fri, Dec 9</h2>
+              <p>Check-out</p>
             </div>
           </div>
           <div class="boarding-pass">
@@ -46,9 +44,8 @@
               <img src="icon/avatar.svg" alt="Passenger" class="avatar">
               <div>
                 <h3>James Doe</h3>
-                <p>Boarding Pass N'123</p>
               </div>
-              <span class="class">Business Class</span>
+              <span class="class">Superior room - 1 double bed<br>or 2 twin beds</span>
             </div>
             <div class="flight-details">
               <div class="detail">
@@ -56,8 +53,8 @@
                   <img src="icon/calendar1.svg" alt="Calendar">
                 </div>
                 <div>
-                  <p>Date</p>
-                  <span>Newark(EWR)</span>
+                  <p>Check-in time</p>
+                  <span>12:00 pm</span>
                 </div>
               </div>
               <div class="detail">
@@ -65,8 +62,8 @@
                   <img src="icon/timmer.svg" alt="Clock">
                 </div>
                 <div>
-                  <p>Flight time</p>
-                  <span>12:00</span>
+                  <p>Check-out time</p>
+                  <span>11:30 pm</span>
                 </div>
               </div>
               <div class="detail">
@@ -74,17 +71,8 @@
                   <img src="icon/door.svg" alt="Gate">
                 </div>
                 <div>
-                  <p>Gate</p>
-                  <span>A12</span>
-                </div>
-              </div>
-              <div class="detail">
-                <div class="icon">
-                  <img src="icon/seat.svg" alt="Seat">
-                </div>
-                <div>
-                  <p>Seat</p>
-                  <span>128</span>
+                  <p>Room no.</p>
+                  <span>On arrival</span>
                 </div>
               </div>
             </div>
@@ -139,11 +127,11 @@
       <section class="ratings">
         <p>Your feedback matters to us. Let us know how we can improve your experience.</p>
         <div class="stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
+          <i class="fas fa-star" id="star-1" data-rating="1"></i>
+          <i class="fas fa-star" id="star-2" data-rating="2"></i>
+          <i class="fas fa-star" id="star-3" data-rating="3"></i>
+          <i class="fas fa-star" id="star-4" data-rating="4"></i>
+          <i class="fas fa-star" id="star-5" data-rating="5"></i>
         </div>
         <textarea placeholder="Share your thoughts..."></textarea>
         <div class="rating-buttons">
@@ -161,7 +149,7 @@
           All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.
         </p> 
         <button class="cancel-flight-btn" onclick="showCancelConfirmation()">
-          Cancel Flight
+          Cancel Booking
         </button>
       </section>
     </main>
@@ -174,7 +162,7 @@
       const stars = document.querySelectorAll('.stars i');
       let currentRating = 0;
       
-      // Handle star hover and click
+      // Handle star hover
       stars.forEach((star, index) => {
         // Mouse enter - fill stars up to this one
         star.addEventListener('mouseenter', () => {
@@ -232,7 +220,7 @@
             try {
               const response = JSON.parse(this.responseText);
               if (response.success) {
-                alert('Thank you for your review! It has been added to the flight details page.');
+                alert('Thank you for your review! It has been added to the hotel details page.');
                 // Reset form
                 stars.forEach(s => {
                   s.style.color = '#a8a8b7';
@@ -244,7 +232,7 @@
                 alert('Error: ' + response.message);
               }
             } catch (e) {
-              alert('Thank you for your review! It has been added to the flight details page.');
+              alert('Thank you for your review! It has been added to the hotel details page.');
               // Reset form even if there's an error parsing the response
               stars.forEach(s => {
                 s.style.color = '#a8a8b7';
@@ -262,8 +250,8 @@
           alert('There was an error submitting your review. Please try again.');
         };
         
-        // Send the data - specify this is a flight review
-        const data = `rating=${currentRating}&review=${encodeURIComponent(reviewText)}&user=${encodeURIComponent(userName)}&type=flight`;
+        // Send the data
+        const data = `rating=${currentRating}&review=${encodeURIComponent(reviewText)}&user=${encodeURIComponent(userName)}&type=hotel`;
         xhr.send(data);
       });
       
@@ -278,7 +266,7 @@
         currentRating = 0;
       });
     });
-    
+
     // Function to show cancel confirmation popup
     function showCancelConfirmation() {
       // Create an iframe for the confirmation popup
@@ -292,11 +280,11 @@
       iframe.style.zIndex = '10000';
       
       // Set the source URL with parameters
-      iframe.src = 'confirm_popup.php?title=' + encodeURIComponent('Are you sure to cancel your flight?') +
-                  '&description=' + encodeURIComponent('If you cancel your flight, you may be subject to cancellation fees depending on the airline\'s policy. Please check the cancellation policy for details.') +
-                  '&confirmText=' + encodeURIComponent('Cancel Flight') +
+      iframe.src = 'confirm_popup.php?title=' + encodeURIComponent('Are you sure to cancel your room?') +
+                  '&description=' + encodeURIComponent('If you cancel your booking, you may be subject to cancellation fees depending on the hotel\'s policy. Please check the cancellation policy for details.') +
+                  '&confirmText=' + encodeURIComponent('Cancel Booking') +
                   '&confirmClass=btn-danger' +
-                  '&actionType=cancelFlight';
+                  '&actionType=cancelHotel';
       
       // Add to document
       document.body.appendChild(iframe);
@@ -306,9 +294,9 @@
         if (event.data === 'closeModal') {
           // Remove the iframe when closed
           document.body.removeChild(iframe);
-        } else if (event.data && event.data.action === 'cancelFlight' && event.data.confirmed) {
-          // Handle flight cancellation
-          alert('Your flight has been cancelled successfully.');
+        } else if (event.data && event.data.action === 'cancelHotel' && event.data.confirmed) {
+          // Handle hotel cancellation
+          alert('Your hotel booking has been cancelled successfully.');
           // Redirect to homepage or booking list
           window.location.href = 'index.php';
         }

@@ -436,6 +436,28 @@ function initializeFavoriteButtons() {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             btn.classList.toggle('selected');
+            
+            // Get the heart icon
+            const heartIcon = btn.querySelector('.heart-icon');
+            
+            // Toggle between filled and outline heart
+            if (btn.classList.contains('selected')) {
+                // Create SVG with purple fill
+                const purpleHeartSVG = `
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="#605DEC" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.7863 3.125C11.2504 3.125 10.0004 5.625 10.0004 5.625C10.0004 5.625 8.7504 3.125 6.21446 3.125C4.15352 3.125 2.52149 4.84922 2.5004 6.90664C2.45743 11.1773 5.88829 14.2145 9.64884 16.7668C9.75251 16.8373 9.87501 16.8751 10.0004 16.8751C10.1258 16.8751 10.2483 16.8373 10.352 16.7668C14.1121 14.2145 17.543 11.1773 17.5004 6.90664C17.4793 4.84922 15.8473 3.125 13.7863 3.125V3.125Z" fill="#605DEC" stroke="#605DEC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>`;
+                
+                // Convert SVG to data URL
+                const svgBlob = new Blob([purpleHeartSVG], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(svgBlob);
+                
+                // Set the heart icon src to the purple filled heart
+                heartIcon.src = url;
+            } else {
+                // Reset to original outline heart
+                heartIcon.src = 'icon/heartHotelBook.svg';
+            }
         });
     });
 }

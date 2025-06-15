@@ -171,20 +171,21 @@ a {
     font-weight: 500;
     border-radius: 4px;
     min-width: 100px;
-    font-size: 16px;
+    font-size: 18px;
     letter-spacing: 0.5px;
     position: absolute;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
     height: 46px;
-    box-shadow: 0 2px 6px rgba(96, 93, 236, 0.2);
+    box-shadow: 0 2px 8px rgba(96, 93, 236, 0.3);
     border: none;
     cursor: pointer;
+    text-align: center;
 }
 
 .search-btn:hover {
-    background-color: #1513A0;
+    background-color: #4845CC;
     box-shadow: 0 4px 8px #605dec4d;
 }
 
@@ -610,137 +611,162 @@ a {
     min-width: 0;
 }
 
-/* Filter Sidebar Styles */
-.hotel-booking-filters {
-    width: 340px;
-    background: #0B2236;
-    border-radius: 16px;
-    padding: 32px 28px 28px 28px;
-    color: #FFFFFF;
-    box-shadow: 0 2px 16px rgba(27, 59, 119, 0.08);
-    font-family: 'Nunito Sans', sans-serif;
-    height: fit-content;
+/* --- FLIGHTBOOK FILTER STYLES FOR HOTELBOOK FILTER SIDEBAR --- */
+.filters {
+    width: 280px;
+    background: #0b2341;
+    color: white;
+    height: 960px;
+    padding-top: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    margin-left: 0px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-top: none;
 }
-
-.hotel-booking-filters h2 {
-    font-size: 22px;
-    margin-bottom: 24px;
-    color: #FFFFFF;
+.filters h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    margin-left: 20px;
 }
-
 .filter-group {
-    margin-bottom: 22px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-left: 20px;
 }
-
 .filter-group h4 {
-    font-size: 16px;
-    color: #A4B0C7;
-    margin-bottom: 10px;
-    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 15px;
 }
-
-.filter-group.room-style {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.filters hr {
+    margin-left: 15px;
 }
-
-.filter-group.room-style .filter-btn {
+.filter-button {
     width: 100%;
-    margin: 0;
-}
-
-.filter-btn {
-    background: #112233;
-    color: #A4B0C7;
-    border: 1px solid #2A3B4D;
-    border-radius: 6px;
-    padding: 7px 18px;
-    margin: 0 8px 8px 0;
+    background: transparent;
+    border: 1px solid #5c63f2;
+    color: white;
+    padding: 10px;
+    margin-bottom: 8px;
     font-size: 15px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition: background-color 0.3s, border-color 0.3s;
 }
-
-.filter-btn:hover,
-.filter-btn.active {
-    background: #605DEC;
-    color: #FFFFFF;
-    border-color: #605DEC;
+.filter-button:hover {
+    background-color: #3c42c9;
 }
-
-.price-range {
-    width: 100%;
-    margin: 10px 0 0 0;
+.filter-button.selected {
+    background-color: #2e33b6;
+    border-color: #2e33b6;
 }
-
-.range-labels {
+.rating-buttons {
     display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    color: #A4B0C7;
-    margin-top: 2px;
-}
-
-.rating-btns {
-    display: flex;
-    flex-direction: row;
     gap: 10px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
 }
-
-.rating-btns button {
-    background: #112233;
-    color: #A4B0C7;
-    border: 1px solid #2A3B4D;
-    border-radius: 6px;
-    padding: 7px 18px;
-    font-size: 15px;
+.rating-buttons button {
+    background: transparent;
+    border: 1px solid #5c63f2;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-    flex: 1 1 0;
-    margin: 0;
+    transition: background-color 0.3s, border-color 0.3s;
 }
-
-.rating-btns button:hover,
-.rating-btns button.active {
-    background: #605DEC;
-    color: #FFFFFF;
-    border-color: #605DEC;
+.rating-buttons button:hover {
+    background-color: #3c42c9;
 }
-
-.checkbox-group {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    font-size: 15px;
-    align-items: flex-start;
+.rating-buttons button.selected {
+    background-color: #2e33b6;
+    border-color: #2e33b6;
 }
-
 .checkbox-group label {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #A4B0C7;
-    width: 100%;
-}
-
-.checkbox-group input[type="checkbox"] {
-    accent-color: #605DEC;
-    width: 18px;
-    height: 18px;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 14px;
-    margin-top: 24px;
-}
-
-.filter-actions .btn {
-    min-width: 110px;
+    margin-bottom: 10px;
     font-size: 16px;
-    padding: 10px 0;
+    cursor: pointer;
+}
+.checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    accent-color: #5c63f2;
+}
+input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 5px;
+    background: white;
+    outline: none;
+    margin-top: 6px;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    background: #5c63f2;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    margin-top: 0px;
+}
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-top: 10px;
+}
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+.action-buttons button {
+    flex: 1;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.cancel-btn {
+    background-color: transparent;        
+    color: white;                          
+    border: 1px solid #5c63f2;           
+    border-radius: 6px;                   
+    padding: 10px 30px;                    
+    font-size: 16px;                      
+    font-weight: bold;                    
+    cursor: pointer;                       
+    transition: all 0.3s ease;             
+    box-shadow: 0 0 4px #5c63f2;          
+    background: black;                     
+}
+.cancel-btn:hover {
+    background-color: #5c63f2;             
+    color: black;                         
+}
+.apply-btn {
+    background-color: #5c63f2;
+    color: white;
+}
+.apply-btn:hover {
+    background-color: #7d83ff;
+}
+/* Remove/override hotel filter styles that conflict */
+.hotel-booking-filters, .filter-btn, .rating-btns, .filter-actions, .btn.btn-primary, .btn, .hotel-booking-filters h2, .hotel-booking-filters .filter-group, .hotel-booking-filters .filter-group h4 {
+    all: unset;
+    display: revert;
 }
 
 /* Hotel List Styles */
@@ -842,14 +868,15 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 18px;
+    gap: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .hotel-card-title {
-    font-size: 23px;
+    font-size: 25px;
     font-weight: 700;
     color: #1A2B3C;
-    margin-bottom: 2px;
+    margin-bottom: 0 !important;
     flex: 1 1 0;
 }
 
@@ -862,12 +889,8 @@ a {
 }
 
 .hotel-card-location-row {
-    font-size: 15px;
-    color: #6E7491;
-    margin: 8px 0 6px 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    gap: 32px !important;
+    margin-bottom: 15px !important;
 }
 
 .hotel-card-price {
@@ -892,9 +915,9 @@ a {
 }
 
 .hotel-card-price-main {
-    font-size: 22px;
+    font-size: 25px;
     color: #605DEC;
-    font-weight: 700;
+    font-weight: 900;
     line-height: 1.1;
 }
 
@@ -906,7 +929,7 @@ a {
 }
 
 .hotel-card-price-tax {
-    font-size: 12px;
+    font-size: 13px;
     color: #7C8DB0;
     margin-top: 2px;
 }
@@ -914,20 +937,21 @@ a {
 .hotel-card-meta-row {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 32px !important;
     font-size: 15px;
     color: #605DEC;
-    margin-bottom: 6px;
+    margin-bottom: 15px !important;
 }
 
-.hotel-card-stars {
-    color: #FFD700;
-    font-size: 17px;
+.hotel-card-stars,
+.hotel-card-stars i {
+    color: #605DEC !important;
+    font-size: 18px;
     letter-spacing: 1px;
 }
 
 .hotel-card-meta {
-    color: #6E7491;
+    color: #000000;
     font-size: 15px;
     font-weight: 500;
     display: flex;
@@ -961,40 +985,37 @@ a {
 .hotel-card-review-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 0;
 }
 
 .hotel-card-review-score {
-    background: #F0F1F7;
-    color: #031E2F;
-    border-radius: 6px;
-    padding: 2px 10px;
-    font-weight: 700;
-    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 36px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #122518;
+    background: #fff;
+    border: 2px solid #605DEC;
+    border-radius: 5px;
+    box-shadow: none;
+    margin-right: 15px;
+    padding: 0;
 }
 
 .hotel-card-review-label {
-    color: #605DEC;
-    font-weight: 700;
+    font-weight: 800;
+    color: #122518;
     font-size: 15px;
-}
-
-.review-label {
-    color: #605DEC;
-    font-weight: 700;
-    margin-left: 2px;
+    margin-right: 8px;
 }
 
 .hotel-card-review-count {
-    color: #7C8DB0;
+    color: #122518;
     font-size: 15px;
-}
-
-.review-count {
-    color: #7C8DB0;
-    font-size: 14px;
-    margin-left: 2px;
+    font-weight: 400;
 }
 
 .hotel-card-action-row {
@@ -1008,8 +1029,10 @@ a {
     background: transparent !important;
     border: 1.5px solid #605DEC !important;
     box-shadow: none !important;
-    padding: 6px;
-    border-radius: 50%;
+    padding: 0;
+    border-radius: 8px !important;
+    width: 48px;
+    height: 48px;
     cursor: pointer;
     outline: none;
     display: flex;
@@ -1021,10 +1044,12 @@ a {
 }
 
 .hotel-card-fav-btn .heart-icon {
-    color: #605DEC;
-    fill: none;
-    stroke: #605DEC;
-    transition: color 0.2s, fill 0.2s;
+    width: 24px !important;
+    height: 24px !important;
+    display: block;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .hotel-card-fav-btn.selected {
@@ -1035,15 +1060,28 @@ a {
     color: #605DEC;
     fill: #605DEC;
     stroke: #605DEC;
+    filter: brightness(1.1) saturate(1.2);
 }
 
 .hotel-card-view-btn {
-    flex: 1 1 0;
-    font-size: 18px;
-    padding: 12px 0;
-    border-radius: 8px;
-    font-weight: 600;
-    margin-left: 0;
+    background: #605DEC !important;
+    color: #fff !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    border-radius: 5px !important;
+    width: 400px;
+    height: 48px !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    display: block;
+    text-align: center;
+    transition: background 0.2s;
+    line-height: 48px !important;
+}
+.hotel-card-view-btn:hover {
+    background: #4f4cee !important;
 }
 
 .hotel-card .btn {
@@ -1195,4 +1233,12 @@ a {
     .hotel-list.hotel-list-column {
         gap: 18px;
     }
+}
+
+.hotel-card-divider {
+    width: 100%;
+    height: 1px;
+    background: #E6E8EC;
+    border: none;
+    margin: 24px 0 18px 0;
 }

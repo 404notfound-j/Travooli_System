@@ -3,8 +3,12 @@
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/hotelBook.css">
 <link rel="stylesheet" href="css/hotelDetails.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <?php
+// Start session to access saved reviews
+session_start();
+
 // Placeholder hotel data (replace with DB query later)
 $hotels = [
     1 => [
@@ -79,37 +83,49 @@ $hotels = [
 
 $hotel_id = isset($_GET['hotel_id']) ? (int)$_GET['hotel_id'] : 1;
 $hotel = $hotels[$hotel_id] ?? $hotels[1];
+
+// Get user reviews from session
+$userReviews = isset($_SESSION['hotel_reviews']) ? $_SESSION['hotel_reviews'] : array();
 ?>
 
 <div class="hotel-details-dark-bg">
     <div class="hotel-details-container">
         <div class="hotel-details-header-row">
-            <div>
-                <h1 class="hotel-details-title"><?php echo htmlspecialchars($hotel['name']); ?></h1>
-                <div class="hotel-details-stars">
-                    <?php for ($i = 0; $i < $hotel['stars']; $i++) echo '★'; ?>
-                    <span class="hotel-details-star-label"><?php echo $hotel['stars']; ?> Star Hotel</span>
+            <div class="hotel-details-header-left">
+                <div class="hotel-details-title-row">
+                    <h1 class="hotel-details-title"><?php echo htmlspecialchars($hotel['name']); ?></h1>
+                    <div class="hotel-details-stars">
+                        <span class="hotel-card-stars">
+                            <?php for ($i = 0; $i < $hotel['stars']; $i++): ?>
+                                <i class="fas fa-star"></i>
+                            <?php endfor; ?>
+                        </span>
+                        <span class="hotel-details-star-label"><?php echo $hotel['stars']; ?> Star Hotel</span>
+                    </div>
                 </div>
                 <div class="hotel-details-location">
-                    <img src="icon/destination.svg" alt="Location" style="width:18px;vertical-align:middle;"> 
+                    <img src="icon/locationWhite.svg" alt="Location" style="width:18px;vertical-align:middle;"> 
                     <?php echo htmlspecialchars($hotel['location']); ?>
                 </div>
-                <div class="hotel-details-review-summary">
-                    <span class="hotel-details-review-score"><?php echo $hotel['rating']; ?></span>
-                    <span class="hotel-details-review-label"><?php echo $hotel['review_label']; ?></span>
-                    <span class="hotel-details-review-count"><?php echo $hotel['review_count']; ?> reviews</span>
+                <div style="height: 40px;"></div>
+                <div class="hotel-details-review-box">
+                    <div class="hotel-details-review-score"><?php echo $hotel['rating']; ?></div>
+                    <div class="hotel-details-review-text"><b>Very Good</b> <?php echo $hotel['review_count']; ?> reviews</div>
                 </div>
             </div>
-            <div class="hotel-details-header-actions">
+            <div class="hotel-details-header-right">
                 <div class="hotel-details-price-block">
                     <span class="hotel-details-price-main">$<?php echo $hotel['price']; ?><span class="hotel-details-price-night">/night</span></span>
                 </div>
-                <button class="hotel-card-fav-btn" type="button">
-                    <svg class="heart-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 21s-6.5-5.2-9-8.5C-1.5 7.5 2.5 3 7 3c2.1 0 4.1 1.2 5 3.1C13.9 4.2 15.9 3 18 3c4.5 0 8.5 4.5 4 9.5-2.5 3.3-9 8.5-9 8.5z"/>
-                    </svg>
-                </button>
-                <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-book-btn">Book now</a>
+                <div class="hotel-details-action-buttons">
+                    <button class="hotel-card-fav-btn" type="button">
+                        <object data="icon/heartHotelDetails.svg" type="image/svg+xml" class="heart-icon"></object>
+                    </button>
+                    <button class="hotel-card-share-btn" type="button">
+                        <object data="icon/share.svg" type="image/svg+xml" class="share-icon"></object>
+                    </button>
+                    <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="hotel-details-book-btn">Book now</a>
+                </div>
             </div>
         </div>
         <div class="hotel-details-gallery-flex">
@@ -124,119 +140,162 @@ $hotel = $hotels[$hotel_id] ?? $hotels[1];
                 <?php endfor; ?>
             </div>
         </div>
+        <hr class="hotel-details-divider">
         <div class="hotel-details-overview-block">
             <h2>Overview</h2>
             <p><?php echo htmlspecialchars($hotel['description']); ?></p>
         </div>
         <div class="hotel-details-review-amenities-row">
-            <div class="hotel-details-review-box">
-                <div class="hotel-details-review-score-lg"><?php echo $hotel['rating']; ?></div>
-                <div class="hotel-details-review-label-lg"><?php echo $hotel['review_label']; ?></div>
-                <div class="hotel-details-review-count-lg"><?php echo $hotel['review_count']; ?> reviews</div>
+            <div class="hotel-details-amenity-review-box">
+                <div class="hotel-details-amenity-review-score">4.2</div>
+                <div class="hotel-details-amenity-review-text">
+                    Very good<br>
+                    371 reviews
+                </div>
             </div>
-            <div class="hotel-details-amenities-list">
-                <?php foreach ($hotel['amenities'] as $amenity): ?>
-                    <div class="hotel-details-amenity-card">
-                        <img src="icon/stars.svg" alt="Amenity" class="hotel-details-amenity-icon">
-                        <span><?php echo htmlspecialchars($amenity); ?></span>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+            <?php foreach ($hotel['amenities'] as $amenity): ?>
+                <div class="hotel-details-amenity-card">
+                    <img src="icon/stars.svg" alt="Amenity" class="hotel-details-amenity-icon">
+                    <span><?php echo htmlspecialchars($amenity); ?></span>
+                </div>
+            <?php endforeach; ?>
         </div>
+        <hr class="hotel-details-divider">
     </div>
 </div>
 
 <!-- Lower Section: Available Rooms -->
 <div class="hotel-details-lower-section">
-    <h2 class="hotel-details-section-title">Available Rooms</h2>
-    <div class="hotel-details-rooms-list">
-        <div class="hotel-details-room-row">
-            <img src="background/room1.jpg" alt="Room 1" class="hotel-details-room-img">
-            <div class="hotel-details-room-desc">Superior room - 1 double bed or 2 twin beds</div>
-            <div class="hotel-details-room-price">$240<span class="hotel-details-room-night">/night</span></div>
-            <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-room-book-btn">Book now</a>
+    <div class="hotel-details-container">
+        <h2 class="hotel-details-rooms-title">Available Rooms</h2>
+        <div class="hotel-details-rooms-list">
+            <div class="hotel-details-room-row">
+                <img src="background/room1.jpg" alt="Room 1" class="hotel-details-room-img">
+                <div class="hotel-details-room-desc">Superior room - 1 double bed or 2 twin beds</div>
+                <div class="hotel-details-room-price">$240<span class="hotel-details-room-night">/night</span></div>
+                <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-room-book-btn">Book now</a>
+            </div>
+            <hr class="hotel-details-divider2">
+            <div class="hotel-details-room-row">
+                <img src="background/room2.jpg" alt="Room 2" class="hotel-details-room-img">
+                <div class="hotel-details-room-desc">Superior room - City view  - 1 double bed or 2 twin beds</div>
+                <div class="hotel-details-room-price">$280<span class="hotel-details-room-night">/night</span></div>
+                <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-room-book-btn">Book now</a>
+            </div>
+            <hr class="hotel-details-divider2">
+            <div class="hotel-details-room-row">
+                <img src="background/room3.jpg" alt="Room 3" class="hotel-details-room-img">
+                <div class="hotel-details-room-desc">Superior room - City view - 1 double bed or 2 twin beds</div>
+                <div class="hotel-details-room-price">$320<span class="hotel-details-room-night">/night</span></div>
+                <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-room-book-btn">Book now</a>
+            </div>
+            <hr class="hotel-details-divider2">
+            <div class="hotel-details-room-row">
+                <img src="background/room4.jpg" alt="Room 4" class="hotel-details-room-img">
+                <div class="hotel-details-room-desc">Superior room - City view - 1 double bed or 2 twin beds</div>
+                <div class="hotel-details-room-price">$350<span class="hotel-details-room-night">/night</span></div>
+                <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-room-book-btn">Book now</a>
+            </div>
         </div>
-        <div class="hotel-details-room-row">
-            <img src="background/room2.jpg" alt="Room 2" class="hotel-details-room-img">
-            <div class="hotel-details-room-desc">Superior room - City view  - 1 double bed or 2 twin beds</div>
-            <div class="hotel-details-room-price">$280<span class="hotel-details-room-night">/night</span></div>
-            <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-room-book-btn">Book now</a>
+        <hr class="hotel-details-divider">
+        <h2 class="hotel-details-reviews-title">Reviews</h2>
+        
+        <!-- Reviews Header -->
+        <div class="reviews-header">
+            <div class="rating-display">
+                <span class="rating-score"><?php echo $hotel['rating']; ?></span>
+                <div class="rating-details">
+                    <div class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <span class="rating-label"><?php echo $hotel['review_label']; ?></span>
+                </div>
+            </div>
         </div>
-        <div class="hotel-details-room-row">
-            <img src="background/room3.jpg" alt="Room 3" class="hotel-details-room-img">
-            <div class="hotel-details-room-desc">Superior room - City view - 1 double bed or 2 twin beds</div>
-            <div class="hotel-details-room-price">$320<span class="hotel-details-room-night">/night</span></div>
-            <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-room-book-btn">Book now</a>
-        </div>
-        <div class="hotel-details-room-row">
-            <img src="background/room4.jpg" alt="Room 4" class="hotel-details-room-img">
-            <div class="hotel-details-room-desc">Superior room - City view - 1 double bed or 2 twin beds</div>
-            <div class="hotel-details-room-price">$350<span class="hotel-details-room-night">/night</span></div>
-            <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&checkin=2023-12-01&checkout=2023-12-02&adult=2&child=0&room=1" class="btn btn-primary hotel-details-room-book-btn">Book now</a>
-        </div>
-    </div>
-    <hr class="hotel-details-divider">
-    <h2 class="hotel-details-section-title">Reviews</h2>
-    <div class="hotel-details-reviews-summary-row" style="display: flex; align-items: flex-start; gap: 28px;">
-        <div class="hotel-details-reviews-score" style="margin-top: 0.5rem;"><?php echo $hotel['rating']; ?></div>
-        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-            <div class="hotel-details-reviews-stars">
-                <?php
-                $fullStars = floor($hotel['rating']);
-                $halfStar = ($hotel['rating'] - $fullStars) >= 0.25 && ($hotel['rating'] - $fullStars) < 0.75 ? 1 : 0;
-                $emptyStars = 5 - $fullStars - $halfStar;
-                for ($i = 0; $i < $fullStars; $i++) {
-                    echo '<span style="color:#605DEC;font-size:2rem;">★</span>';
+        
+        <!-- Reviews List -->
+        <div class="reviews-list">
+            <?php 
+            // Display user-submitted reviews first
+            if (!empty($userReviews)) {
+                foreach ($userReviews as $index => $review) {
+                    // Generate star rating HTML
+                    $starsHtml = '';
+                    for ($i = 1; $i <= 5; $i++) {
+                        if ($i <= $review['rating']) {
+                            $starsHtml .= '<i class="fas fa-star"></i>';
+                        } else {
+                            $starsHtml .= '<i class="far fa-star"></i>';
+                        }
+                    }
+                    ?>
+                    <!-- User Review -->
+                    <div class="review-item">
+                        <div class="review-content">
+                            <img src="icon/profile.svg" alt="<?php echo htmlspecialchars($review['user']); ?>" class="user-avatar">
+                            <div class="review-text">
+                                <div class="review-header">
+                                    <span class="user-name"><?php echo htmlspecialchars($review['user']); ?></span>
+                                    <span class="separator">|</span>
+                                    <div class="review-rating">
+                                        <?php echo $starsHtml; ?>
+                                    </div>
+                                </div>
+                                <p class="review-comment"><?php echo htmlspecialchars($review['review']); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-divider"></div>
+                    <?php
                 }
-                if ($halfStar) {
-                    echo '<span style="color:#605DEC;font-size:2rem;position:relative;display:inline-block;width:1.2em;">'
-                        .'<span style="position:absolute;left:0;width:50%;overflow:hidden;">★</span>'
-                        .'<span style="color:#B2B7FF;">★</span>'
-                        .'</span>';
-                }
-                for ($i = 0; $i < $emptyStars; $i++) {
-                    echo '<span style="color:#B2B7FF;font-size:2rem;">★</span>';
+            }
+            
+            // Default reviews
+            $defaultUsers = [
+                ['name' => 'Omar Siphron', 'rating' => 5],
+                ['name' => 'Cristofer Ekstrom Bothman', 'rating' => 4],
+                ['name' => 'Kaiya Lubin', 'rating' => 5],
+                ['name' => 'Erin Septimus', 'rating' => 3],
+                ['name' => 'Terry George', 'rating' => 4]
+            ];
+            
+            foreach ($defaultUsers as $index => $user) {
+                // Generate star rating HTML
+                $starsHtml = '';
+                for ($i = 1; $i <= 5; $i++) {
+                    if ($i <= $user['rating']) {
+                        $starsHtml .= '<i class="fas fa-star"></i>';
+                    } else {
+                        $starsHtml .= '<i class="far fa-star"></i>';
+                    }
                 }
                 ?>
-            </div>
-            <div class="hotel-details-reviews-label" style="margin-top:2px;"><?php echo $hotel['review_label']; ?></div>
-        </div>
-    </div>
-    <div class="hotel-details-reviews-list">
-        <div class="hotel-details-review-item">
-            <img src="background/user1.jpg" alt="Omar Siphron" class="hotel-details-review-avatar">
-            <div class="hotel-details-review-content">
-                <div class="hotel-details-review-user">Omar Siphron <span class="hotel-details-review-stars">★★★★★</span></div>
-                <div class="hotel-details-review-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-            </div>
-        </div>
-        <div class="hotel-details-review-item">
-            <img src="background/user2.jpg" alt="Cristofer Ekstrom Bothman" class="hotel-details-review-avatar">
-            <div class="hotel-details-review-content">
-                <div class="hotel-details-review-user">Cristofer Ekstrom Bothman <span class="hotel-details-review-stars">★★★★★</span></div>
-                <div class="hotel-details-review-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-            </div>
-        </div>
-        <div class="hotel-details-review-item">
-            <img src="background/user3.jpg" alt="Kaiya Lubin" class="hotel-details-review-avatar">
-            <div class="hotel-details-review-content">
-                <div class="hotel-details-review-user">Kaiya Lubin <span class="hotel-details-review-stars">★★★★★</span></div>
-                <div class="hotel-details-review-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-            </div>
-        </div>
-        <div class="hotel-details-review-item">
-            <img src="background/user4.jpg" alt="Erin Septimus" class="hotel-details-review-avatar">
-            <div class="hotel-details-review-content">
-                <div class="hotel-details-review-user">Erin Septimus <span class="hotel-details-review-stars">★★★★★</span></div>
-                <div class="hotel-details-review-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-            </div>
-        </div>
-        <div class="hotel-details-review-item">
-            <img src="background/user5.jpg" alt="Terry George" class="hotel-details-review-avatar">
-            <div class="hotel-details-review-content">
-                <div class="hotel-details-review-user">Terry George <span class="hotel-details-review-stars">★★★★★</span></div>
-                <div class="hotel-details-review-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-            </div>
+                <!-- Default Review -->
+                <div class="review-item">
+                    <div class="review-content">
+                        <img src="icon/profile.svg" alt="<?php echo htmlspecialchars($user['name']); ?>" class="user-avatar">
+                        <div class="review-text">
+                            <div class="review-header">
+                                <span class="user-name"><?php echo htmlspecialchars($user['name']); ?></span>
+                                <span class="separator">|</span>
+                                <div class="review-rating">
+                                    <?php echo $starsHtml; ?>
+                                </div>
+                            </div>
+                            <p class="review-comment">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        </div>
+                    </div>
+                </div>
+                <?php if ($index < count($defaultUsers) - 1) { ?>
+                    <div class="review-divider"></div>
+                <?php } ?>
+                <?php
+            }
+            ?>
         </div>
     </div>
 </div>

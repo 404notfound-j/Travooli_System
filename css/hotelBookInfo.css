@@ -41,7 +41,7 @@
 .guest-info-heading {
     color: #605DEC;
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 900;
     margin-bottom: 16px;
 }
 
@@ -79,6 +79,10 @@
     width: 100%;
 }
 
+.form-row select {
+    width: calc(50% - 8px);
+}
+
 .hotel-book-info-form input, .hotel-book-info-form select {
     padding: 16px;
     border: 1px solid #ccc;
@@ -86,6 +90,19 @@
     font-size: 16px;
     background: #fafbff;
     transition: border 0.2s;
+    color: #757575;
+}
+
+.hotel-book-info-form input::placeholder {
+    color: #757575;
+}
+
+.hotel-book-info-form select {
+    color: #757575;
+}
+
+.hotel-book-info-form select option {
+    color: #000000;
 }
 
 .hotel-book-info-form input:focus, .hotel-book-info-form select:focus {
@@ -94,9 +111,10 @@
 }
 
 .hotel-book-info-right {
-    display: flex;
+
     flex-direction: column;
-    width: 400px;
+    height: 446px;
+    width: 850px;
     align-self: flex-start;
 }
 
@@ -120,8 +138,17 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 12px;
-    color: #222;
+    color: #000000;
+    font-size: 18px;
+}
+
+.price-details-tickets {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    color: #000000;
     font-size: 16px;
+    font-weight: 900;
 }
 
 .price-details-total {
@@ -131,7 +158,7 @@
     font-size: 18px;
     margin-top: 16px;
     color: #222;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #7f7f7f;
     padding-top: 16px;
 }
 
@@ -151,7 +178,7 @@
     background: #605DEC;
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;

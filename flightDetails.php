@@ -105,7 +105,119 @@
       </div>
     </div>
 </div>
-    <?php include 'feedback.php'; ?>
+    <?php 
+    // Start session to access saved reviews
+    session_start();
+    
+    // Get flight reviews from session
+    $flightReviews = isset($_SESSION['flight_reviews']) ? $_SESSION['flight_reviews'] : array();
+    ?>
+    
+    <section class="feedback-section">
+        <div class="feedback-container">
+            <!-- Reviews Header -->
+            <div class="reviews-header">
+                <h2 class="reviews-title">Reviews</h2>
+                <div class="rating-display">
+                    <span class="rating-score">4.2</span>
+                    <div class="rating-details">
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <span class="rating-label">Very good</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reviews-divider"></div>
+            
+            <!-- Reviews List -->
+            <div class="reviews-list">
+                <?php 
+                // Display user-submitted reviews first
+                if (!empty($flightReviews)) {
+                    foreach ($flightReviews as $index => $review) {
+                        // Generate star rating HTML
+                        $starsHtml = '';
+                        for ($i = 1; $i <= 5; $i++) {
+                            if ($i <= $review['rating']) {
+                                $starsHtml .= '<i class="fas fa-star"></i>';
+                            } else {
+                                $starsHtml .= '<i class="far fa-star"></i>';
+                            }
+                        }
+                        ?>
+                        <!-- User Review -->
+                        <div class="review-item">
+                            <div class="review-content">
+                                <img src="icon/profile.svg" alt="<?php echo htmlspecialchars($review['user']); ?>" class="user-avatar">
+                                <div class="review-text">
+                                    <div class="review-header">
+                                        <span class="user-name"><?php echo htmlspecialchars($review['user']); ?></span>
+                                        <span class="separator">|</span>
+                                        <div class="review-rating">
+                                            <?php echo $starsHtml; ?>
+                                        </div>
+                                    </div>
+                                    <p class="review-comment"><?php echo htmlspecialchars($review['review']); ?></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-divider"></div>
+                        <?php
+                    }
+                }
+                
+                // Default reviews
+                $defaultUsers = [
+                    ['name' => 'Omar Siphron', 'rating' => 5],
+                    ['name' => 'Cristofer Ekstrom Bothman', 'rating' => 4],
+                    ['name' => 'Kaiya Lubin', 'rating' => 5],
+                    ['name' => 'Erin Septimus', 'rating' => 3],
+                    ['name' => 'Terry George', 'rating' => 4]
+                ];
+                
+                foreach ($defaultUsers as $index => $user) {
+                    // Generate star rating HTML
+                    $starsHtml = '';
+                    for ($i = 1; $i <= 5; $i++) {
+                        if ($i <= $user['rating']) {
+                            $starsHtml .= '<i class="fas fa-star"></i>';
+                        } else {
+                            $starsHtml .= '<i class="far fa-star"></i>';
+                        }
+                    }
+                    ?>
+                    <!-- Default Review -->
+                    <div class="review-item">
+                        <div class="review-content">
+                            <img src="icon/profile.svg" alt="<?php echo htmlspecialchars($user['name']); ?>" class="user-avatar">
+                            <div class="review-text">
+                                <div class="review-header">
+                                    <span class="user-name"><?php echo htmlspecialchars($user['name']); ?></span>
+                                    <span class="separator">|</span>
+                                    <div class="review-rating">
+                                        <?php echo $starsHtml; ?>
+                                    </div>
+                                </div>
+                                <p class="review-comment">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <?php if ($index < count($defaultUsers) - 1) { ?>
+                        <div class="review-divider"></div>
+                    <?php } ?>
+                    <?php
+                }
+                ?>
+            </div>
+        </div>
+    </section>
+    
     <?php include 'u_footer_1.php'; ?>
 <script src="js/flightDetails.js"></script>
 

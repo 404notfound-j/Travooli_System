@@ -169,7 +169,7 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary search-btn">Search</button>
+                <button type="submit" class="search-btn">Search</button>
             </form>
         </div>
     </section>
@@ -178,58 +178,50 @@
     <section class="hotel-booking-section">
         <div class="hotel-booking-main-layout">
             <!-- Filters Sidebar -->
-            <aside class="hotel-booking-filters">
-                <h2>Filters</h2>
-                
-                <div class="filter-group room-style">
-                    <h4>Room style</h4>
-                    <button class="filter-btn">Budget</button>
-                    <button class="filter-btn">Family</button>
-                    <button class="filter-btn">Luxury</button>
-                    <button class="filter-btn">Trendy</button>
+            <div class="filters">
+              <h2>Filters</h2>
+              <div class="filter-group">
+                <h4>Room style</h4>
+                <button class="filter-button">Budget</button>
+                <button class="filter-button">Family</button>
+                <button class="filter-button">Luxury</button>
+                <button class="filter-button">Trendy</button>
+              </div>
+              <hr>
+              <div class="filter-group">
+                <h4>Price</h4>
+                <input type="range" min="50" max="1200" value="400" class="price-range" id="priceRange">
+                <div class="range-labels">
+                  <span>$50</span>
+                  <span>$1200</span>
                 </div>
-                
-                <hr>
-                
-                <div class="filter-group">
-                    <h4>Price</h4>
-                    <input type="range" min="50" max="1200" value="400" class="price-range" id="priceRange">
-                    <div class="range-labels">
-                        <span>$50</span>
-                        <span>$1200</span>
-                    </div>
+              </div>
+              <hr>
+              <div class="filter-group">
+                <h4>Rating</h4>
+                <div class="rating-buttons">
+                  <button>0+</button>
+                  <button>1+</button>
+                  <button>2+</button>
+                  <button>3+</button>
+                  <button>4+</button>
                 </div>
-                
-                <hr>
-                
-                <div class="filter-group">
-                    <h4>Rating</h4>
-                    <div class="rating-btns">
-                        <button>0+</button>
-                        <button>1+</button>
-                        <button>2+</button>
-                        <button>3+</button>
-                        <button>4+</button>
-                    </div>
+              </div>
+              <hr>
+              <div class="filter-group">
+                <h4>Freebies</h4>
+                <div class="checkbox-group">
+                  <label><input type="checkbox"> Free breakfast</label>
+                  <label><input type="checkbox"> Free parking</label>
+                  <label><input type="checkbox"> Free internet</label>
+                  <label><input type="checkbox"> Free airport shuttle</label>
                 </div>
-                
-                <hr>
-                
-                <div class="filter-group">
-                    <h4>Freebies</h4>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox"> Free breakfast</label>
-                        <label><input type="checkbox"> Free parking</label>
-                        <label><input type="checkbox"> Free internet</label>
-                        <label><input type="checkbox"> Free airport shuttle</label>
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button class="btn" type="button" onclick="location.reload();">Reset</button>
-                    <button class="btn btn-primary" type="button">Apply filters</button>
-                </div>
-            </aside>
+              </div>
+              <div class="action-buttons">
+                <button class="cancel-btn" onclick="location.reload();">Cancel</button>
+                <button class="apply-btn">Apply Filters</button>
+              </div>
+            </div>
             
             <!-- Hotel Results -->
             <main class="hotel-booking-content">
@@ -250,25 +242,30 @@
                                 </div>
                             </div>
                             <div class="hotel-card-location-row">
-                                <img src="icon/destination.svg" alt="Location" style="width:16px;height:16px;"> Kuala Lumpur, Malaysia
+                                <img src="icon/location.svg" alt="Location" style="width:16px;height:16px;"> Kuala Lumpur, Malaysia
                             </div>
                             <div class="hotel-card-meta-row">
-                                <span class="hotel-card-stars">★★★★★</span>
+                                <span class="hotel-card-stars">
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                </span>
                                 <span class="hotel-card-meta">5 Star Hotel</span>
-                                <span class="hotel-card-meta"><img src="icon/meal.svg" alt="Amenities" style="width:18px;vertical-align:middle;"> 25+ Amenities</span>
+                                <span class="hotel-card-meta"><img src="icon/aminities.svg" alt="Amenities" style="width:18px;vertical-align:middle;"> <b>25+</b> Amenities</span>
                             </div>
                             <div class="hotel-card-review-row">
                                 <span class="hotel-card-review-score">4.7</span>
                                 <span class="hotel-card-review-label">Excellent</span>
                                 <span class="hotel-card-review-count">210 reviews</span>
                             </div>
+                            <hr class="hotel-card-divider">
                             <div class="hotel-card-action-row">
                                 <button class="hotel-card-fav-btn" type="button">
-                                    <svg class="heart-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 21s-6.5-5.2-9-8.5C-1.5 7.5 2.5 3 7 3c2.1 0 4.1 1.2 5 3.1C13.9 4.2 15.9 3 18 3c4.5 0 8.5 4.5 4 9.5-2.5 3.3-9 8.5-9 8.5z"/>
-                                    </svg>
+                                    <img src="icon/heartHotelBook.svg" alt="Favorite" class="heart-icon">
                                 </button>
-                                <a href="hotelDetails.php?hotel_id=1" class="btn btn-primary hotel-card-view-btn">View Place</a>
+                                <a href="hotelDetails.php?hotel_id=1" class="hotel-card-view-btn">View Place</a>
                             </div>
                         </div>
                     </article>
@@ -289,25 +286,30 @@
                                 </div>
                             </div>
                             <div class="hotel-card-location-row">
-                                <img src="icon/destination.svg" alt="Location" style="width:16px;height:16px;"> Istanbul, Turkey
+                                <img src="icon/location.svg" alt="Location" style="width:16px;height:16px;"> Istanbul, Turkey
                             </div>
                             <div class="hotel-card-meta-row">
-                                <span class="hotel-card-stars">★★★★★</span>
+                                <span class="hotel-card-stars">
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                </span>
                                 <span class="hotel-card-meta">5 Star Hotel</span>
-                                <span class="hotel-card-meta"><img src="icon/meal.svg" alt="Amenities" style="width:18px;vertical-align:middle;"> 20+ Amenities</span>
+                                <span class="hotel-card-meta"><img src="icon/aminities.svg" alt="Amenities" style="width:18px;vertical-align:middle;"> 20+ Amenities</span>
                             </div>
                             <div class="hotel-card-review-row">
                                 <span class="hotel-card-review-score">4.2</span>
                                 <span class="hotel-card-review-label">Very Good</span>
                                 <span class="hotel-card-review-count">54 reviews</span>
                             </div>
+                            <hr class="hotel-card-divider">
                             <div class="hotel-card-action-row">
                                 <button class="hotel-card-fav-btn" type="button">
-                                    <svg class="heart-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 21s-6.5-5.2-9-8.5C-1.5 7.5 2.5 3 7 3c2.1 0 4.1 1.2 5 3.1C13.9 4.2 15.9 3 18 3c4.5 0 8.5 4.5 4 9.5-2.5 3.3-9 8.5-9 8.5z"/>
-                                    </svg>
+                                    <img src="icon/heartHotelBook.svg" alt="Favorite" class="heart-icon">
                                 </button>
-                                <a href="hotelDetails.php?hotel_id=2" class="btn btn-primary hotel-card-view-btn">View Place</a>
+                                <a href="hotelDetails.php?hotel_id=2" class="hotel-card-view-btn">View Place</a>
                             </div>
                         </div>
                     </article>
@@ -328,25 +330,30 @@
                                 </div>
                             </div>
                             <div class="hotel-card-location-row">
-                                <img src="icon/destination.svg" alt="Location" style="width:16px;height:16px;"> Johor Bahru, Malaysia
+                                <img src="icon/location.svg" alt="Location" style="width:16px;height:16px;"> Johor Bahru, Malaysia
                             </div>
                             <div class="hotel-card-meta-row">
-                                <span class="hotel-card-stars">★★★★☆</span>
+                                <span class="hotel-card-stars">
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                  <i class="fas fa-star"></i>
+                                </span>
                                 <span class="hotel-card-meta">4 Star Hotel</span>
-                                <span class="hotel-card-meta"><img src="icon/meal.svg" alt="Amenities" style="width:18px;vertical-align:middle;"> 15+ Amenities</span>
+                                <span class="hotel-card-meta"><img src="icon/aminities.svg" alt="Amenities" style="width:18px;vertical-align:middle;"> 15+ Amenities</span>
                             </div>
                             <div class="hotel-card-review-row">
                                 <span class="hotel-card-review-score">4.0</span>
                                 <span class="hotel-card-review-label">Very Good</span>
                                 <span class="hotel-card-review-count">98 reviews</span>
                             </div>
+                            <hr class="hotel-card-divider">
                             <div class="hotel-card-action-row">
                                 <button class="hotel-card-fav-btn" type="button">
-                                    <svg class="heart-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 21s-6.5-5.2-9-8.5C-1.5 7.5 2.5 3 7 3c2.1 0 4.1 1.2 5 3.1C13.9 4.2 15.9 3 18 3c4.5 0 8.5 4.5 4 9.5-2.5 3.3-9 8.5-9 8.5z"/>
-                                    </svg>
+                                    <img src="icon/heartHotelBook.svg" alt="Favorite" class="heart-icon">
                                 </button>
-                                <a href="hotelDetails.php?hotel_id=3" class="btn btn-primary hotel-card-view-btn">View Place</a>
+                                <a href="hotelDetails.php?hotel_id=3" class="hotel-card-view-btn">View Place</a>
                             </div>
                         </div>
                     </article>
