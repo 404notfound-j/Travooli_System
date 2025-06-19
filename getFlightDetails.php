@@ -2,58 +2,36 @@
 header('Content-Type: application/json');
 include 'connection.php';
 
-// Get flightId from URL, sanitize input
-$flightId = isset($_GET['flightId']) ? $_GET['flightId'] : '';
+$flightId = isset($_GET['flightId']) ? $_GET['flightId'] : null;
 
-if (empty($flightId)) {
-    http_response_code(400);
-    echo json_encode(["error" => "Invalid flight ID"]);
-    exit();
+if (!$flightId) {
+    echo json_encode(['error' => 'No flight ID provided']);
+    exit;
 }
 
-$stmt = $connenction->prepare("
-    SELECT f.flight_id, f.airline_id, 
-           f.departure_time, f.arrival_time,
-           f.orig_airport_id, f.dest_airport_id, `date`
-    FROM flightinfo f
-    LEFT JOIN airport orig ON f.orig_airport_id = orig.airport_id
-    LEFT JOIN airport dest ON f.dest_airport_id = dest.airport_id
-    WHERE f.flight_id = ?
-");
+$query = "SELECT f.flight_id, f.airline_id, a.airline_name, 
+                 f.orig_airport_id, f.dest_airport_id, f.departure_time, f.arrival_time, f.date, s.class_id, 
+                 s.price, s.available_seats, oa.airport_full AS origin_airport_full, oa.city_full AS origin_airport_address, da.airport_full AS dest_airport_full,
+                 da.city_full AS dest_airport_address
+            FROM flight_info_t f
+            JOIN flight_seat_cls_t s ON f.flight_id = s.flight_id
+            JOIN airport_t oa ON f.orig_airport_id = oa.airport_short
+            JOIN airport_t da ON f.dest_airport_id = da.airport_short
+            JOIN airline_t a ON f.airline_id = a.airline_id
+            WHERE f.flight_id = ?";
+$stmt = mysqli_prepare($connection, $query);
+mysqli_stmt_bind_param($stmt, "s", $flightId);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
-// Bind as string (not integer)
-$stmt->bind_param("s", $flightId);
+$flight = mysqli_fetch_assoc($result);
 
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows === 0) {
-    http_response_code(404);
-    echo json_encode(["error" => "Flight not found"]);
-    exit();
-}
-
-$flight = $result->fetch_assoc();
-$stmt->close();
-
-// Fetch origin airport details
-$origAirportId = $flight['orig_airport_id'];
-$stmt = $conn->prepare("SELECT airport_full, city_full FROM airport WHERE airport_id = ?");
-$stmt->bind_param("s", $origAirportId);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    $originAirport = $result->fetch_assoc();
-    $flight['origin_airport_full'] = $originAirport['airport_full'];
-    $flight['origin_airport_address'] = $originAirport['city_full'];
+if (!$flight) {
+    echo json_encode(['error' => 'Flight not found']);
 } else {
-     $flight['origin_airport_full'] = "Unknown Origin Airport";
-     $flight['origin_airport_address'] = "";
+    echo json_encode($flight);
 }
 
-$stmt->close();
-$connenction->close();
-
-// Output combined result as JSON
-echo json_encode($flight);
+mysqli_stmt_close($stmt);
+mysqli_close($connection);
+?>
