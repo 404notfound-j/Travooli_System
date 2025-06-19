@@ -5,6 +5,11 @@
   margin: 20px auto;
   padding: 20px;
 }
+.container {
+  max-width: 1000px;
+  margin: 0 auto; /* Center horizontally */
+  padding: 20px;
+}
 .title-section {
   display: flex;
   justify-content: space-between;
