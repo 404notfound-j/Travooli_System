@@ -59,18 +59,21 @@ document.addEventListener('DOMContentLoaded', function () {
       saveBtn?.addEventListener('click', function (e) {
         e.preventDefault();
       
-        const selectedBag = popupBody.querySelector('.bag-option.selected')?.getAttribute('data-bag');
-        const quantity = popupBody.querySelector('.quantity-display')?.textContent;
+        const selectedOption = popupBody.querySelector('.bag-option.selected');
+        const selectedBag = selectedOption?.getAttribute('data-bag');
+        const pricePerUnit = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
+        const quantity = parseInt(popupBody.querySelector('.quantity-display')?.textContent) || 1;
+      
+        const totalBaggagePrice = pricePerUnit * quantity;
       
         if (selectedBag) {
-          // Find the original button that opened this popup
           const openerButton = document.querySelector('.edit-baggage-btn.active');
       
           if (openerButton) {
-            // Locate the .addon-value element near this button
             const addonValue = openerButton.closest('.addon-details')?.querySelector('.addon-value');
             if (addonValue) {
               addonValue.textContent = `${quantity} piece${quantity > 1 ? 's' : ''}, ${selectedBag}`;
+              addonValue.setAttribute('data-price', totalBaggagePrice); 
             }
       
             openerButton.classList.remove('active');
@@ -78,6 +81,9 @@ document.addEventListener('DOMContentLoaded', function () {
       
           popupOverlay.classList.add('hidden');
           document.body.classList.remove('blurred');
+          if (typeof updatePrices === 'function') {
+            updatePrices();
+          }
         }
       });      
     }

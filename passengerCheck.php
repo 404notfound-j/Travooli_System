@@ -73,12 +73,12 @@
                                 <div class="passenger-name">James Doe</div>
                                 <div class="addon-details">
                                     <span class="addon-type">Meal Add-on</span>
-                                    <span class="addon-value">Multi-meal</span>
+                                    <span class="addon-value" data-price="30">Multi-meal</span>
                                     <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
                             <div class="addon-details">
                                 <span class="addon-type">Additional Baggage</span>
-                                <span class="addon-value">1piece, 25kg</span>
+                                <span class="addon-value" data-price="20">1piece, 25kg</span>
                                 <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
                             </div>
                         </div>
@@ -88,12 +88,12 @@
                                 <div class="passenger-name">Peter Doe</div>
                                 <div class="addon-details">
                                     <span class="addon-type">Meal Add-on</span>
-                                    <span class="addon-value">Multi-meal</span>
+                                    <span class="addon-value" data-price="30">Multi-meal</span>
                                     <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
                                 <div class="addon-details">
                                     <span class="addon-type">Additional Baggage</span>
-                                    <span class="addon-value">1piece, 25kg</span>
+                                    <span class="addon-value" data-price="20">1piece, 25kg</span>
                                     <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
                         </div>
@@ -108,12 +108,12 @@
                                 <div class="passenger-name">James Doe</div>
                                     <div class="addon-details">
                                     <span class="addon-type">Meal Add-on</span>
-                                    <span class="addon-value">Multi-meal</span>
+                                    <span class="addon-value" data-price="30">Multi-meal</span>
                                     <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
                                 <div class="addon-details">
                                     <span class="addon-type">Additional Baggage</span>
-                                    <span class="addon-value">1piece, 25kg</span>
+                                    <span class="addon-value" data-price="20">1piece, 25kg</span>
                                     <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
                             </div>
                         </div>
@@ -123,12 +123,12 @@
                                 <div class="passenger-name">Peter Doe</div>
                                     <div class="addon-details">
                                     <span class="addon-type">Meal Add-on</span>
-                                    <span class="addon-value">Multi-meal</span>
+                                    <span class="addon-value" data-price="30">Multi-meal</span>
                                     <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
                                 <div class="addon-details">
                                     <span class="addon-type">Additional Baggage</span>
-                                    <span class="addon-value">1piece, 25kg</span>
+                                    <span class="addon-value" data-price="20">1piece, 25kg</span>
                                     <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
                                 </div>
                                  </div>
@@ -145,29 +145,29 @@
                     <div class="price-items">
                         <div class="price-item">
                             <span class="item-name">Tickets (2 Adults, 1 Child)</span>
-                            <span class="item-price">$340</span>
+                            <span class="item-price">RM340</span>
                         </div>
                         <div class="price-item">
                             <span class="item-name">Baggage Fees</span>
-                            <span class="item-price">$20</span>
+                            <span class="baggage-price">RM 0</span>
                         </div>
                          <div class="price-item">
                             <span class="item-name">Multi-meal</span>
-                            <span class="item-price">$30</span>
+                            <span class="meal-price">RM 0</span>
                         </div>
                          <div class="price-item">
                             <span class="item-name">Taxes & Fees</span>
-                            <span class="item-price">$121</span>
+                            <span class="item-price">RM 121</span>
                         </div>
                          <div class="price-item">
                             <span class="item-name">Discount</span>
-                            <span class="item-price">$0</span>
+                            <span class="item-price">RM 0</span>
                         </div>
                     </div>
                     <hr>
                     <div class="total-price">
                         <span class="total-text">Total </span>
-                        <span class="total-value">$491</span>
+                        <span class="total-value">RM 491</span>
                     </div>
                 </div>
                  <div class="button-row">
@@ -184,5 +184,6 @@
 <script src="js/popupAddFlight.js"></script>
 <script src="js/bag_popup.js"></script>
 <script src="js/meal_popup.js"></script>
+<script src="js/passenger.js"></script>
 </html>
 

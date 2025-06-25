@@ -29,36 +29,38 @@ document.addEventListener('DOMContentLoaded', function () {
         option.addEventListener('click', function () {
           mealOptions.forEach(opt => opt.classList.remove('selected'));
           this.classList.add('selected');
-  
-          const selectedMeal = this.getAttribute('data-meal');
-          console.log('Selected meal:', selectedMeal);
         });
       });
-  
-      const saveButton = popupBody.querySelector('.popup-save-btn');
-      if (saveButton) {
-        saveButton.addEventListener('click', function (e) {
+      const closeBtn = popupBody.querySelector('.popup-close');
+        closeBtn?.addEventListener('click', () => {
+        popupOverlay.classList.add('hidden');
+        popupBody.innerHTML = ''; // ✅ clear the popup contents
+        document.body.classList.remove('blurred');
+        document.querySelectorAll('.edit-meals-btn').forEach(btn => btn.classList.remove('active')); // optional cleanup
+    });
+      const saveBtn = popupBody.querySelector('.popup-save-btn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function (e) {
           e.preventDefault();
-  
           const selectedOption = popupBody.querySelector('.meal-option.selected');
           const selectedMeal = selectedOption ? selectedOption.getAttribute('data-meal') : null;
-  
           if (selectedMeal) {
-            console.log('Saving meal selection:', selectedMeal);
-  
-            // Update the correct .addon-value
+            const selectedPrice = selectedOption.getAttribute('data-price') || 0;
             const openerButton = document.querySelector('.edit-meals-btn.active');
             if (openerButton) {
               const addonValue = openerButton.closest('.addon-details')?.querySelector('.addon-value');
               if (addonValue) {
                 addonValue.textContent = selectedMeal;
+                addonValue.setAttribute('data-price', selectedPrice);
               }
               openerButton.classList.remove('active');
             }
-  
             popupOverlay.classList.add('hidden');
             document.body.classList.remove('blurred');
-          }
+            if (typeof updatePrices === 'function') {
+              updatePrices();
+            }
+          }          
         });
       }
     }

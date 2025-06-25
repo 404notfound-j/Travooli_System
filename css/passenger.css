@@ -6,66 +6,11 @@ body {
   margin: 0;
   background: #031E2F;
   color: #FFFFFF;
-  font-family: 'Inter', sans-serif; /* Assuming Inter is also used or a fallback */
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 24px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-text {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 800;
-  font-size: 27px;
-  color: #FFFFFF;
-}
-
-.navigation-menu {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
-}
-
-.nav-item {
-  font-family: 'Nunito Sans', sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  color: #A4B0C7;
-  text-decoration: none;
-  padding: 10px;
-}
-
-.nav-item.active {
-  color: #605DEC;
-}
-
-.signup-btn {
-  background-color: #605DEC;
-  color: #FAFAFA;
-  padding: 12px 20px;
-  border-radius: 4px;
-  border: none;
-  font-family: 'Nunito Sans', sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  cursor: pointer;
 }
 
 .main-content {
   display: flex;
-  flex-direction: column; /* Default to column for mobile first, adjust with media query */
+  flex-direction: column; 
   align-items: center;
   padding: 20px;
   gap: 40px;
@@ -80,11 +25,11 @@ body {
 }
 
 .price-and-button-container {
+  position: fixed;
   display: flex;
   flex-direction: column;
-  gap: 24px; /* Adjust gap as needed */
-  margin-left: 60px; /* Add left margin to shift it right */
-  /* Add any other necessary styling for alignment within booking-layout */
+  gap: 24px; 
+  right: 60px; 
 }
 
 .passenger-info-section,
@@ -289,14 +234,12 @@ body {
 }
 
 .addon-type {
-  font-family: 'Poppins', sans-serif;
   font-weight: 600;
   font-size: 15px;
   color: #605DEC;
 }
 
 .addon-value {
-  font-family: 'Nunito Sans', sans-serif;
   font-weight: 400;
   font-size: 16px;
   color: #6E7491;
@@ -335,14 +278,13 @@ body {
 }
 
 .item-name {
-  font-family: 'Poppins', sans-serif;
   font-weight: 400;
   font-size: 16px;
   color: #112211;
 }
 
-.item-price {
-  font-family: 'Poppins', sans-serif;
+.item-price,.meal-price,
+.baggage-price {
   font-weight: 600;
   font-size: 16px;
   color: #112211;
@@ -355,14 +297,12 @@ body {
 }
 
 .total-text {
-  font-family: 'Montserrat', sans-serif;
   font-weight: 500;
   font-size: 16px;
   color: #112211;
 }
 
 .total-value {
-  font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   font-size: 25px;
   color: #605DEC;

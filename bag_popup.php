@@ -16,20 +16,19 @@
             <div class="popup-title">Baggage Information</div>
             
             <div class="bag-options">
-                <div class="bag-option selected" data-bag="10kg">
+                <div class="bag-option selected" data-bag="10kg" data-price="0">
                     <div class="bag-weight">10Kg</div>
                     <div class="bag-price free">Free</div>
                 </div>
-                <div class="bag-option" data-bag="25kg">
+                <div class="bag-option" data-bag="25kg" data-price="20">
                     <div class="bag-weight">25 Kg</div>
                     <div class="bag-price">RM 20</div>
                 </div>
-                <div class="bag-option" data-bag="50kg">
+                <div class="bag-option" data-bag="50kg" data-price="40">
                     <div class="bag-weight">50 Kg</div>
                     <div class="bag-price">RM 40</div>
                 </div>
-            </div>
-            
+            </div>           
             <div class="popup-divider"></div>
             
             <div class="bag-quantity-section">
