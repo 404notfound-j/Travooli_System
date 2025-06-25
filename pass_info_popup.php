@@ -46,7 +46,7 @@
                             <label class="popup-label" for="country">Country</label>
                             <select class="popup-select" id="country" name="country">
                                 <option value="">Select</option>
-                                <option value="us">United States</option>
+                                <option value="us">Malaysia</option>
                                 <option value="uk">United Kingdom</option>
                                 <option value="ca">Canada</option>
                                 <!-- Add more countries as needed -->
