@@ -4,10 +4,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAirportDropdowns();
     initializeDatePicker();
     initializePassengerDropdown();
-    initializeSearchButton();
     initializeCardEffects();
     initializeTestimonialAnimations();
 });
+
 
 // Airport Dropdown Functionality
 function initializeAirportDropdowns() {
@@ -524,30 +524,6 @@ function updatePassengerDisplay() {
     
     passengerInput.value = displayText;
     passengerInput.placeholder = displayText || '1 adult';
-}
-
-// Search Button Functionality
-function initializeSearchButton() {
-    const searchBtn = document.getElementById('searchBtn');
-    
-    searchBtn.addEventListener('click', function() {
-        const fromAirport = document.getElementById('fromAirport').value;
-        const toAirport = document.getElementById('toAirport').value;
-        const dateInput = document.getElementById('dateInput').value;
-        
-        if (!fromAirport || !toAirport) {
-            alert('Please select both departure and destination airports.');
-            return;
-        }
-        
-        if (!dateInput) {
-            alert('Please select your travel dates.');
-            return;
-        }
-        
-        // In a real application, this would handle the search functionality
-        alert(`Searching flights from ${fromAirport} to ${toAirport}.\nDates: ${dateInput}\n\nSearch functionality would be implemented here in a real application.`);
-    });
 }
 
 // Card Effects

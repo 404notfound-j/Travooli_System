@@ -280,10 +280,10 @@
       <div class="filter-group">
         <h4>Airlines</h4>
         <div class="checkbox-group">
-          <label><input type="checkbox">Emirated</label>
-          <label><input type="checkbox">Fly Dubai</label>
-          <label><input type="checkbox">Qatar</label>
-          <label><input type="checkbox">Etihad</label>
+          <label><input type="checkbox">AirAsia</label>
+          <label><input type="checkbox">BatikAir</label>
+          <label><input type="checkbox">Mas</label>
+          <label><input type="checkbox">FireFly</label>
         </div>
       </div>
       <hr>
@@ -301,7 +301,7 @@
     </div>
     <div class="main-panel">
       <div class="sort-bar">
-        <div class="sort-option">Cheapest<br><span>$99 . 2h 18m</span></div>
+        <div class="sort-option" id="sortCheapest">Cheapest<br><span>$99 . 2h 18m</span></div>
         <div class="sort-option selected">Best<br><span>$99 . 2h 18m</span></div>
         <div class="sort-option" id="sortQuickest">Quickest<br><span>$99 · 2h 18m</span></div>
         <div class="sort-other"><span>&#9776;</span><span>Other sort</span></div>

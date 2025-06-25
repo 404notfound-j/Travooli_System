@@ -1,76 +1,92 @@
 <?php
 include 'connection.php';
 
+// Get POST data
 $origin = $_POST['origin'] ?? null;
 $destination = $_POST['destination'] ?? null;
-$seatClass = $_POST['seatClass'] ?? null;  // EC, PE, BC, FC
+$seatClass = $_POST['seatClass'] ?? null;
 $date = $_POST['date'] ?? null;
-$timeFrom = $_POST['timeFrom'] ?? null;    // e.g., "08:00:00"
-$timeTo = $_POST['timeTo'] ?? null;        // e.g., "12:00:00"
-
-$query = "SELECT f.flight_id, f.airline_id, f.orig_airport_id, f.dest_airport_id, 
-                 f.departure_time, f.arrival_time, f.date,
-                 s.class_id, s.price, s.available_seats
-          FROM flightinfo f
-          JOIN flight_seats s ON f.flight_id = s.flight_id
-          WHERE 1=1";
-
+$timeFrom = $_POST['timeFrom'] ?? null;
+$timeTo = $_POST['timeTo'] ?? null;
+$sortBy = $_POST['sortBy'] ?? null;
+$airlinesInput = $_POST['airlines'] ?? null;
 $params = [];
 $types = "";
 
+// Start query
+if ($sortBy === "cheapest") {
+    $query = "SELECT f.flight_id, f.airline_id, f.orig_airport_id, f.dest_airport_id,
+                     f.departure_time, f.arrival_time, f.date,
+                     MIN(s.price) AS price
+              FROM flight_info_t f
+              JOIN flight_seat_cls_t s ON f.flight_id = s.flight_id
+              WHERE 1=1";
+} else {
+    $query = "SELECT f.flight_id, f.airline_id, f.orig_airport_id, f.dest_airport_id,
+                     f.departure_time, f.arrival_time, f.date,
+                     s.class_id, s.price, s.available_seats
+              FROM flight_info_t f
+              JOIN flight_seat_cls_t s ON f.flight_id = s.flight_id
+              WHERE 1=1";
+}
+
+// Apply filters
 if ($origin) {
     $query .= " AND f.orig_airport_id = ?";
     $types .= "s";
     $params[] = $origin;
 }
-
 if ($destination) {
     $query .= " AND f.dest_airport_id = ?";
     $types .= "s";
     $params[] = $destination;
 }
-
 if ($date) {
     $query .= " AND f.date = ?";
     $types .= "s";
     $params[] = $date;
 }
 
-if ($seatClass) {
-    $query .= " AND s.class_id = ?";
-    $types .= "s";
-    $params[] = $seatClass;
+if (!empty($_POST['airlines'])) {
+    $airlines = explode(',', $_POST['airlines']); // From JS: formData.append("airlines", "AK,MH")
+    $placeholders = implode(',', array_fill(0, count($airlines), '?'));
+    $query .= " AND f.airline_id IN ($placeholders)";
+    $types .= str_repeat('s', count($airlines));
+    $params = array_merge($params, $airlines);
 }
-
-if ($timeFrom && $timeTo) {
-    $query .= " AND f.departure_time BETWEEN ? AND ?";
-    $types .= "ss";
-    $params[] = $timeFrom;
-    $params[] = $timeTo;
+if (!$sortBy || $sortBy !== "cheapest") {
+    // Only apply these for normal search (not cheapest)
+    if ($seatClass) {
+        $query .= " AND s.class_id = ?";
+        $types .= "s";
+        $params[] = $seatClass;
+    }
+    if ($timeFrom && $timeTo) {
+        $query .= " AND f.departure_time BETWEEN ? AND ?";
+        $types .= "ss";
+        $params[] = $timeFrom;
+        $params[] = $timeTo;
+    }
 }
-
+if ($sortBy === "cheapest") {
+    $query .= " GROUP BY f.flight_id";
+}
 $stmt = mysqli_prepare($connection, $query);
-
 if ($stmt === false) {
     http_response_code(500);
     echo json_encode(['error' => 'Failed to prepare SQL statement']);
     exit;
 }
-
 if (!empty($params)) {
     mysqli_stmt_bind_param($stmt, $types, ...$params);
 }
-
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
-
 $flights = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $flights[] = $row;
 }
-
 echo json_encode($flights);
-
 mysqli_stmt_close($stmt);
 mysqli_close($connection);
 ?>
