@@ -63,7 +63,7 @@
                         </p>
                     </div>
                     <div class="trip-details">
-                        <div class="trip-segment">
+                        <div class="trip-segment" data-segment="depart">
                             <div class="segment-header">
                                  <button class="depart-btn">Depart</button>
                                 <span class="route">Kuala Lumpur - Penang</span>
@@ -98,7 +98,10 @@
                                 </div>
                         </div>
                     </div>
-                        <div class="trip-segment">
+                <div class="add-on-container">
+                    <!-- new passenger add-on placeholder -->
+                </div>
+                        <div class="trip-segment" data-segment="return">
                             <div class="segment-header">
                                 <button class="return-btn">Return</button>
                                 <span class="route">Penang - Kuala Lumpur </span>
@@ -138,7 +141,9 @@
                     </div>
                 </div>
             </div>
-
+            <div class="add-on-container">
+                 <!-- new passenger add-on placeholder -->
+        </div>
             <div class="price-and-button-container">
                 <div class="price-details-section">
                     <h2>Price Details</h2>
@@ -182,8 +187,6 @@
 </div>
 </body>
 <script src="js/popupAddFlight.js"></script>
-<script src="js/bag_popup.js"></script>
-<script src="js/meal_popup.js"></script>
 <script src="js/passenger.js"></script>
 </html>
 
