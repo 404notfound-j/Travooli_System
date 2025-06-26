@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnLogin'])) {
             <p class="signin-desc">Welcome back to Travooli! Sign in with your email address or phone number to continue where you left off and enjoy seamless access to all our features.</p>
             <form class="signin-form" method="post" action="">
                 <?php if (!empty($loginError)): ?>
-                    <p style="color: red; font-size: 14px; margin-bottom: 15px;"> <?php echo $loginError; ?> </p>
+                    <p id="signin-error-message" style="color: red; font-size: 14px; margin-bottom: 15px;"> <?php echo $loginError; ?> </p>
                 <?php endif; ?>
                 <input type="email" id="email" name="email" placeholder="Email or phone number" required>
                 <input type="password" id="password" name="password" placeholder="Password" required>
@@ -87,6 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnLogin'])) {
 
     <?php include 'u_footer_1.php'; ?>
     <?php include 'u_footer_2.php'; ?>
+    
+    <!-- Slide Message Animation Script -->
+    <script src="js/sign.js"></script>
 </body>
 </html>
 

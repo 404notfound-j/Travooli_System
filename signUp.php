@@ -11,36 +11,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSignUp'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Check if email already exists in user_detail_t
-    $checkEmailQuery = "SELECT * FROM user_detail_t WHERE email_address = '$email'";
-    $checkEmailResult = mysqli_query($connection, $checkEmailQuery);
+    // Password validation
+    $passwordLength = strlen($password);
+    $hasNumber = preg_match('/\d/', $password);
+    $hasSpaces = preg_match('/\s/', $password);
 
-    // Also check if email exists in admin_detail_t (to prevent conflicts)
-    $checkAdminEmailQuery = "SELECT * FROM admin_detail_t WHERE email_address = '$email'";
-    $checkAdminEmailResult = mysqli_query($connection, $checkAdminEmailQuery);
-
-    if (mysqli_num_rows($checkEmailResult) > 0 || mysqli_num_rows($checkAdminEmailResult) > 0) {
-        $signupError = "This email is already registered. Please use another.";
+    if ($passwordLength < 8 || $passwordLength > 20) {
+        $signupError = "Password must be between 8-20 characters.";
+    } elseif (!$hasNumber) {
+        $signupError = "Password must contain at least 1 number.";
+    } elseif ($hasSpaces) {
+        $signupError = "Password cannot contain spaces.";
     } else {
-        // Generate next user_id
-        $getLastIdQuery = "SELECT user_id FROM user_detail_t WHERE user_id LIKE 'U%' ORDER BY CAST(SUBSTRING(user_id, 2) AS UNSIGNED) DESC LIMIT 1";
-        $lastIdResult = mysqli_query($connection, $getLastIdQuery);
-        
-        if (mysqli_num_rows($lastIdResult) > 0) {
-            $lastRow = mysqli_fetch_assoc($lastIdResult);
-            $lastNumber = intval(substr($lastRow['user_id'], 1)); // Remove 'U' and convert to int
-            $newNumber = $lastNumber + 1;
+        // Check if email already exists in user_detail_t
+        $checkEmailQuery = "SELECT * FROM user_detail_t WHERE email_address = '$email'";
+        $checkEmailResult = mysqli_query($connection, $checkEmailQuery);
+
+        // Also check if email exists in admin_detail_t (to prevent conflicts)
+        $checkAdminEmailQuery = "SELECT * FROM admin_detail_t WHERE email_address = '$email'";
+        $checkAdminEmailResult = mysqli_query($connection, $checkAdminEmailQuery);
+
+        if (mysqli_num_rows($checkEmailResult) > 0 || mysqli_num_rows($checkAdminEmailResult) > 0) {
+            $signupError = "This email is already registered. Please use another.";
         } else {
-            $newNumber = 1; // First user
-        }
-        
-        $newUserId = 'U' . str_pad($newNumber, 3, '0', STR_PAD_LEFT); // Format as U001, U002, etc.
-        
-        $insertQuery = "INSERT INTO user_detail_t (user_id, fst_name, lst_name, email_address, password, country) VALUES ('$newUserId', '$firstName', '$lastName', '$email', '$password', 'Malaysia')";
-        if (mysqli_query($connection, $insertQuery)) {
-            $signupSuccess = "Sign-up successful. You can now log in.";
-        } else {
-            $signupError = "Error: " . mysqli_error($connection);
+            // Generate next user_id
+            $getLastIdQuery = "SELECT user_id FROM user_detail_t WHERE user_id LIKE 'U%' ORDER BY CAST(SUBSTRING(user_id, 2) AS UNSIGNED) DESC LIMIT 1";
+            $lastIdResult = mysqli_query($connection, $getLastIdQuery);
+            
+            if (mysqli_num_rows($lastIdResult) > 0) {
+                $lastRow = mysqli_fetch_assoc($lastIdResult);
+                $lastNumber = intval(substr($lastRow['user_id'], 1)); // Remove 'U' and convert to int
+                $newNumber = $lastNumber + 1;
+            } else {
+                $newNumber = 1; // First user
+            }
+            
+            $newUserId = 'U' . str_pad($newNumber, 3, '0', STR_PAD_LEFT); // Format as U001, U002, etc.
+            
+            $insertQuery = "INSERT INTO user_detail_t (user_id, fst_name, lst_name, email_address, password, country) VALUES ('$newUserId', '$firstName', '$lastName', '$email', '$password', 'Malaysia')";
+            if (mysqli_query($connection, $insertQuery)) {
+                // Set up user session for automatic login
+                $_SESSION['user_id'] = $newUserId;
+                $_SESSION['username'] = $firstName . ' ' . $lastName;
+                $_SESSION['role'] = 'user';
+                
+                $signupSuccess = "redirect_to_profile"; // Special flag for JavaScript
+            } else {
+                $signupError = "Error: " . mysqli_error($connection);
+            }
         }
     }
 }
@@ -66,12 +84,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSignUp'])) {
             <p class="signin-desc">Travooli is totally free to use. Sign up using your email address or phone number below to get started.</p>
             <form class="signin-form" method="post" action="">
                 <?php if (!empty($signupError)): ?>
-                    <p style="color: red; font-size: 14px; margin-bottom: 15px;"> <?php echo $signupError; ?> </p>
+                    <p id="signup-error-message" style="color: red; font-size: 14px; margin-bottom: 15px;"> <?php echo $signupError; ?> </p>
                 <?php elseif (!empty($signupSuccess)): ?>
-                    <p style="color: green; font-size: 14px; margin-bottom: 15px;"> <?php echo $signupSuccess; ?> </p>
+                    <p id="signup-success-message" style="color: green; font-size: 14px; margin-bottom: 15px;"> <?php echo $signupSuccess; ?> </p>
                 <?php endif; ?>
                 <input type="email" id="email" name="email" placeholder="Email or phone number" required>
                 <input type="password" id="password" name="password" placeholder="Password" required>
+                <small class="password-hint">Password must be 8-20 characters, contain at least 1 number, and no spaces.</small>
                 <div class="name-container">
                     <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
                     <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
@@ -108,5 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSignUp'])) {
 
     <?php include 'u_footer_1.php'; ?>
     <?php include 'u_footer_2.php'; ?>
+    
+    <!-- Slide Message Animation Script -->
+    <script src="js/sign.js"></script>
 </body>
 </html>
