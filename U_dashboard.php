@@ -587,7 +587,7 @@
     </section>
     
     <script src="js/script.js"></script>
-    
+
     <?php include 'u_footer_1.php'; ?>
     <?php include 'u_footer_2.php'; ?>
 </body>
