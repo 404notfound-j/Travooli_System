@@ -6,23 +6,29 @@ $signupError = $signupSuccess = "";
 
 // Sign-Up Processing (Only for users)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSignUp'])) {
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $email = $_POST['email'];
+    $firstName = trim($_POST['firstName']);
+    $lastName = trim($_POST['lastName']);
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    // Password validation
-    $passwordLength = strlen($password);
-    $hasNumber = preg_match('/\d/', $password);
-    $hasSpaces = preg_match('/\s/', $password);
-
-    if ($passwordLength < 8 || $passwordLength > 20) {
-        $signupError = "Password must be between 8-20 characters.";
-    } elseif (!$hasNumber) {
-        $signupError = "Password must contain at least 1 number.";
-    } elseif ($hasSpaces) {
-        $signupError = "Password cannot contain spaces.";
+    // Validate names (letters only)
+    if (!preg_match('/^[A-Za-z]+$/', $firstName)) {
+        $signupError = "First name can only contain letters (no numbers, symbols, or spaces).";
+    } elseif (!preg_match('/^[A-Za-z]+$/', $lastName)) {
+        $signupError = "Last name can only contain letters (no numbers, symbols, or spaces).";
     } else {
+        // Password validation
+        $passwordLength = strlen($password);
+        $hasNumber = preg_match('/\d/', $password);
+        $hasSpaces = preg_match('/\s/', $password);
+
+        if ($passwordLength < 8 || $passwordLength > 20) {
+            $signupError = "Password must be between 8-20 characters.";
+        } elseif (!$hasNumber) {
+            $signupError = "Password must contain at least 1 number.";
+        } elseif ($hasSpaces) {
+            $signupError = "Password cannot contain spaces.";
+        } else {
         // Check if email already exists in user_detail_t
         $checkEmailQuery = "SELECT * FROM user_detail_t WHERE email_address = '$email'";
         $checkEmailResult = mysqli_query($connection, $checkEmailQuery);
@@ -60,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSignUp'])) {
                 $signupError = "Error: " . mysqli_error($connection);
             }
         }
+    }
     }
 }
 ?>

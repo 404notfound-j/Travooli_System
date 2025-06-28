@@ -15,11 +15,37 @@ body {
     min-height: 100vh;
 }
 
+/* Signin Background (copied from sign.css) */
+.signin-bg {
+    min-height: 100vh;
+    width: 100%;
+    background: #1a2332 url('../background/Map.png') no-repeat center center;
+    background-size: cover;
+    background-attachment: local;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.signin-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(82, 82, 122, 0.2);
+    z-index: 1;
+}
+
 /* Profile Container */
 .profile-main {
     padding: 30px 20px;
     max-width: 1200px;
     margin: 0 auto;
+    position: relative;
+    z-index: 2;
 }
 
 .profile-container {
@@ -29,6 +55,8 @@ body {
     border-radius: 20px;
     padding: 30px 40px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 3;
 }
 
 /* Profile Header */
@@ -55,7 +83,77 @@ body {
     -webkit-user-select: none;
     -webkit-user-drag: none;
     user-select: none;
-    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+/* Clickable Avatar Styles */
+.clickable-avatar {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.3s ease;
+    z-index: 4;
+}
+
+.clickable-avatar:hover .avatar-img {
+    transform: scale(1.05);
+    box-shadow: 0 12px 28px rgba(96, 93, 236, 0.4);
+    border-color: #8B5DFF;
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: -1.5px;
+    left: -1.5px;
+    right: -1.5px;
+    bottom: 5.5px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.clickable-avatar:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.camera-icon {
+    color: #ffffff;
+    margin-bottom: 4px;
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+}
+
+.clickable-avatar:hover .camera-icon {
+    transform: translateY(0);
+}
+
+.avatar-text {
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    opacity: 0.9;
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+}
+
+.clickable-avatar:hover .avatar-text {
+    transform: translateY(0);
+}
+
+/* Active state when clicking */
+.clickable-avatar:active {
+    transform: scale(0.98);
+}
+
+.clickable-avatar:active .avatar-img {
+    transform: scale(1.02);
 }
 
 .profile-title h1 {
@@ -112,13 +210,16 @@ body {
 
 /* Form Styles */
 .form-section {
+    margin-top: 25px;
     margin-bottom: 25px;
     margin-left: 40px;
     padding-right: 20px;
+    position: relative;
+    z-index: 3;
 }
 
 .form-section h2 {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     color: #ffffff;
     margin-bottom: 20px;
@@ -153,7 +254,7 @@ body {
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .form-group.readonly {
@@ -177,6 +278,8 @@ body {
     font-family: 'Poppins', sans-serif;
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
+    position: relative;
+    z-index: 4;
 }
 
 .form-group input:focus,
@@ -209,11 +312,14 @@ body {
     display: flex;
     gap: 16px;
     justify-content: flex-end;
-    margin-top: 30px;
+    margin-top: 40px;
+    margin-bottom: 20px;
     margin-left: 40px;
     padding-top: 20px;
     padding-right: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 4;
 }
 
 .btn-primary,
@@ -231,6 +337,8 @@ body {
     align-items: center;
     justify-content: center;
     min-width: 120px;
+    position: relative;
+    z-index: 4;
 }
 
 .btn-primary {
@@ -320,6 +428,16 @@ body {
     .avatar-img {
         width: 60px;
         height: 60px;
+    }
+    
+    /* Mobile adjustments for clickable avatar */
+    .avatar-text {
+        font-size: 9px;
+    }
+    
+    .camera-icon svg {
+        width: 16px;
+        height: 16px;
     }
     
     .profile-title h1 {
