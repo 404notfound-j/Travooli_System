@@ -158,15 +158,64 @@ function validatePassword(password) {
     };
 }
 
+// Name validation function
+function validateName(name, fieldName) {
+    const errors = [];
+    
+    // Check if empty
+    if (!name || name.trim() === '') {
+        errors.push(`${fieldName} is required`);
+    } else if (!/^[A-Za-z]+$/.test(name.trim())) {
+        errors.push(`${fieldName} can only contain letters (no numbers, symbols, or spaces)`);
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors: errors
+    };
+}
+
 // Form validation on submit
 function initFormValidation() {
     document.addEventListener('DOMContentLoaded', function() {
         const signupForm = document.querySelector('.signin-form');
         
         if (signupForm) {
+            // Add input restrictions for name fields
+            initNameInputRestrictions();
+            
             signupForm.addEventListener('submit', function(e) {
+                const firstNameInput = document.getElementById('firstName');
+                const lastNameInput = document.getElementById('lastName');
                 const passwordInput = document.getElementById('password');
                 
+                // Validate first name
+                if (firstNameInput) {
+                    const firstName = firstNameInput.value;
+                    const validation = validateName(firstName, 'First name');
+                    
+                    if (!validation.isValid) {
+                        e.preventDefault();
+                        showErrorMessage(validation.errors[0]);
+                        firstNameInput.focus();
+                        return false;
+                    }
+                }
+                
+                // Validate last name
+                if (lastNameInput) {
+                    const lastName = lastNameInput.value;
+                    const validation = validateName(lastName, 'Last name');
+                    
+                    if (!validation.isValid) {
+                        e.preventDefault();
+                        showErrorMessage(validation.errors[0]);
+                        lastNameInput.focus();
+                        return false;
+                    }
+                }
+                
+                // Validate password
                 if (passwordInput) {
                     const password = passwordInput.value;
                     const validation = validatePassword(password);
@@ -185,6 +234,44 @@ function initFormValidation() {
             });
         }
     });
+}
+
+// Initialize input restrictions for name fields
+function initNameInputRestrictions() {
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    
+    // Restrict first name input to letters only
+    if (firstNameInput) {
+        firstNameInput.addEventListener('input', function(e) {
+            // Remove any non-letter characters
+            let value = e.target.value.replace(/[^A-Za-z]/g, '');
+            e.target.value = value;
+        });
+        
+        firstNameInput.addEventListener('keypress', function(e) {
+            // Prevent typing non-letter characters
+            if (!/[A-Za-z]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // Restrict last name input to letters only
+    if (lastNameInput) {
+        lastNameInput.addEventListener('input', function(e) {
+            // Remove any non-letter characters
+            let value = e.target.value.replace(/[^A-Za-z]/g, '');
+            e.target.value = value;
+        });
+        
+        lastNameInput.addEventListener('keypress', function(e) {
+            // Prevent typing non-letter characters
+            if (!/[A-Za-z]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+            }
+        });
+    }
 }
 
  
