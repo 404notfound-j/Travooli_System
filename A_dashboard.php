@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Travooli</title>
+    <link rel="stylesheet" href="css/A_dashboard.css">
+</head>
+<body>
+
 <?php
 // Start output buffering to capture the page content
 ob_start();
@@ -48,3 +58,6 @@ $pageContent = ob_get_clean();
 // Include the admin sidebar layout
 include 'adminSidebar.php';
 ?>
+
+</body>
+</html>

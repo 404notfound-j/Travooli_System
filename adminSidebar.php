@@ -55,14 +55,8 @@ $initials = strtoupper(substr($adminData['fst_name'], 0, 1) . substr($adminData[
     <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,500,600,700,900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/adminSIdebar.css">
-    <?php
-    // Include page-specific CSS based on current page
-    $currentPage = basename($_SERVER['PHP_SELF']);
-    if ($currentPage === 'A_dashboard.php') {
-        echo '<link rel="stylesheet" href="css/A_dashboard.css">';
-    }
-    ?>
+    <link rel="stylesheet" href="css/adminSidebar.css">
+
 </head>
 <body>
     <div class="sidebar">
@@ -72,7 +66,7 @@ $initials = strtoupper(substr($adminData['fst_name'], 0, 1) . substr($adminData[
         </div>
         
         <nav class="nav-menu">
-            <a href="#" class="nav-item active">Dashboard</a>
+            <a href="A_dashboard.php" class="nav-item active">Dashboard</a>
             <a href="#" class="nav-item">Flight</a>
             <a href="#" class="nav-item">Booking</a>
             <a href="#" class="nav-item">Report</a>
@@ -146,6 +140,13 @@ $initials = strtoupper(substr($adminData['fst_name'], 0, 1) . substr($adminData[
             ?>
         </main>
     </div>
-    <script src="js/adminSIdebar.js"></script>
+    <script src="js/adminSidebar.js"></script>
+    <?php
+    // Include page-specific JavaScript based on current page
+    $currentPage = basename($_SERVER['PHP_SELF']);
+    if ($currentPage === 'admin_profile.php') {
+        echo '<script src="js/admin_profile.js"></script>';
+    }
+    ?>
 </body>
 </html>
