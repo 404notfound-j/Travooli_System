@@ -10,6 +10,15 @@
 <body>
     <header>        
         <?php include 'userHeader.php';?>
+        <?php
+          if (isset($_GET['depart'])) $_SESSION['selected_depart_flight_id'] = $_GET['depart'];
+          if (isset($_GET['return'])) $_SESSION['selected_return_flight_id'] = $_GET['return'];
+          if (isset($_GET['flightId'])) $_SESSION['selected_flight_id'] = $_GET['flightId'];
+          if (isset($_GET['classId'])) $_SESSION['selectedClass'] = $_GET['classId'];
+        ?>
+<input type="hidden" id="depart_flight_id" value="<?= $_SESSION['selected_depart_flight_id'] ?? $_SESSION['selected_flight_id'] ?? '' ?>">
+<input type="hidden" id="return_flight_id" value="<?= $_SESSION['selected_return_flight_id'] ?? '' ?>">
+<input type="hidden" id="seat_class_field" value="<?= $_SESSION['selectedClass'] ?? 'PE' ?>">
     </header>
     <main class="main-content">
         <div class="container">
@@ -122,36 +131,35 @@
                 </div>
                 <!-- Right Column -->
                 <div class="right-column">
-                    <div class="price-card">
-                        <h2>Price Details</h2>
-                        <p>Tickets (2 Adults, 1 Child)</p>
-                        
-                        <div class="price-item">
-                            <span>Subtotal</span>
-                            <span>$340</span>
-                        </div>
-                        <div class="price-item">
-                            <span>Baggage Fees</span>
-                            <span>$20</span>
-                        </div>
-                        <div class="price-item">
-                            <span>Multi-meal</span>
-                            <span>$30</span>
-                        </div>
-                        <div class="price-item">
-                            <span>Taxes & Fees</span>
-                            <span>$121</span>
-                        </div>
-                        <div class="price-item">
-                            <span>Discount</span>
-                            <span>$0</span>
-                        </div>
-                        <hr>
-                        <div class="total">
-                            <span>Total</span>
-                            <span>$491</span>
-                        </div>
-                    </div>
+                <div class="price-card">
+                    <h2>Price Details</h2>
+                    <p id="ticket-count-label">Tickets</p>
+                <div class="price-item">
+                    <span>Subtotal</span>
+                    <span id="flight-price">RM 0</span>
+                </div>
+                <div class="price-item">
+                    <span>Baggage Fees</span>
+                    <span class="baggage-price">RM 0</span>
+                </div>
+                <div class="price-item">
+                    <span>Multi-meal</span>
+                    <span class="meal-price">RM 0</span>
+                </div>
+                <div class="price-item">
+                    <span>Taxes & Fees</span>
+                    <span>RM 121</span>
+                </div>
+                <div class="price-item">
+                    <span>Discount</span>
+                    <span>RM 0</span>
+                </div>
+                <hr>
+                <div class="total">
+                    <span>Total</span>
+                    <span id="total">RM 0</span>
+                </div>
+            </div>
                     <button class="proceed-btn">Proceed to Payment</button>
                 </div>
             </div>

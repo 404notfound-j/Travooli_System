@@ -396,6 +396,7 @@ hr {
     font-size: 25px;
     font-weight: 600;
     font-family: 'Montserrat', sans-serif;
+    text-align: right;
 }
 
 .proceed-btn {

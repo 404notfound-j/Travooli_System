@@ -1,5 +1,31 @@
-// Payment method selection
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    const total = sessionStorage.getItem('total_price') || '0';
+    const ticket = sessionStorage.getItem('ticket_price') || '0';
+    const baggage = sessionStorage.getItem('baggage_price') || '0';
+    const meal = sessionStorage.getItem('meal_price') || '0';
+    const label1 = sessionStorage.getItem('ticket_label') || 'Tickets';
+    const adults = parseInt(sessionStorage.getItem('adultCount')) || 1;
+    const children = parseInt(sessionStorage.getItem('childCount')) || 0;
+    // Update the price values
+    document.getElementById('flight-price').textContent = `RM ${ticket}`;
+    document.querySelector('.meal-price').textContent = `RM ${meal}`;
+    document.querySelector('.baggage-price').textContent = `RM ${baggage}`;
+    document.getElementById('total').textContent = `RM ${total}`;
+    document.getElementById('ticket-count-label').textContent = label1;
+    // Generate dynamic passenger label
+    let label = 'Tickets (';
+    if (adults > 0) label += `${adults} Adult${adults > 1 ? 's' : ''}`;
+    if (children > 0) {
+      if (adults > 0) label += ', ';
+      label += `${children} Child${children > 1 ? 'ren' : ''}`;
+    }
+    label += ')';
+    const ticketLabel = document.getElementById('ticket-count-label');
+    
+
+  // Payment method selection
+    if (ticketLabel) ticketLabel.textContent = label;
+    document.getElementById('ticket-count-label').textContent = label;
     const paymentMethods = document.querySelectorAll('.payment-method');
     const radioButtons = document.querySelectorAll('.radio-button');
     
@@ -121,4 +147,62 @@ document.addEventListener('DOMContentLoaded', function() {
             addLoadingState(this, 'Confirm and pay');
         });
     }
+    document.querySelector('.proceed-btn').addEventListener('click', function () {
+        const selectedMethod = document.querySelector('.payment-method.selected .method-name')?.textContent.trim();
+
+        // If Credit/Debit Card selected, validate card fields
+        if (selectedMethod === "Debit/Credit Card") {
+            const nameInput = document.querySelector('input[placeholder="Name"]');
+            const cardInput = document.querySelector('input[placeholder="Card Number"]');
+            const expiryInput = document.querySelector('input[placeholder="Expiration Date"]');
+            const cvvInput = document.querySelector('input[placeholder="CVV"]');
+    
+            if (!nameInput.value || !cardInput.value || !expiryInput.value || !cvvInput.value) {
+                alert('Please complete all card details before proceeding.');
+                return;
+            }
+        }
+        const amountText = document.getElementById('total').textContent;
+        const amount = amountText.replace(/[^\d.]/g, '');
+        const paymentMethodElement = document.querySelector('.payment-method.selected .method-name');
+        const paymentMethod = paymentMethodElement ? paymentMethodElement.textContent.trim() : '';
+        const departId = document.getElementById('depart_flight_id')?.value;
+        const returnId = document.getElementById('return_flight_id')?.value;
+        const classId = document.getElementById('seat_class_field')?.value;
+    
+        const today = new Date();
+        const paymentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+        console.log("Preparing payment data:");
+        console.log("Amount:", amount);
+        console.log("Payment Method:", paymentMethod);
+        console.log("Payment Date:", paymentDate);
+        console.log("Depart Flight ID:", departId);
+        console.log("Return Flight ID:", returnId);
+        console.log("Seat Class:", classId);
+    
+        fetch('insertFlightPayment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount,
+                payment_method: paymentMethod,
+                payment_date: paymentDate,
+                depart_id: departId,
+                return_id: returnId,
+                class_id: classId
+            })
+        })
+        .then(res => res.text())
+        .then(response => {
+            console.log("Server Response:", response);
+            window.location.href = 'payment_complete.php';
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            alert("Payment failed. Please try again.");
+        });
+    });    
 });
+
+  

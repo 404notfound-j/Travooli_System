@@ -1,110 +1,213 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const addBtn = document.querySelector('.add-passenger-btn');
-    const popupOverlay = document.getElementById('popup-overlay');
-    const popupBody = document.getElementById('popup-body');
-  
-    addBtn.addEventListener('click', () => {
+  const addBtn = document.querySelector('.add-passenger-btn');
+  const popupOverlay = document.getElementById('popup-overlay');
+  const popupBody = document.getElementById('popup-body');
+  const passengerList = document.querySelector('.passenger-list');
+  const adultCount = parseInt(sessionStorage.getItem("adultCount")) || 1;
+  const childCount = parseInt(sessionStorage.getItem("childCount")) || 0;
+  const countryMap= {
+    au: "Australia",
+    cn: "China",
+    jp: "Japan",
+    kr: "South Korea",
+    gb: "United Kingdom",
+    in: "India",
+    my: "Malaysia",
+    sg: "Singapore",
+    us: "United States"
+  };
+  let currentEditingPassenger = null;
+
+  function bindEditPassengerBtn(button) {
+    button.addEventListener('click', () => {
+      const passengerItem = button.closest('.passenger-item');
+      currentEditingPassenger = passengerItem;
+
+      const name = passengerItem.querySelector('.passenger-name').textContent.trim();
+      const typeText = passengerItem.querySelector('.passenger-type').textContent.trim();
+      const [type, gender, country] = typeText.split(" / ");
+      const [firstName, ...lastNameParts] = name.split(" ");
+      const lastName = lastNameParts.join(" ");
+      const codeEntry = Object.entries(countryMap).find(([code, name]) => name === country);
+      const countryCode = codeEntry ? codeEntry[0] : '';
+      const dob = passengerItem.getAttribute('data-dob');
       fetch('pass_info_popup.php')
         .then(res => res.text())
         .then(html => {
           popupBody.innerHTML = html;
           popupOverlay.classList.remove('hidden');
           document.body.classList.add('blurred');
-  
-          // Add Save behavior inside the loaded popup
-          setTimeout(() => {
-            const saveBtn = popupBody.querySelector('.popup-save-btn');
-            const closeBtn = popupBody.querySelector('.popup-close');
-  
-            closeBtn?.addEventListener('click', () => {
-              popupOverlay.classList.add('hidden');
-              document.body.classList.remove('blurred');
-            });
-  
-            saveBtn?.addEventListener('click', function (e) {
-              e.preventDefault();
-            
-              const fname = popupBody.querySelector('#first_name').value.trim();
-              const lname = popupBody.querySelector('#last_name').value.trim();
-              const gender = popupBody.querySelector('#gender').value;
-              const country = popupBody.querySelector('#country').value;
-            
-              if (!fname || !lname) return;
-            
-              const passengerList = document.querySelector('.passenger-list');
-              const passengerItem = document.createElement('div');
-              passengerItem.classList.add('passenger-item');
-              passengerItem.innerHTML = `
-                <input type="checkbox" checked>
-                <div class="passenger-details">
-                  <span class="passenger-name">${fname} ${lname}</span>
-                  <span class="passenger-type">Adult / ${gender} / ${country}</span>
-                </div>
-                <button class="edit-passenger-btn"><i class="fa-solid fa-user-pen"></i></button>
-              `;
-              passengerList.appendChild(passengerItem);
-              document.querySelectorAll('.trip-segment').forEach(segment => {
-                console.log(document.querySelectorAll('.trip-segment').length); // Should be 2
-                const newAddon = document.createElement('div');
-                newAddon.classList.add('passenger-addon-item');
-                newAddon.innerHTML = `
-                  <div class="addons-row">
-                    <div class="passenger-name">${fname} ${lname}</div>
-                    <div class="addon-details">
-                      <span class="addon-type">Meal Add-on</span>
-                      <span class="addon-value" data-price="30">Multi-meal</span>
-                      <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
-                    </div>
-                    <div class="addon-details">
-                      <span class="addon-type">Additional Baggage</span>
-                      <span class="addon-value" data-price="20">1piece, 25kg</span>
-                      <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
-                    </div>
-                  </div>
-                `;
-                const addonContainer = segment.querySelector('.add-on-container') || segment;
-                addonContainer.appendChild(newAddon);                
-              });
-              
-              if (typeof updatePrices === 'function') updatePrices();
-              popupOverlay.classList.add('hidden');
-              document.body.classList.remove('blurred');
-            });
-
-            let currentEditingPassenger = null;
-            const editBtn = passengerItem.querySelector('.edit-passenger-btn');
-            editBtn.addEventListener('click', () => {
-              const name = passengerItem.querySelector('.passenger-name').textContent.trim();
-              const typeText = passengerItem.querySelector('.passenger-type').textContent.trim(); // <- corrected this line
-              const [type, gender, country] = typeText.split(" / ");
-              const [firstName, ...lastNameParts] = name.split(" ");
-              const lastName = lastNameParts.join(" ");
-            
-              fetch('pass_info_popup.php')
-                .then(res => res.text())
-                .then(html => {
-                  popupBody.innerHTML = html;
-                  popupOverlay.classList.remove('hidden');
-                  document.body.classList.add('blurred');
-            
-                  // Save reference for editing
-                  currentEditingPassenger = passengerItem;
-            
-                  // Populate fields
-                  document.getElementById('first_name').value = firstName;
-                  document.getElementById('last_name').value = lastName;
-                  document.getElementById('gender').value = gender.toLowerCase();
-                  document.getElementById('country').value = country.toLowerCase();
-            
-                  setupPopupEvents(); // now it knows it's in edit mode
-                });
-            });
-              
-              popupOverlay.classList.add('hidden');
-              document.body.classList.remove('blurred');
-            });
-          }, 100);
+          document.getElementById('first_name').value = firstName;
+          document.getElementById('last_name').value = lastName;
+          document.getElementById('gender').value = gender.toLowerCase();
+          document.getElementById('country').value = countryCode;
+          document.getElementById('dob').value = dob || '';
+          setupPopupEvents();
         });
+    });
+  }
+
+  function createPassengerEntry(type, index) {
+    const fname = `Guest`;
+    const lname = ``;     
+
+    const passengerItem = document.createElement('div');
+    passengerItem.classList.add('passenger-item');
+    passengerItem.innerHTML = `
+      <input type="checkbox" checked>
+      <div class="passenger-details">
+        <span class="passenger-name">${fname} ${lname}</span>
+        <span class="passenger-type">${type} / Male / Malaysia</span>
+      </div>
+      <button class="edit-passenger-btn"><i class="fa-solid fa-user-pen"></i></button>
+    `;
+    passengerList.appendChild(passengerItem);
+
+    const editBtn = passengerItem.querySelector('.edit-passenger-btn');
+    bindEditPassengerBtn(editBtn);
+
+    document.querySelectorAll('.trip-segment').forEach(segment => {
+      const newAddon = document.createElement('div');
+      newAddon.classList.add('passenger-addon-item');
+      newAddon.innerHTML = `
+        <div class="addons-row">
+          <div class="passenger-name">${fname} ${lname}</div>
+          <div class="addon-details">
+            <span class="addon-type">Meal Add-on</span>
+            <span class="addon-value" data-price="30">Multi-meal</span>
+            <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
+          </div>
+          <div class="addon-details">
+            <span class="addon-type">Additional Baggage</span>
+            <span class="addon-value" data-price="20">1piece, 25kg</span>
+            <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
+          </div>
+        </div>
+      `;
+      const addonContainer = segment.querySelector('.add-on-container') || segment;
+      addonContainer.appendChild(newAddon);
+    }); 
+  }
+
+  function updateTicketLabel() {
+    let adults = 0;
+    let children = 0;
+  
+    document.querySelectorAll('.passenger-type').forEach(typeEl => {
+      const type = typeEl.textContent.trim().split(' / ')[0];
+      if (type === 'Adult') adults++;
+      if (type === 'Child') children++;
+    });
+  
+    let label = 'Tickets (';
+    if (adults > 0) label += `${adults} Adult${adults > 1 ? 's' : ''}`;
+    if (children > 0) {
+      label += adults > 0 ? ', ' : '';
+      label += `${children} Child${children > 1 ? 'ren' : ''}`;
+    }
+    label += ')';
+  
+    const labelEl = document.getElementById('ticket-count-label');
+    if (labelEl) labelEl.textContent = label;
+  }
+  
+  function generatePassengerList() {
+    passengerList.innerHTML = '';
+    document.querySelectorAll('.passenger-addon-item').forEach(el => el.remove());
+
+    for (let i = 1; i <= adultCount; i++) createPassengerEntry("Adult", i);
+    for (let i = 1; i <= childCount; i++) createPassengerEntry("Child", i);
+  }
+
+  // Generate initial passenger list based on sessionStorage
+  generatePassengerList();
+
+  addBtn.addEventListener('click', () => {
+    fetch('pass_info_popup.php')
+      .then(res => res.text())
+      .then(html => {
+        popupBody.innerHTML = html;
+        popupOverlay.classList.remove('hidden');
+        document.body.classList.add('blurred');
+        setTimeout(() => {
+          const saveBtn = popupBody.querySelector('.popup-save-btn');
+          const closeBtn = popupBody.querySelector('.popup-close');
+          closeBtn?.addEventListener('click', () => {
+            popupOverlay.classList.add('hidden');
+            document.body.classList.remove('blurred');
+          });
+
+          saveBtn?.addEventListener('click', function (e) {
+            e.preventDefault();
+            const fname = popupBody.querySelector('#first_name').value.trim();
+            const lname = popupBody.querySelector('#last_name').value.trim();
+            const gender = popupBody.querySelector('#gender').value;
+            const countryCode = popupBody.querySelector('#country').value;
+            const countryName = countryMap[countryCode] || countryCode;
+            const dobInput = popupBody.querySelector('#dob');
+
+            if (!dobInput || !dobInput.value) {
+              alert("Please provide a valid date of birth.");
+              return;
+            }
+
+            const dob = new Date(dobInput.value);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+              age--;
+            }
+
+            const passengerType = age < 12 ? "Child" : "Adult";
+            if (!fname || !lname) return;
+
+            const passengerItem = document.createElement('div');
+            passengerItem.classList.add('passenger-item');
+            passengerItem.setAttribute('data-dob', dobInput.value);
+            passengerItem.innerHTML = `
+              <input type="checkbox" checked>
+              <div class="passenger-details">
+                <span class="passenger-name">${fname} ${lname}</span>
+                <span class="passenger-type">${passengerType} / ${gender} / ${countryName}</span>
+              </div>
+              <button class="edit-passenger-btn"><i class="fa-solid fa-user-pen"></i></button>
+            `;
+            passengerList.appendChild(passengerItem);
+
+            const editBtn = passengerItem.querySelector('.edit-passenger-btn');
+            bindEditPassengerBtn(editBtn);
+
+            document.querySelectorAll('.trip-segment').forEach(segment => {
+              const newAddon = document.createElement('div');
+              newAddon.classList.add('passenger-addon-item');
+              newAddon.innerHTML = `
+                <div class="addons-row">
+                  <div class="passenger-name">${fname} ${lname}</div>
+                  <div class="addon-details">
+                    <span class="addon-type">Meal Add-on</span>
+                    <span class="addon-value" data-price="30">Multi-meal</span>
+                    <button class="edit-meals-btn"><i class="fa-solid fa-user-pen"></i></button>
+                  </div>
+                  <div class="addon-details">
+                    <span class="addon-type">Additional Baggage</span>
+                    <span class="addon-value" data-price="20">1piece, 25kg</span>
+                    <button class="edit-baggage-btn"><i class="fa-solid fa-user-pen"></i></button>
+                  </div>
+                </div>
+              `;
+              const addonContainer = segment.querySelector('.add-on-container') || segment;
+              addonContainer.appendChild(newAddon);
+            });
+            updateTicketLabel();
+            if (typeof updatePrices === 'function') updatePrices();
+
+            popupOverlay.classList.add('hidden');
+            document.body.classList.remove('blurred');
+          });
+        }, 100);
+      });
+  });
 
 // Handle Edit Passenger Buttons
 document.querySelectorAll('.edit-passenger-btn').forEach(button => {
@@ -116,8 +219,9 @@ document.querySelectorAll('.edit-passenger-btn').forEach(button => {
     const typeText = passengerItem.querySelector('.passenger-type').textContent.trim();
     const [type, gender, country] = typeText.split(" / ");
     const [firstName, ...lastNameParts] = name.split(" ");
+    
     const lastName = lastNameParts.join(" ");
-
+    const dob = passengerItem.getAttribute('data-dob');
     fetch('pass_info_popup.php')
       .then(res => res.text())
       .then(html => {
@@ -130,11 +234,11 @@ document.querySelectorAll('.edit-passenger-btn').forEach(button => {
         document.getElementById('last_name').value = lastName;
         document.getElementById('gender').value = gender.toLowerCase();
         document.getElementById('country').value = country.toLowerCase();
+        document.getElementById('dob').value = dob || '';
         setupPopupEvents();
       });
   });
 });
-
 
 function setupPopupEvents() {
   const saveBtn = popupBody.querySelector('.popup-save-btn');
@@ -151,21 +255,49 @@ function setupPopupEvents() {
     const fname = popupBody.querySelector('#first_name').value.trim();
     const lname = popupBody.querySelector('#last_name').value.trim();
     const gender = popupBody.querySelector('#gender').value;
-    const country = popupBody.querySelector('#country').value;
-
+    const countryCode = popupBody.querySelector('#country').value;
+    const countryName = countryMap[countryCode] || countryCode;
+    const dobInput = popupBody.querySelector('#dob');
     if (!fname || !lname) return;
 
-    // If editing an existing passenger
     if (currentEditingPassenger) {
-      currentEditingPassenger.querySelector('.passenger-name').textContent = `${fname} ${lname}`;
-      currentEditingPassenger.querySelector('.passenger-type').textContent = `Adult / ${gender} / ${country}`;
-      currentEditingPassenger = null; // clear reference
+      const updatedFullName = `${fname} ${lname}`;
+      const oldName = currentEditingPassenger.querySelector('.passenger-name').textContent.trim();
+      currentEditingPassenger.setAttribute('data-dob', dobInput.value);
+      // Update top passenger block
+      currentEditingPassenger.querySelector('.passenger-name').textContent = updatedFullName;
+      if (!dobInput || !dobInput.value) {
+        alert("Please provide a valid date of birth.");
+        return;
+      }
+
+      const dob = new Date(dobInput.value);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const monthDiff = today.getMonth() - dob.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+      const passengerType = age < 12 ? "Child" : "Adult";
+
+      currentEditingPassenger.querySelector('.passenger-type').textContent = `${passengerType} / ${gender} / ${countryName}`;
+      currentEditingPassenger.setAttribute('data-dob', dobInput.value); 
+      
+      // === Update addon section names (Depart & Return) ===
+      document.querySelectorAll('.addons-row .passenger-name').forEach(el => {
+        if (el.textContent.trim() === oldName) {
+          el.textContent = updatedFullName;
+        }
+      });
+
+      currentEditingPassenger = null;
     }
 
     popupOverlay.classList.add('hidden');
     document.body.classList.remove('blurred');
   });
 }
+
 document.addEventListener('click', function (e) {
   if (e.target.closest('.edit-meals-btn')) {
     const btn = e.target.closest('.edit-meals-btn');
@@ -210,7 +342,7 @@ function setupMealPopupEvents() {
   const closeBtn = popupBody.querySelector('.popup-close');
     closeBtn?.addEventListener('click', () => {
     popupOverlay.classList.add('hidden');
-    popupBody.innerHTML = ''; // ✅ clear the popup contents
+    popupBody.innerHTML = ''; 
     document.body.classList.remove('blurred');
     document.querySelectorAll('.edit-meals-btn').forEach(btn => btn.classList.remove('active')); // optional cleanup
 });
@@ -295,11 +427,9 @@ function setupBagPopupEvents() {
         if (addonValue) {
           addonValue.textContent = `${quantity} piece${quantity > 1 ? 's' : ''}, ${selectedBag}`;
           addonValue.setAttribute('data-price', totalBaggagePrice); 
-        }
-  
+        } 
         openerButton.classList.remove('active');
       }
-  
       popupOverlay.classList.add('hidden');
       document.body.classList.remove('blurred');
       if (typeof updatePrices === 'function') {
@@ -309,4 +439,26 @@ function setupBagPopupEvents() {
   });      
 }
 });
+
+document.querySelector('.select-seats-btn').addEventListener('click', function (e) {
+  e.preventDefault(); // Stop default link behavior
+
+  // Get price values from the DOM
+  const total = document.querySelector('.total-value')?.textContent.trim().replace('RM', '').trim() || '0';
+  const ticket = document.getElementById('flight-price')?.textContent.trim().replace('RM', '').trim() || '0';
+  const baggage = document.querySelector('.baggage-price')?.textContent.trim().replace('RM', '').trim() || '0';
+  const meal = document.querySelector('.meal-price')?.textContent.trim().replace('RM', '').trim() || '0';
+
+  // Save them in sessionStorage
+  sessionStorage.setItem('total_price', total);
+  sessionStorage.setItem('ticket_price', ticket);
+  sessionStorage.setItem('baggage_price', baggage);
+  sessionStorage.setItem('meal_price', meal);
+  console.log("Total:", total);
+  console.log("Ticket:", ticket);
+  console.log("Baggage:", baggage);
+  console.log("Meal:", meal);
   
+  // Redirect to next page
+  window.location.href = "seat_selection.php";
+});
