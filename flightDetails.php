@@ -9,7 +9,21 @@
 </head>
 <body>
   <header>
-    <?php include 'userHeader.php'; ?>
+    <?php include 'userHeader.php'; 
+  if (isset($_GET['flightId'])) {
+    $_SESSION['selected_flight_id'] = $_GET['flightId'];
+}
+if (isset($_GET['classId'])) {
+    $_SESSION['selectedClass'] = $_GET['classId'];
+}
+
+if (isset($_GET['depart'])) {
+    $_SESSION['selected_depart_flight_id'] = $_GET['depart'];
+}
+if (isset($_GET['return'])) {
+    $_SESSION['selected_return_flight_id'] = $_GET['return'];
+}
+    ?>
   </header>
   <div class="container">
     <div class="title-section">
@@ -24,27 +38,24 @@
             <span class="rating-score">4.2</span> <!-- Static for now -->
             <span class="rating-text">Very Good 54 reviews</span> <!-- Static for now -->
         </div>
-
     </div>
-
       </div>
       <div class="price-cta">
         <strong style="font-size: 24px; color: #5c63f2;" id="depart-flight-price">Loading price...</strong> <!-- Static for now, could be dynamic -->
         <button class="like-button"><i class="fa-solid fa-heart"></i></button> <!-- Static for now -->
         <button><i class="fa-solid fa-share-nodes"></i></button> <!-- Static for now -->
-        <button class="book-now-btn">Book now</button> <!-- Static for now -->
+        <button class="book-now-btn">Book now</button> 
       </div>
     </div>
     <!-- Main airplane image might be dynamic based on airline/aircraft -->
-    <img src="../Images/airasia.jpg" alt="Plane" class="main-airplane-image" id="depart-airplane-image">
-
+    <img src="images/plane.jpg" class="airline-picture" id="depart-airplane-image" >
     <div class="features-header"">
       <h3 style="color: #5c63f2;">Basic Economy Features</h3>
-      <div class="feature-tags">
-        <button>Economy</button>
-        <button>Premium Economy</button>
-        <button>Business Class</button>
-        <button>First Class</button>
+      <div class="seat">
+      <span class="seat-option" data-class="EC">Economy</span>
+        <span class="seat-option" data-class="PE">Premium Economy</span>
+        <span class="seat-option" data-class="BC">Business Class</span>
+        <span class="seat-option" data-class="FC">First Class</span>
       </div>
     </div>
 
@@ -54,7 +65,7 @@
     </div>
     <div class="flight-box">
       <div class="header-row">
-        <div class="flight-title" id="depart-date">Depart date</div>
+        <div class="flight-title" id="depart-date">Depart Flight</div>
         <div id="depart-flight-duration">Loading duration...</div>
       </div>
 
@@ -104,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div class="flight-box">
+    <div class="flight-box" id="return-flight-section">
   <div class="header-row">
     <div class="flight-title" id="return-date">Return Flight</div>
     <div id="return-flight-duration">Loading duration...</div>
@@ -155,7 +166,6 @@
     </div>
   </div>
 </div>
-
     <?php include 'feedback.php'; ?>
 
 <script src="js/flightDetails.js"></script>

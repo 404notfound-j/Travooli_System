@@ -56,11 +56,11 @@ if (!empty($_POST['airlines'])) {
 }
 if (!$sortBy || $sortBy !== "cheapest") {
     // Only apply these for normal search (not cheapest)
-    if ($seatClass) {
+    if (!empty($seatClass)) {
         $query .= " AND s.class_id = ?";
         $types .= "s";
         $params[] = $seatClass;
-    }
+    }    
     if ($timeFrom && $timeTo) {
         $query .= " AND f.departure_time BETWEEN ? AND ?";
         $types .= "ss";

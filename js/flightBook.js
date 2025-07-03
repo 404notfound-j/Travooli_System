@@ -1,27 +1,88 @@
-// Get query parameters from previous page
+//from dashboard
 const urlParams = new URLSearchParams(window.location.search);
-const from = urlParams.get('from') || 'From where?';
-const to = urlParams.get('to') || 'Where to?';
-const passenger = urlParams.get('passenger') || '1 adult';
-let storedFromCode = "";
-let storedToCode = "";
-let currentTrip = "depart"; 
+const fromCode = urlParams.get('from') || '';
+const toCode = urlParams.get('to') || '';
+const rawDepartDate = urlParams.get('departDate') || '';
+const rawReturnDate = urlParams.get('returnDate') || '';
+const departDate = convertToDDMM(rawDepartDate);
+const returnDate = convertToDDMM(rawReturnDate);
+const trip = urlParams.get('trip') || 'one';
+const adults = parseInt(urlParams.get('adults')) || 1;
+const children = parseInt(urlParams.get('children')) || 0;
+const passengerLabel = `${adults} adult${adults > 1 ? 's' : ''}${children > 0 ? ', ' + children + ' child' + (children > 1 ? 'ren' : '') : ''}`;
+const passenger = passengerLabel;
+let storedFromCode = fromCode;
+let storedToCode = toCode;
+let currentTrip = (trip === 'round') ? 'depart' : 'oneway';
 
 // Airline shortcodes mapping
 const airlineCodeMap = {
   "AirAsia": "AK",
-  "BatikAir": "OD",
   "Mas": "MH",
   "FireFly": "FY"
 };
+document.addEventListener('DOMContentLoaded', () => {
+  initializeFlightBookingUI();
 
-// Format date to yyyy-mm-dd
-function formatToISODate(dateStr) {
-  const currentYear = new Date().getFullYear();
-  const [day, month] = dateStr.split('/');
-  if (!day || !month) return "";
-  return `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  if (storedFromCode && storedToCode && departDate) {
+    const fromInput = document.getElementById('fromAirport');
+    const toInput = document.getElementById('toAirport');
+    const departInput = document.getElementById('departDate');
+    const returnInput = document.getElementById('returnDate');
+
+    if (fromInput) fromInput.value = storedFromCode;
+    if (toInput) toInput.value = storedToCode;
+    if (departInput) departInput.value = rawDepartDate;
+    if (returnInput && trip === "round") returnInput.value = rawReturnDate;
+
+    const tripRadio = document.querySelector(`input[name="tripType"][value="${trip}"]`);
+    if (tripRadio) tripRadio.checked = true;
+
+    // Only fetch DEPARTURE flights
+    const origin = storedFromCode;
+    const destination = storedToCode;
+    const depart = formatToISODate(convertToDDMM(rawDepartDate));
+
+    sessionStorage.setItem("selectingReturn", "false");
+
+    fetchAndRenderFlights({
+      origin: origin,
+      destination: destination,
+      date: depart,
+      trip: "depart"
+    });
+  }
+});
+
+
+function convertToDDMM(dateStr) {
+  const parts = dateStr.split(' ');
+  if (parts.length < 3) return ''; // Not enough parts to process
+
+  const dayRaw = parts[2];
+  const monthAbbr = parts[1];
+
+  if (!dayRaw || !monthAbbr) return '';
+
+  const day = dayRaw.padStart(2, '0');
+  const monthMap = {
+    Jan: '01', Feb: '02', Mar: '03', Apr: '04',
+    May: '05', Jun: '06', Jul: '07', Aug: '08',
+    Sep: '09', Oct: '10', Nov: '11', Dec: '12'
+  };
+
+  const month = monthMap[monthAbbr];
+  return day && month ? `${day}/${month}` : '';
 }
+
+function formatToISODate(ddmm) {
+  if (!ddmm || !ddmm.includes('/')) return ''; // Prevents crash
+  const [day, month] = ddmm.split('/');
+  if (!day || !month) return '';
+  const year = new Date().getFullYear();
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
+
 
 // Convert minutes to time format
 function formatTime(timeStr) {
@@ -91,20 +152,19 @@ function setupSortOptions() {
   document.querySelectorAll('.sort-option').forEach(option => {
     option.addEventListener('click', () => {
       const selectingReturn = sessionStorage.getItem("selectingReturn") === "true";
-    
+
       document.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('selected'));
       option.classList.add('selected');
       const sortLabel = option.textContent.trim().toLowerCase();
-    
-      const sortBy = sortLabel.includes("cheapest") ? "cheapest" : "best"; // Add more if needed
-    
+      const sortBy = sortLabel.includes("cheapest") ? "cheapest" : "best";
+
       fetchAndRenderFlights({
         sortBy: sortBy,
         trip: selectingReturn ? "return" : currentTrip
       });
-    });    
-  }
-)};
+    });
+  });
+}
 
 function fetchAndRenderFlights(options = {}) {
   const seatClassMap = {
@@ -114,28 +174,31 @@ function fetchAndRenderFlights(options = {}) {
     "First Class": "FC"
   };
 
-  let selectedClass = "";
-  if (options.forceSeatClass) {
-    selectedClass = options.forceSeatClass;
-  } else {
-    document.querySelectorAll(".filter-button").forEach(btn => {
-      if (btn.classList.contains("selected")) {
-        selectedClass = seatClassMap[btn.innerText.trim()];
-      }
-    });
-  }
-  if (options.trip) {
-    currentTrip = options.trip; 
-  }  
+  let selectedClass = "PE";
+  document.querySelectorAll(".filter-button").forEach(btn => {
+    if (btn.classList.contains("selected")) {
+      const label = btn.innerText.trim();
+      const seatClassMap = {
+        "Economy": "EC",
+        "Premium Economy": "PE",
+        "Business Class": "BC",
+        "First Class": "FC"
+      };
+      selectedClass = seatClassMap[label] || "PE";
+    }
+  });
+  
+
+  if (options.trip) currentTrip = options.trip;
+
   let minutes = parseInt(document.getElementById("timeRange").value);
   let hours = Math.floor(minutes / 60);
   let mins = minutes % 60;
   let timeFrom = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00`;
 
   const formData = new FormData();
-  if (!options.sortBy || options.sortBy === "best") {
-    formData.append("seatClass", selectedClass);
-  }
+  formData.append("seatClass", selectedClass);
+  console.log("Selected Seat Class:", selectedClass);
   formData.append("timeFrom", timeFrom);
   formData.append("timeTo", "23:00:00");
 
@@ -149,9 +212,7 @@ function fetchAndRenderFlights(options = {}) {
   if (options.date) formData.append("date", options.date);
   if (options.trip) formData.append("trip", options.trip);
   if (options.sortBy === "cheapest") formData.append("sortBy", "cheapest");
-
-  console.log("User Search Input:");
-  for (const [key, value] of formData.entries()) {
+  for (let [key, value] of formData.entries()) {
     console.log(`  ${key}: ${value}`);
   }
 
@@ -159,52 +220,67 @@ function fetchAndRenderFlights(options = {}) {
     method: "POST",
     body: formData
   })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
     .then(data => {
-      console.log("Backend returned:", data.length, "flight(s)");
-      console.log(data);
+      console.log("Received response from getflight.php:", data);
       renderFlights(data);
     })
-    .catch(err => console.error("Error fetching flights:", err));
+    .catch(err => {
+    });
+}
+
+function extractAirportCode(value) {
+  if (value.includes('(')) {
+    return value.split('(')[1].replace(')', '').trim();
+  }
+  return value.trim(); 
 }
 
 // Handle search or filter click
 function handleSearchOrFilter(isFilter = false) {
-  storedFromCode = document.getElementById('fromAirport').value.split('(')[1]?.replace(')', '').trim() || '';
-  storedToCode = document.getElementById('toAirport').value.split('(')[1]?.replace(')', '').trim() || '';  
+  const fromAirportInput = document.getElementById('fromAirport').value;
+  const toAirportInput = document.getElementById('toAirport').value;
   const departRaw = document.getElementById('departDate').value;
   const returnRaw = document.getElementById('returnDate').value;
   const depart = formatToISODate(departRaw);
   const returnDate = formatToISODate(returnRaw);
-  const tripType = document.querySelector('input[name="tripType"]:checked')?.value || "oneway";
-  const origin = from.split('(')[1]?.replace(')', '').trim() || "";
-  const destination = to.split('(')[1]?.replace(')', '').trim() || "";
-  const fromAirportInput = document.getElementById('fromAirport').value;
-  const toAirportInput = document.getElementById('toAirport').value;
   const resultsContainer = document.getElementById('flightResults');
+ 
+
+
+  let tripType = document.querySelector('input[name="tripType"]:checked')?.value || "oneway";
+
+  if (!fromAirportInput || !toAirportInput || !departRaw || (tripType === "round" && !returnRaw)) {
+    alert("Please complete all required fields including Return Date for Round Trip.");
+    return;
+  }
+ console.log("Search Submitted:");
+console.log("From:", fromAirportInput);
+console.log("To:", toAirportInput);
+console.log("Depart Date:", departRaw);
+console.log("Return Date:", returnRaw);
+console.log("Passenger(s):", passenger);
+console.log("Trip Type:", tripType);
+const origin = fromAirportInput.includes('(') ? fromAirportInput.split('(')[1].replace(')', '').trim() : fromAirportInput;
+const destination = toAirportInput.includes('(') ? toAirportInput.split('(')[1].replace(')', '').trim() : toAirportInput;
   if (resultsContainer) {
     resultsContainer.style.display = 'block';
     resultsContainer.innerHTML = '';
   }
-  
+
   if (isFilter) {
-    // If user is selecting return flight, skip filter re-fetch
-    if (sessionStorage.getItem("selectingReturn") === "true") {
-      console.log("User is selecting return flight — skipping filter re-fetch");
-      return;
-    }
-    fetchAndRenderFlights({ trip: currentTrip })
-}else{
-    // Search logic
-    if (tripType === "round" && returnDate) {
-      // Fetch departing flight
-      fetchAndRenderFlights({ origin, destination, date: depart, trip: "depart", forceSeatClass: "PE" });
-      // Fetch returning flight
-      fetchAndRenderFlights({ origin, destination, date: depart, trip: "depart", forceSeatClass: "PE" });
+    if (sessionStorage.getItem("selectingReturn") === "true") return;
+    fetchAndRenderFlights({ trip: currentTrip });
+  } else {
+    if (tripType === "round") {
+      fetchAndRenderFlights({ origin, destination, date: depart, trip: "depart" });
+      sessionStorage.setItem("selectingReturn", "false");
     } else {
-      // Oneway: send only depart data
-      fetchAndRenderFlights({ origin, destination, date: depart, trip: "depart", forceSeatClass: "PE" });
-    }
+      fetchAndRenderFlights({ origin, destination, date: depart, trip: "depart" });
+    }    
   }
 }
 
@@ -212,6 +288,8 @@ function handleSearchOrFilter(isFilter = false) {
 function renderFlights(flights) {
   const container = document.getElementById('flightResults');
   if (!container) return;
+
+  let fullHTML = '';
   flights.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
 
   if (flights.length > 0) {
@@ -227,7 +305,7 @@ function renderFlights(flights) {
     const flightBox = `
       <div class="flight-card">
         <div class="airline-section">
-          <img src="" alt="${flight.airline_id} Logo" class="airline-logo">
+         <img src="images/${flight.airline_id}.png" class="airline-logo" alt="${flight.airline_id} Logo">
           <span class="airline-name">${flight.airline_id}</span>
         </div>
         <div class="content-section">
@@ -261,69 +339,115 @@ function renderFlights(flights) {
         </div>
       </div>
     `;
-    container.innerHTML += flightBox;
+    fullHTML += flightBox;
   });
+
+  container.innerHTML = fullHTML; // ✅ Commit all at once
 }
 
-// Favorite and view details interaction
 function setupFlightResultEvents() {
-  document.getElementById('flightResults').addEventListener('click', (event) => {
+  const container = document.getElementById('flightResults');
+  if (!container) return;
+
+  console.log("📌 Event listener attached to #flightResults");
+
+  container.addEventListener('click', (event) => {
     const heartBtn = event.target.closest('.heart-btn');
     if (heartBtn) {
       heartBtn.classList.toggle('favorited');
+      return;
     }
+      const viewBtn = event.target.closest('.view-details-btn');
+      if (!viewBtn) return;
+    
+      // ✅ Prevent auto-clicking or programmatic trigger
+      if (!event.isTrusted) {
+        console.warn("⛔ Ignored synthetic or auto click");
+        return;
+      }
+    
+      console.log("🖱️ View Details clicked");
+    
+      // Proceed as normal...
+    
 
-    const viewBtn = event.target.closest('.view-details-btn');
-if (viewBtn) {
-  const flightId = viewBtn.dataset.flightId;
-  const selectingReturn = sessionStorage.getItem("selectingReturn") === "true";
-  const tripType = document.querySelector('input[name="tripType"]:checked')?.value || "oneway";
-
-  if (selectingReturn) {
-    // === You are now selecting return ===
-    sessionStorage.setItem("selectedReturnFlight", flightId);
-    sessionStorage.setItem("selectingReturn", "false"); // Clear flag
-
-    const departFlightId = sessionStorage.getItem("selectedDepartFlight");
-    const returnFlightId = sessionStorage.getItem("selectedReturnFlight");
-
-    window.location.href = `flightDetails.php?depart=${departFlightId}&return=${returnFlightId}`;
-    return;
-  }
-
-  if (tripType === "round") {
-    // === Selecting departure ===
-    const from = document.getElementById('fromAirport').value;
-    const to = document.getElementById('toAirport').value;
-    const returnRaw = document.getElementById('returnDate').value;
-
-    sessionStorage.setItem("selectedDepartFlight", flightId);
-    sessionStorage.setItem("departFrom", from);
-    sessionStorage.setItem("departTo", to);
-    sessionStorage.setItem("selectingReturn", "true");
-
-    const fromCode = from.includes('(') ? from.split('(')[1].replace(')', '').trim() : '';
-    const toCode = to.includes('(') ? to.split('(')[1].replace(')', '').trim() : '';
-    const returnDate = formatToISODate(returnRaw);
-
-    const resultsContainer = document.getElementById('flightResults');
-    if (resultsContainer) {
-      resultsContainer.innerHTML = `<h3>Select Return Flight (${toCode} → ${fromCode})</h3>`;
-    }
-
-    fetchAndRenderFlights({
-      origin: toCode,
-      destination: fromCode,
-      date: returnDate,
-      trip: "return"
+    const flightId = viewBtn.dataset.flightId;
+    let selectedClass = "PE";
+    document.querySelectorAll(".filter-button").forEach(btn => {
+      if (btn.classList.contains("selected")) {
+        const label = btn.innerText.trim();
+        const seatClassMap = {
+          "Economy": "EC",
+          "Premium Economy": "PE",
+          "Business Class": "BC",
+          "First Class": "FC"
+        };
+        selectedClass = seatClassMap[label] || "PE";
+      }
     });
-  } else {
-    // === One-way booking ===
-    window.location.href = `flightDetails.php?flightId=${flightId}`;
-  }
-}
+
+    sessionStorage.setItem("selectedSeatClass", selectedClass);
+    const adultCount = parseInt(document.getElementById('adultCount')?.value) || 1;
+    const childCount = parseInt(document.getElementById('childCount')?.value) || 0;
+    sessionStorage.setItem("adultCount", adultCount);
+    sessionStorage.setItem("childCount", childCount);
+
+    const selectingReturn = sessionStorage.getItem("selectingReturn") === "true";
+
+    // Force tripType to 'round' if selectingReturn is true
+    let tripType = "one";
+    if (selectingReturn) {
+      tripType = "round";
+    } else {
+      tripType = document.querySelector('input[name="tripType"]:checked')?.value || "one";
+    }    
+
+    if (selectingReturn) {
+      sessionStorage.setItem("selectedReturnFlight", flightId);
+      sessionStorage.setItem("selectedReturnClass", selectedClass);
+      sessionStorage.setItem("selectingReturn", "false");
+
+      const departFlightId = sessionStorage.getItem("selectedDepartFlight");
+      const returnFlightId = flightId;
+      const departClass = sessionStorage.getItem("selectedDepartClass") || "PE";
+      const returnClass = selectedClass;
+      window.location.href = `flightDetails.php?depart=${departFlightId}&return=${returnFlightId}&departClass=${departClass}&returnClass=${returnClass}`;
+      return;
+    }
+
+    if (tripType === "round") {
+      const from = document.getElementById('fromAirport').value;
+      const to = document.getElementById('toAirport').value;
+      const returnRaw = document.getElementById('returnDate').value;
+
+      const fromCode = extractAirportCode(from);
+      const toCode = extractAirportCode(to);
+      const returnDate = formatToISODate(returnRaw);
+
+      sessionStorage.setItem("selectedDepartFlight", flightId);
+      sessionStorage.setItem("departFrom", fromCode);
+      sessionStorage.setItem("departTo", toCode);
+      sessionStorage.setItem("selectingReturn", "true");
+      sessionStorage.setItem("selectedDepartClass", selectedClass);
+      sessionStorage.setItem("selectedReturnClass", selectedClass);
+      
+      const resultsContainer = document.getElementById('flightResults');
+      if (resultsContainer) {
+        resultsContainer.innerHTML = `<h3>Select Return Flight (${toCode} → ${fromCode})</h3>`;
+      }
+
+      fetchAndRenderFlights({
+        origin: toCode,
+        destination: fromCode,
+        date: returnDate,
+        trip: "return"
+      });
+    } else {
+      window.location.href = `flightDetails.php?flightId=${flightId}&classId=${selectedClass}`;
+    }
   });
 }
+
 
 // Clear user searches on load
 function clearUserSearches() {
@@ -342,5 +466,3 @@ function initializeFlightBookingUI() {
   const applyBtn = document.querySelector('.apply-btn');
   if (applyBtn) applyBtn.addEventListener('click', () => handleSearchOrFilter(true));
 }
-
-document.addEventListener('DOMContentLoaded', initializeFlightBookingUI);

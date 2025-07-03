@@ -1236,4 +1236,30 @@ input:focus ~ .input-border {
 
 #passengerSection.active input {
     background: rgba(73, 133, 224, 0.08);
+}
+
+/* High-specificity modal button styles to ensure correct appearance */
+#loginReminderModal .login-modal-footer .login-btn-secondary {
+    background-color: #605DEC !important;
+    color: #fff !important;
+    border: 1.5px solid #605DEC !important;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin: 0 4px !important;
+    transition: background 0.2s, color 0.2s, border 0.2s !important;
+    box-shadow: 0 2px 8px #605dec22 !important;
+    outline: none !important;
+    display: inline-block !important;
+    min-width: 100px !important;
+    text-align: center !important;
+}
+
+#loginReminderModal .login-modal-footer .login-btn-secondary:hover,
+#loginReminderModal .login-modal-footer .login-btn-secondary:focus {
+    background-color: #4845CC !important;
+    border-color: #4845CC !important;
+    color: #fff !important;
 } 
