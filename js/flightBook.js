@@ -177,9 +177,17 @@ function fetchAndRenderFlights(options = {}) {
   let selectedClass = "PE";
   document.querySelectorAll(".filter-button").forEach(btn => {
     if (btn.classList.contains("selected")) {
-      selectedClass = seatClassMap[btn.innerText.trim()] || "PE";
+      const label = btn.innerText.trim();
+      const seatClassMap = {
+        "Economy": "EC",
+        "Premium Economy": "PE",
+        "Business Class": "BC",
+        "First Class": "FC"
+      };
+      selectedClass = seatClassMap[label] || "PE";
     }
   });
+  
 
   if (options.trip) currentTrip = options.trip;
 
@@ -420,7 +428,9 @@ function setupFlightResultEvents() {
       sessionStorage.setItem("departFrom", fromCode);
       sessionStorage.setItem("departTo", toCode);
       sessionStorage.setItem("selectingReturn", "true");
-
+      sessionStorage.setItem("selectedDepartClass", selectedClass);
+      sessionStorage.setItem("selectedReturnClass", selectedClass);
+      
       const resultsContainer = document.getElementById('flightResults');
       if (resultsContainer) {
         resultsContainer.innerHTML = `<h3>Select Return Flight (${toCode} → ${fromCode})</h3>`;

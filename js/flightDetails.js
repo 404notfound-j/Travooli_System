@@ -27,13 +27,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+function updateTotalFlightPriceIfReady() {
+  const departPriceText = document.getElementById('depart-flight-price')?.textContent;
+  const returnPriceText = document.getElementById('return-flight-price')?.textContent;
+  const totalDisplay = document.getElementById('total-flight-price');
+
+  if (departPriceText && totalDisplay) {
+    const depart = parseFloat(departPriceText.replace('RM', '').trim()) || 0;
+    const ret = returnPriceText ? parseFloat(returnPriceText.replace('RM', '').trim()) : 0;
+    totalDisplay.textContent = `RM ${(depart + ret).toFixed(2)}`;
+  }
+}
+
 function loadFlightDetails(flightId, type) {
   const urlParams = new URLSearchParams(window.location.search);
-  const classParam =
-    type === 'depart'
-      ? urlParams.get('departClass') || urlParams.get('classId') || "PE"
-      : urlParams.get('returnClass') || "PE";
-
+  let classParam;
+  if (type === 'depart') {
+    classParam = urlParams.get('departClass') || urlParams.get('classId') || sessionStorage.getItem("selectedDepartClass") || "PE";
+    sessionStorage.setItem("selectedDepartClass", classParam);
+  } else {
+    classParam = urlParams.get('returnClass') || sessionStorage.getItem("selectedReturnClass") || "PE";
+    sessionStorage.setItem("selectedReturnClass", classParam);
+  }
+  
   fetch(`getFlightDetails.php?flightId=${flightId}&classId=${classParam}`)
     .then(res => res.json())
     .then(flight => {
@@ -41,45 +57,42 @@ function loadFlightDetails(flightId, type) {
         alert(flight.error);
         return;
       }
-
+  
       const formattedDeparture = formatTimeTo12Hour(flight.departure_time);
       const formattedArrival = formatTimeTo12Hour(flight.arrival_time);
       const durationMinutes = calculateDuration(flight.departure_time, flight.arrival_time);
       const duration = formatDuration(durationMinutes);
-
+  
       document.getElementById(`${type}-departure-time`).textContent = formattedDeparture;
       document.getElementById(`${type}-arrival-time`).textContent = formattedArrival;
       document.getElementById(`${type}-departure-airport-code`).textContent = flight.orig_airport_id;
       document.getElementById(`${type}-arrival-airport-code`).textContent = flight.dest_airport_id;
       document.getElementById(`${type}-flight-duration`).textContent = duration;
-
-      const airlineHeader = document.getElementById("depart-flight-airline-plane");
-      if (airlineHeader && type === 'depart') {
-        airlineHeader.textContent = `${flight.airline_name || flight.airline_id}`;
-      }
-
-      const originInfoEl = document.getElementById(`${type}-origin-airport-info`);
-      if (originInfoEl && type === 'depart') {
-        originInfoEl.textContent = `${flight.origin_airport_full || ''}, ${flight.origin_airport_address || ''}`;
-      }
-
-      document.getElementById(`${type}-airline-name`).textContent = flight.airline_name;
-      document.getElementById(`${type}-aircraft-type`).textContent = flight.flight_id;
-
-      const priceEl = document.getElementById(`${type}-flight-price`);
-      if (priceEl) priceEl.textContent = `RM ${parseFloat(flight.price).toFixed(2)}`;
-
-      // ✅ Set airline logo image (for DEPART only)
+  
       if (type === 'depart') {
+        const airlineHeader = document.getElementById("depart-flight-airline-plane");
+        if (airlineHeader) {
+          airlineHeader.textContent = `${flight.airline_name || flight.airline_id}`;
+        }
+  
+        const originInfoEl = document.getElementById(`${type}-origin-airport-info`);
+        if (originInfoEl) {
+          originInfoEl.textContent = `${flight.origin_airport_full || ''}, ${flight.origin_airport_address || ''}`;
+        }
+  
         const airlineImage = document.getElementById("depart-airplane-image");
         if (airlineImage) {
           airlineImage.src = `images/${flight.airline_name}.jpg`; 
         }
       }
+  
+      document.getElementById(`${type}-airline-name`).textContent = flight.airline_name;
+      document.getElementById(`${type}-aircraft-type`).textContent = flight.flight_id;
+      const priceEl = document.getElementById(`${type}-flight-price`);
+      if (priceEl) priceEl.textContent = `RM ${parseFloat(flight.price).toFixed(2)}`;
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error(err));  
 }
-
 
 // Utility functions
 function formatTimeTo12Hour(timeString) {
