@@ -15,14 +15,8 @@ if (!$user_logged_in) {
     exit();
 }
 
-include 'userHeader.php'; ?>
-<link rel="stylesheet" href="css/styles.css">
-<link rel="stylesheet" href="css/hotelBookInfo.css">
-<script src="js/loginReminder.js"></script>
-
-<?php
 // Database connection
-  include 'connection.php';
+include 'connection.php';
 
 // Get parameters from URL
 $hotel_id = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : 'H0001'; 
@@ -50,15 +44,13 @@ $checkin_date = new DateTime($checkin);
 $checkout_date = new DateTime($checkout);
 $interval = $checkin_date->diff($checkout_date);
 $nights = $interval->days > 0 ? $interval->days : 1;
-// Debug: Output values
-// echo "<!-- room_count: $room_count, nights: $nights -->";
 
 // Calculate prices
 $room_price = $room['price_per_night'] * $nights * $room_count;
 $tax = round($room_price * 0.06, 2); // 6% tax
 $total = $room_price + $tax;
 
-// Handle form submission
+// Handle form submission - MOVED BEFORE ANY OUTPUT
 $error_message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -82,16 +74,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($existing_customer = mysqli_fetch_assoc($existing_customer_result)) {
                 $customer_id = $existing_customer['customer_id'];
             } else {
-            // Generate customer ID
-            $customer_id_query = "SELECT MAX(SUBSTRING(customer_id, 2)) as max_id FROM customer_t";
-            $result = mysqli_query($connection, $customer_id_query);
-            $row = mysqli_fetch_assoc($result);
-            $next_id = str_pad((int)$row['max_id'] + 1, 4, '0', STR_PAD_LEFT);
-            $customer_id = "C" . $next_id;
-            // Insert customer data
-            $insert_customer = "INSERT INTO customer_t (customer_id, fst_name, lst_name, email, phone_no, nationality) 
-                            VALUES ('$customer_id', '$firstname', '$lastname', '$email', '$phone', '$nationality')";
-            mysqli_query($connection, $insert_customer);
+                // Generate customer ID
+                $customer_id_query = "SELECT MAX(SUBSTRING(customer_id, 2)) as max_id FROM customer_t";
+                $result = mysqli_query($connection, $customer_id_query);
+                $row = mysqli_fetch_assoc($result);
+                $next_id = str_pad((int)$row['max_id'] + 1, 4, '0', STR_PAD_LEFT);
+                $customer_id = "C" . $next_id;
+                // Insert customer data
+                $insert_customer = "INSERT INTO customer_t (customer_id, fst_name, lst_name, email, phone_no, nationality) 
+                                VALUES ('$customer_id', '$firstname', '$lastname', '$email', '$phone', '$nationality')";
+                mysqli_query($connection, $insert_customer);
             }
             
             // Commit the changes
@@ -99,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             // Form is valid, redirect to payment page with all parameters
             $redirect_url = "hotelPayment.php?";
-            $redirect_url .= "customer_id=" . urlencode($customer_id); // Add the new customer_id
+            $redirect_url .= "customer_id=" . urlencode($customer_id);
             $redirect_url .= "&hotel_id=" . urlencode($hotel_id);
             $redirect_url .= "&r_type_id=" . urlencode($r_type_id);
             $redirect_url .= "&checkin=" . urlencode($checkin);
@@ -126,6 +118,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
+// NOW it's safe to start outputting HTML
+include 'userHeader.php'; ?>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/hotelBookInfo.css">
+<script src="js/loginReminder.js"></script>
+
+<?php
 // Debug output for troubleshooting
 // Remove or comment out after debugging
 //

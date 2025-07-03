@@ -1,3 +1,136 @@
+<?php
+// Start session to check login status
+session_start();
+include 'connection.php';
+
+// Get parameters from URL
+$customer_id = isset($_GET['customer_id']) ? $_GET['customer_id'] : '';
+$hotel_id = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : '';
+$r_type_id = isset($_GET['r_type_id']) ? $_GET['r_type_id'] : '';
+$checkin = isset($_GET['checkin']) ? $_GET['checkin'] : (isset($_SESSION['checkin_date']) ? $_SESSION['checkin_date'] : date('Y-m-d'));
+$checkout = isset($_GET['checkout']) ? $_GET['checkout'] : (isset($_SESSION['checkout_date']) ? $_SESSION['checkout_date'] : date('Y-m-d', strtotime('+1 day')));
+$room_count = isset($_GET['room']) ? (int)$_GET['room'] : 1;
+$adult = isset($_GET['adult']) ? (int)$_GET['adult'] : 1;
+$child = isset($_GET['child']) ? (int)$_GET['child'] : 0;
+$firstname = isset($_GET['firstname']) ? $_GET['firstname'] : '';
+$lastname = isset($_GET['lastname']) ? $_GET['lastname'] : '';
+$nationality = isset($_GET['nationality']) ? $_GET['nationality'] : '';
+$email = isset($_GET['email']) ? $_GET['email'] : '';
+$phone = isset($_GET['phone']) ? $_GET['phone'] : '';
+$room_price = isset($_GET['room_price']) ? $_GET['room_price'] : '';
+$tax = isset($_GET['tax']) ? $_GET['tax'] : '';
+$total = isset($_GET['total']) ? $_GET['total'] : '';
+
+// Process payment form submission - MOVED BEFORE ANY OUTPUT
+$payment_success = false;
+$error_message = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Debug: Output all POST and GET data
+    error_log("POST DATA: " . print_r($_POST, true));
+    error_log("GET DATA: " . print_r($_GET, true));
+    
+    $payment_method = isset($_POST['payment_method']) ? $_POST['payment_method'] : '';
+    
+    // Always get booking info from GET (URL) to ensure latest user selection
+    $customer_id = isset($_GET['customer_id']) ? $_GET['customer_id'] : '';
+    $hotel_id = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : '';
+    $r_type_id = isset($_GET['r_type_id']) ? $_GET['r_type_id'] : '';
+    $checkin = isset($_GET['checkin']) ? $_GET['checkin'] : (isset($_SESSION['checkin_date']) ? $_SESSION['checkin_date'] : date('Y-m-d'));
+    $checkout = isset($_GET['checkout']) ? $_GET['checkout'] : (isset($_SESSION['checkout_date']) ? $_SESSION['checkout_date'] : date('Y-m-d', strtotime('+1 day')));
+    $room_count = isset($_GET['room']) ? (int)$_GET['room'] : 1;
+    $adult = isset($_GET['adult']) ? (int)$_GET['adult'] : 1;
+    $child = isset($_GET['child']) ? (int)$_GET['child'] : 0;
+    $room_price = isset($_GET['room_price']) ? $_GET['room_price'] : '';
+    $tax = isset($_GET['tax']) ? $_GET['tax'] : '';
+    $total = isset($_GET['total']) ? $_GET['total'] : '';
+    
+    if (empty($payment_method)) {
+        $error_message = "Please select a payment method.";
+    } else {
+        try {
+            // Start transaction
+            mysqli_begin_transaction($connection, MYSQLI_TRANS_START_READ_WRITE);
+            
+            // Get the logged-in user's ID from the session
+            $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'U001'; // Default to U001 if not logged in
+            
+            // --- Generate booking ID safely (lock table row) ---
+            $booking_id_query = "SELECT MAX(SUBSTRING(h_book_id, 3)) as max_id FROM hotel_booking_t FOR UPDATE";
+            $result = mysqli_query($connection, $booking_id_query);
+            $row = mysqli_fetch_assoc($result);
+            $max_id = isset($row['max_id']) ? (int)$row['max_id'] : 0;
+            $next_booking_id = str_pad($max_id + 1, 4, '0', STR_PAD_LEFT);
+            $h_book_id = "BK" . $next_booking_id;
+            
+            // Debug: Output booking info before insert
+            error_log("Booking Insert: h_book_id=$h_book_id, user_id=$user_id, customer_id=$customer_id, hotel_id=$hotel_id, r_type_id=$r_type_id, checkin=$checkin, checkout=$checkout, room_count=$room_count, adult=$adult, child=$child");
+            
+            // --- Use prepared statement for booking insert ---
+            $stmt = mysqli_prepare($connection, "INSERT INTO hotel_booking_t (h_book_id, user_id, customer_id, hotel_id, r_type_id, check_in_date, check_out_date, status, room_count, adult_count, child_count) VALUES (?, ?, ?, ?, ?, ?, ?, 'Confirmed', ?, ?, ?)");
+            if (!$stmt) throw new Exception('Prepare booking insert failed: ' . mysqli_error($connection));
+            mysqli_stmt_bind_param($stmt, 'ssssssssii', $h_book_id, $user_id, $customer_id, $hotel_id, $r_type_id, $checkin, $checkout, $room_count, $adult, $child);
+            if (!mysqli_stmt_execute($stmt)) {
+                error_log('Booking insert error: ' . mysqli_stmt_error($stmt));
+                throw new Exception('Booking insert error: ' . mysqli_stmt_error($stmt));
+            }
+            mysqli_stmt_close($stmt);
+            
+            // --- Generate payment ID safely (lock table row) ---
+            $payment_id_query = "SELECT MAX(SUBSTRING(h_payment_id, 3)) as max_id FROM hotel_payment_t FOR UPDATE";
+            $result = mysqli_query($connection, $payment_id_query);
+            $row = mysqli_fetch_assoc($result);
+            $max_payment_id = isset($row['max_id']) ? (int)$row['max_id'] : 0;
+            $next_payment_id = str_pad($max_payment_id + 1, 4, '0', STR_PAD_LEFT);
+            $h_payment_id = "HP" . $next_payment_id;
+            
+            // Get current date for payment date
+            $payment_date = date('Y-m-d');
+            
+            // --- Use prepared statement for payment insert ---
+            $stmt2 = mysqli_prepare($connection, "INSERT INTO hotel_payment_t (h_payment_id, h_book_id, payment_date, amount, method, status) VALUES (?, ?, ?, ?, ?, 'Paid')");
+            if (!$stmt2) throw new Exception('Prepare payment insert failed: ' . mysqli_error($connection));
+            mysqli_stmt_bind_param($stmt2, 'sssss', $h_payment_id, $h_book_id, $payment_date, $total, $payment_method);
+            if (!mysqli_stmt_execute($stmt2)) {
+                error_log('Payment insert error: ' . mysqli_stmt_error($stmt2));
+                throw new Exception('Payment insert error: ' . mysqli_stmt_error($stmt2));
+            }
+            mysqli_stmt_close($stmt2);
+            
+            // Commit the changes
+            mysqli_commit($connection);
+            
+            // Store booking ID in session for hotelPaymentComplete.php
+            $_SESSION['last_booking_id'] = $h_book_id;
+            
+            $payment_success = true;
+            
+            if ($payment_success) {
+                header("Location: hotelPaymentComplete.php");
+                exit();
+            }
+            
+        } catch (Exception $e) {
+            // Rollback transaction on error
+            mysqli_rollback($connection);
+            $error_message = "Error processing payment: " . $e->getMessage();
+        }
+    }
+
+    // Return JSON if it's an AJAX request
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        if ($payment_success) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => $error_message]);
+        }
+        exit();
+    }
+}
+
+// NOW it's safe to start outputting HTML
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,137 +145,6 @@
         <?php include 'userHeader.php';?>
     </header>
     <main class="main-content">
-        <?php
-        // Start session to check login status
-        include 'connection.php';
-
-        // Get parameters from URL
-        $customer_id = isset($_GET['customer_id']) ? $_GET['customer_id'] : '';
-        $hotel_id = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : '';
-        $r_type_id = isset($_GET['r_type_id']) ? $_GET['r_type_id'] : '';
-        $checkin = isset($_GET['checkin']) ? $_GET['checkin'] : (isset($_SESSION['checkin_date']) ? $_SESSION['checkin_date'] : date('Y-m-d'));
-        $checkout = isset($_GET['checkout']) ? $_GET['checkout'] : (isset($_SESSION['checkout_date']) ? $_SESSION['checkout_date'] : date('Y-m-d', strtotime('+1 day')));
-        $room_count = isset($_GET['room']) ? (int)$_GET['room'] : 1;
-        $adult = isset($_GET['adult']) ? (int)$_GET['adult'] : 1;
-        $child = isset($_GET['child']) ? (int)$_GET['child'] : 0;
-        $firstname = isset($_GET['firstname']) ? $_GET['firstname'] : '';
-        $lastname = isset($_GET['lastname']) ? $_GET['lastname'] : '';
-        $nationality = isset($_GET['nationality']) ? $_GET['nationality'] : '';
-        $email = isset($_GET['email']) ? $_GET['email'] : '';
-        $phone = isset($_GET['phone']) ? $_GET['phone'] : '';
-        $room_price = isset($_GET['room_price']) ? $_GET['room_price'] : '';
-        $tax = isset($_GET['tax']) ? $_GET['tax'] : '';
-        $total = isset($_GET['total']) ? $_GET['total'] : '';
-
-        // Process payment form submission
-        $payment_success = false;
-        $error_message = "";
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            // Debug: Output all POST and GET data
-            error_log("POST DATA: " . print_r($_POST, true));
-            error_log("GET DATA: " . print_r($_GET, true));
-            
-            $payment_method = isset($_POST['payment_method']) ? $_POST['payment_method'] : '';
-            
-            // Always get booking info from GET (URL) to ensure latest user selection
-            $customer_id = isset($_GET['customer_id']) ? $_GET['customer_id'] : '';
-            $hotel_id = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : '';
-            $r_type_id = isset($_GET['r_type_id']) ? $_GET['r_type_id'] : '';
-            $checkin = isset($_GET['checkin']) ? $_GET['checkin'] : (isset($_SESSION['checkin_date']) ? $_SESSION['checkin_date'] : date('Y-m-d'));
-            $checkout = isset($_GET['checkout']) ? $_GET['checkout'] : (isset($_SESSION['checkout_date']) ? $_SESSION['checkout_date'] : date('Y-m-d', strtotime('+1 day')));
-            $room_count = isset($_GET['room']) ? (int)$_GET['room'] : 1;
-            $adult = isset($_GET['adult']) ? (int)$_GET['adult'] : 1;
-            $child = isset($_GET['child']) ? (int)$_GET['child'] : 0;
-            $room_price = isset($_GET['room_price']) ? $_GET['room_price'] : '';
-            $tax = isset($_GET['tax']) ? $_GET['tax'] : '';
-            $total = isset($_GET['total']) ? $_GET['total'] : '';
-            
-            if (empty($payment_method)) {
-                $error_message = "Please select a payment method.";
-            } else {
-                try {
-                    // Start transaction
-                    mysqli_begin_transaction($connection, MYSQLI_TRANS_START_READ_WRITE);
-                    
-                    // Get the logged-in user's ID from the session
-                    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'U001'; // Default to U001 if not logged in
-                    
-                    // --- Generate booking ID safely (lock table row) ---
-                    $booking_id_query = "SELECT MAX(SUBSTRING(h_book_id, 3)) as max_id FROM hotel_booking_t FOR UPDATE";
-                    $result = mysqli_query($connection, $booking_id_query);
-                    $row = mysqli_fetch_assoc($result);
-                    $max_id = isset($row['max_id']) ? (int)$row['max_id'] : 0;
-                    $next_booking_id = str_pad($max_id + 1, 4, '0', STR_PAD_LEFT);
-                    $h_book_id = "BK" . $next_booking_id;
-                    
-                    // Debug: Output booking info before insert
-                    error_log("Booking Insert: h_book_id=$h_book_id, user_id=$user_id, customer_id=$customer_id, hotel_id=$hotel_id, r_type_id=$r_type_id, checkin=$checkin, checkout=$checkout, room_count=$room_count, adult=$adult, child=$child");
-                    
-                    // --- Use prepared statement for booking insert ---
-                    $stmt = mysqli_prepare($connection, "INSERT INTO hotel_booking_t (h_book_id, user_id, customer_id, hotel_id, r_type_id, check_in_date, check_out_date, status, room_count, adult_count, child_count) VALUES (?, ?, ?, ?, ?, ?, ?, 'Confirmed', ?, ?, ?)");
-                    if (!$stmt) throw new Exception('Prepare booking insert failed: ' . mysqli_error($connection));
-                    mysqli_stmt_bind_param($stmt, 'ssssssssii', $h_book_id, $user_id, $customer_id, $hotel_id, $r_type_id, $checkin, $checkout, $room_count, $adult, $child);
-                    if (!mysqli_stmt_execute($stmt)) {
-                        error_log('Booking insert error: ' . mysqli_stmt_error($stmt));
-                        throw new Exception('Booking insert error: ' . mysqli_stmt_error($stmt));
-                    }
-                    mysqli_stmt_close($stmt);
-                    
-                    // --- Generate payment ID safely (lock table row) ---
-                    $payment_id_query = "SELECT MAX(SUBSTRING(h_payment_id, 3)) as max_id FROM hotel_payment_t FOR UPDATE";
-                    $result = mysqli_query($connection, $payment_id_query);
-                    $row = mysqli_fetch_assoc($result);
-                    $max_payment_id = isset($row['max_id']) ? (int)$row['max_id'] : 0;
-                    $next_payment_id = str_pad($max_payment_id + 1, 4, '0', STR_PAD_LEFT);
-                    $h_payment_id = "HP" . $next_payment_id;
-                    
-                    // Get current date for payment date
-                    $payment_date = date('Y-m-d');
-                    
-                    // --- Use prepared statement for payment insert ---
-                    $stmt2 = mysqli_prepare($connection, "INSERT INTO hotel_payment_t (h_payment_id, h_book_id, payment_date, amount, method, status) VALUES (?, ?, ?, ?, ?, 'Paid')");
-                    if (!$stmt2) throw new Exception('Prepare payment insert failed: ' . mysqli_error($connection));
-                    mysqli_stmt_bind_param($stmt2, 'sssss', $h_payment_id, $h_book_id, $payment_date, $total, $payment_method);
-                    if (!mysqli_stmt_execute($stmt2)) {
-                        error_log('Payment insert error: ' . mysqli_stmt_error($stmt2));
-                        throw new Exception('Payment insert error: ' . mysqli_stmt_error($stmt2));
-                    }
-                    mysqli_stmt_close($stmt2);
-                    
-                    // Commit the changes
-                    mysqli_commit($connection);
-                    
-                    // Store booking ID in session for hotelPaymentComplete.php
-                    $_SESSION['last_booking_id'] = $h_book_id;
-                    
-                    $payment_success = true;
-                    
-                    if ($payment_success) {
-                        header("Location: hotelPaymentComplete.php");
-                        exit();
-                    }
-                    
-                } catch (Exception $e) {
-                    // Rollback transaction on error
-                    mysqli_rollback($connection);
-                    $error_message = "Error processing payment: " . $e->getMessage();
-                }
-            }
-
-            // Return JSON if it's an AJAX request
-            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                header('Content-Type: application/json');
-                if ($payment_success) {
-                    echo json_encode(['success' => true]);
-                } else {
-                    echo json_encode(['success' => false, 'error' => $error_message]);
-                }
-                exit();
-            }
-        }
-        ?>
-
         <div class="container">
             <?php if ($payment_success): ?>
                 <div class="payment-success">
