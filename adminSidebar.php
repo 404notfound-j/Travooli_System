@@ -14,7 +14,7 @@
 <body>
     <div class="sidebar">
         <div class="logo">
-            <h1>Travooti ✈</h1>
+            <h1>Travooli ✈</h1>
             <span>Management System</span>
         </div>
         
