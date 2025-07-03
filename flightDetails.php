@@ -65,7 +65,7 @@ if (isset($_GET['return'])) {
     </div>
     <div class="flight-box">
       <div class="header-row">
-        <div class="flight-title" id="depart-date">Depart date</div>
+        <div class="flight-title" id="depart-date">Depart Flight</div>
         <div id="depart-flight-duration">Loading duration...</div>
       </div>
 
