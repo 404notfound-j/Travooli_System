@@ -289,20 +289,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             
                             <div class="price-item">
                                 <span>Subtotal</span>
-                                <span>$<?php echo htmlspecialchars($room_price); ?></span>
+                                <span>RM<?php echo number_format($room_price, 2); ?></span>
                             </div>
                             <div class="price-item">
                                 <span>Taxes & Fees</span>
-                                <span>$<?php echo htmlspecialchars($tax); ?></span>
+                                <span>RM<?php echo number_format($tax, 2); ?></span>
                             </div>
                             <div class="price-item">
                                 <span>Discount</span>
-                                <span>$0</span>
+                                <span>RM0.00</span>
                             </div>
                             <hr>
                             <div class="total">
                                 <span>Total</span>
-                                <span>$<?php echo htmlspecialchars($total); ?></span>
+                                <span>RM<?php echo number_format($total, 2); ?></span>
                             </div>
                         </div>
                         <button type="submit" class="proceed-btn">Proceed to Payment</button>

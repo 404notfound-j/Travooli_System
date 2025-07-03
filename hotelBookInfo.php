@@ -192,10 +192,10 @@ include 'userHeader.php'; ?>
             <div class="hotel-book-info-right">
                 <div class="price-details-box">
                     <h3 class="price-details-title">Price Details (<?php echo htmlspecialchars($room['type_name']); ?>)</h3>
-                    <div class="price-details-row"><span>Room Price ($<?php echo $room['price_per_night']; ?> × <?php echo $nights; ?> nights × <?php echo $room_count; ?> rooms)</span><span>$<?php echo $room_price; ?></span></div>
-                    <div class="price-details-row"><span>Taxes & Fees (6%)</span><span>$<?php echo $tax; ?></span></div>
-                    <div class="price-details-row"><span>Discount</span><span>$0</span></div>
-                    <div class="price-details-total"><span>Total</span><span class="price-details-total-amount">$<?php echo $total; ?></span></div>
+                    <div class="price-details-row"><span>Room Price (RM<?php echo number_format($room['price_per_night'], 2); ?> × <?php echo $nights; ?> nights × <?php echo $room_count; ?> rooms)</span><span>RM<?php echo number_format($room_price, 2); ?></span></div>
+                    <div class="price-details-row"><span>Taxes & Fees (6%)</span><span>RM<?php echo number_format($tax, 2); ?></span></div>
+                    <div class="price-details-row"><span>Discount</span><span>RM0.00</span></div>
+                    <div class="price-details-total"><span>Total</span><span class="price-details-total-amount">RM<?php echo number_format($total, 2); ?></span></div>
                 </div>
             </div>
         </div>
