@@ -81,4 +81,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+
+    // Check user login status from PHP session
+    const userLoggedIn = window.userLoggedIn !== undefined ? window.userLoggedIn : false;
+    // Set login status in localStorage for JavaScript to access
+    if (userLoggedIn) {
+        localStorage.setItem('user_logged_in', 'true');
+    }
+    // Expose Book Now button logic globally
+    window.handleBookNowClick = function(event, href) {
+        if (!userLoggedIn) {
+            event.preventDefault();
+            // Use the global login reminder modal from loginReminder.js
+            if (typeof window.showLoginReminder === 'function') {
+                window.showLoginReminder();
+            }
+            return false;
+        }
+        return true;
+    };
 }); 

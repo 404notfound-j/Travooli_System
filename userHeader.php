@@ -54,7 +54,7 @@ if (isset($_SESSION['user_id'])) {
         <nav class="nav">
             <ul class="nav-list" id="nav-menu">
                 <li class="nav-item active"><a href="U_dashboard.php">Flights</a></li>
-                <li class="nav-item"><a href="#hotels">Hotels</a></li>
+                <li class="nav-item"><a href="hotelBook.php">Hotels</a></li>
                 <li class="nav-item"><a href="#notifications">Notifications</a></li>
                 <li class="nav-item"><a href="#tickets">My Tickets</a></li>
                 <li class="nav-item"><a href="#reservations">My Reservations</a></li>
@@ -83,7 +83,7 @@ if (isset($_SESSION['user_id'])) {
         <nav class="nav">
             <ul class="nav-list" id="nav-menu">
                 <li class="nav-item active"><a href="U_dashboard.php">Flights</a></li>
-                <li class="nav-item"><a href="#hotels">Hotels</a></li>
+                <li class="nav-item"><a href="hotelBook.php">Hotels</a></li>
                 <li class="nav-item"><a href="#notifications">Notifications</a></li>
                 <li class="nav-item"><a href="#tickets">My Tickets</a></li>
                 <li class="nav-item"><a href="#reservations">My Reservations</a></li>
