@@ -52,6 +52,23 @@ body {
     font-size: 12px;
     opacity: 0.8;
     font-weight: 300;
+    display: block;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.logo-img {
+    max-height: 35px;
+    width: auto;
+    margin-bottom: 8px;
+    transition: opacity 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+
+.logo-img:hover {
+    opacity: 0.9;
 }
 
 .nav-menu {
@@ -196,114 +213,214 @@ body {
     gap: 20px;
 }
 
-.notification-btn {
-    position: relative;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: background-color 0.3s ease;
+.admin-main-content {
+    padding: 30px;
+    background: #f8fafc;
+    min-height: calc(100vh - 60px);
+    overflow-y: auto;
 }
 
-.notification-btn:hover {
-    background-color: #f1f5f9;
-}
 
-.notification-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    background-color: #ef4444;
-    color: white;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 600;
-}
 
-.language-selector {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    background: white;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.flag {
-    width: 20px;
-    height: 15px;
-    background: linear-gradient(to bottom, #012169 33%, white 33%, white 66%, #C8102E 66%);
-    position: relative;
-}
-
-.flag::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        linear-gradient(to bottom right, transparent 46%, #C8102E 46%, #C8102E 54%, transparent 54%),
-        linear-gradient(to bottom left, transparent 46%, #C8102E 46%, #C8102E 54%, transparent 54%),
-        linear-gradient(to bottom, transparent 40%, white 40%, white 60%, transparent 60%),
-        linear-gradient(to right, transparent 40%, white 40%, white 60%, transparent 60%);
-}
-
-.user-profile {
+/* Admin Profile Styles */
+.admin-profile-container {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 6px 12px;
+    cursor: pointer;
+    position: relative;
+    padding: 8px 12px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     background: white;
-    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
 }
 
-.user-avatar {
+.admin-profile-container:hover {
+    background-color: rgba(96, 93, 236, 0.05);
+    border-color: rgba(96, 93, 236, 0.2);
+}
+
+.admin-profile-container.active {
+    background-color: rgba(96, 93, 236, 0.1);
+    border-color: #605DEC;
+}
+
+.admin-avatar {
     width: 32px;
     height: 32px;
+    background: linear-gradient(135deg, #605DEC 0%, #4F46E5 100%);
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
+    transition: all 0.3s ease;
 }
 
-.user-info h4 {
+.admin-profile-picture {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #605DEC;
+    transition: all 0.3s ease;
+}
+
+.admin-profile-container:hover .admin-avatar,
+.admin-profile-container:hover .admin-profile-picture {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(96, 93, 236, 0.3);
+}
+
+.admin-info h4 {
+    margin: 0;
     font-size: 14px;
     font-weight: 600;
     color: #1e293b;
+    line-height: 1.3;
 }
 
-.user-info span {
+.admin-info span {
     font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+    margin-bottom: 0;
+    display: block;
+    line-height: 1.2;
+}
+
+.admin-dropdown-icon {
+    transition: transform 0.3s ease;
     color: #64748b;
 }
 
-.bell-icon {
-    width: 20px;
-    height: 20px;
-    fill: #64748b;
+.admin-profile-container.active .admin-dropdown-icon {
+    transform: rotate(180deg);
+    color: #605DEC;
 }
 
-.dropdown-arrow {
-    width: 12px;
-    height: 12px;
-    fill: #64748b;
+/* Admin Profile Dropdown */
+.admin-profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.admin-profile-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.admin-profile-info {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #605DEC 0%, #4F46E5 100%);
+    color: white;
+}
+
+.admin-dropdown-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.admin-dropdown-avatar {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.admin-profile-details {
+    flex: 1;
+}
+
+.admin-dropdown-name {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: white;
+}
+
+.admin-email {
+    display: block;
+    font-size: 13px;
+    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.admin-dropdown-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    margin: 0;
+}
+
+.admin-dropdown-menu {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+}
+
+.admin-dropdown-menu li {
+    margin: 0;
+}
+
+.admin-dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.admin-dropdown-menu a:hover {
+    background-color: rgba(96, 93, 236, 0.08);
+    color: #605DEC;
+}
+
+.admin-logout-item a {
+    color: #ef4444;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin-top: 4px;
+    padding-top: 16px;
+}
+
+.admin-logout-item a:hover {
+    background-color: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
 }
 
 @media (max-width: 768px) {
@@ -318,5 +435,10 @@ body {
     
     .main-content {
         margin-left: 0;
+    }
+    
+    .admin-profile-dropdown {
+        width: 280px;
+        right: -10px;
     }
 }

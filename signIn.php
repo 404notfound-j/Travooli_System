@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnLogin'])) {
         $_SESSION['user_id'] = $row['admin_id'];  
         $_SESSION['username'] = $row['fst_name'] . ' ' . $row['lst_name'];   
         $_SESSION['role'] = 'admin';             
-        header("Location: admin_dashboard.php");
+        header("Location: A_dashboard.php");
 
     // Regular user login check
     } elseif ($row = mysqli_fetch_assoc($resultUser)) {

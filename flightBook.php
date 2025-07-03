@@ -19,7 +19,6 @@
       $airports = [];
       $query = "SELECT airport_id, airport_full, airport_short, city_full FROM airport_t ORDER BY city_full ASC";
       $result = mysqli_query($connection, $query);
-      
       if ($result) {
           while ($row = mysqli_fetch_assoc($result)) {
               $airports[] = $row;
@@ -281,7 +280,6 @@
         <h4>Airlines</h4>
         <div class="checkbox-group">
           <label><input type="checkbox">AirAsia</label>
-          <label><input type="checkbox">BatikAir</label>
           <label><input type="checkbox">Mas</label>
           <label><input type="checkbox">FireFly</label>
         </div>
@@ -290,8 +288,8 @@
       <div class="filter-group">
         <h4>Trips</h4>
         <div class="checkbox-group">
-          <label><input type="checkbox">Round trip</label>
-          <label><input type="checkbox">On Way</label>
+          <label><input type="checkbox"class="trip-filter" value="round">Round trip</label>
+          <label><input type="checkbox"class="trip-filter" value="one">On Way</label>
         </div>
       </div>
       <div class="action-buttons">
@@ -301,17 +299,16 @@
     </div>
     <div class="main-panel">
       <div class="sort-bar">
-        <div class="sort-option" id="sortCheapest">Cheapest<br><span>$99 . 2h 18m</span></div>
-        <div class="sort-option selected">Best<br><span>$99 . 2h 18m</span></div>
-        <div class="sort-option" id="sortQuickest">Quickest<br><span>$99 · 2h 18m</span></div>
+        <div class="sort-option" id="sortCheapest">Cheapest<br><span>RM ?</span></div>
+        <div class="sort-option selected">Best<br><span>RM ?/span></div>
+        <div class="sort-option" id="sortQuickest">Quickest<br><span>RM ?</span></div>
         <div class="sort-other"><span>&#9776;</span><span>Other sort</span></div>
       </div>
   <div id="flightResults" class="results-container"></div>
 </div>
 </div>
-
-<script src="js/flightBook.js"> </script>
 <script src="js/script.js"> </script>
+<script src="js/flightBook.js"> </script>
 </body>
 </html>
 

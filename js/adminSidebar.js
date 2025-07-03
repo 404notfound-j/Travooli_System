@@ -1,6 +1,12 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Navigation menu functionality
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', function(e) {
-        e.preventDefault();
+        // Only prevent default for items without valid href or with href="#"
+        const href = this.getAttribute('href');
+        if (!href || href === '#' || href === '') {
+            e.preventDefault();
+        }
         
         // Remove active class from all items
         document.querySelectorAll('.nav-item').forEach(nav => {
@@ -12,32 +18,67 @@ document.querySelectorAll('.nav-item').forEach(item => {
     });
 });
 
-// Logout functionality
-document.querySelector('.logout-btn').addEventListener('click', function() {
-    if (confirm('Are you sure you want to log out?')) {
-        alert('Logging out...');
-        // Here you would typically redirect to login page
+    // Admin profile dropdown functionality
+    const adminProfileContainer = document.getElementById('admin-profile-container');
+    const adminProfileDropdown = document.getElementById('admin-profile-dropdown');
+    
+    function toggleAdminDropdown() {
+        if (adminProfileContainer && adminProfileDropdown) {
+            adminProfileContainer.classList.toggle('active');
+            adminProfileDropdown.classList.toggle('active');
+        }
     }
+    
+    function closeAdminDropdown() {
+        if (adminProfileContainer && adminProfileDropdown) {
+            adminProfileContainer.classList.remove('active');
+            adminProfileDropdown.classList.remove('active');
+    }
+    }
+    
+    // Admin profile container click event
+    if (adminProfileContainer) {
+        adminProfileContainer.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleAdminDropdown();
+});
+    }
+    
+    // Close admin dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (adminProfileDropdown && adminProfileDropdown.classList.contains('active')) {
+            const isClickInsideProfile = adminProfileContainer.contains(event.target) || adminProfileDropdown.contains(event.target);
+            if (!isClickInsideProfile) {
+                closeAdminDropdown();
+            }
+        }
 });
 
-// Notification click
-document.querySelector('.notification-btn').addEventListener('click', function() {
-    alert('You have 6 new notifications!');
-});
+    // Close admin dropdown when clicking dropdown items
+    if (adminProfileDropdown) {
+        const adminDropdownItems = adminProfileDropdown.querySelectorAll('a');
+        adminDropdownItems.forEach(item => {
+            item.addEventListener('click', () => {
+                closeAdminDropdown();
+            });
+        });
+    }
+    
+    // Escape key to close admin dropdown
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && adminProfileDropdown && adminProfileDropdown.classList.contains('active')) {
+            closeAdminDropdown();
+        }
+    });
 
-// Language selector
-document.querySelector('.language-selector').addEventListener('click', function() {
-    alert('Language selector clicked - dropdown would appear here');
-});
 
-// User profile click
-document.querySelector('.user-profile').addEventListener('click', function() {
-    alert('User profile menu would appear here');
-});
 
 // Mobile sidebar toggle (for responsive design)
 function toggleSidebar() {
-    document.querySelector('.sidebar').classList.toggle('open');
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('open');
+        }
 }
 
 // Add mobile menu button dynamically for small screens
@@ -49,14 +90,28 @@ if (window.innerWidth <= 768) {
         top: 15px;
         left: 15px;
         z-index: 1000;
-        background: #1e3a5f;
+            background: #031E2F;
         color: white;
         border: none;
         padding: 10px;
         border-radius: 5px;
         cursor: pointer;
         font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     `;
     mobileMenuBtn.onclick = toggleSidebar;
+        mobileMenuBtn.setAttribute('aria-label', 'Toggle sidebar menu');
     document.body.appendChild(mobileMenuBtn);
 }
+    
+    // Window resize handler
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+});
+

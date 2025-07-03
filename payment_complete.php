@@ -15,305 +15,153 @@
     <header>
         <?php include 'userHeader.php';?>
     </header>
-    <main class="container">
-      <h1 class="title">Have a good trip, Peter!</h1>
-      <p class="reference">Booking Reference: <span>#BK0012345678</span></p>
-      <p class="description">
-          Thank you for booking your travel with <span>Travooli</span> !<br>
-          Below is a summary of your trip to Tokyo. 
-          A copy of your booking confirmation has been sent to your email address. You can always revisit this information in the My Trips section of our app. Safe travels!
-      </p>
+    <?php
+include 'connection.php';
+if (isset($_GET['classId'])) $_SESSION['selectedClass'] = $_GET['classId'];
+$classId = $_SESSION['selectedClass'] ?? 'PE'; 
+$classLabelMap = [
+    'EC' => 'Economy Class',
+    'PE' => 'Premium Economy',
+    'BC' => 'Business Class',
+    'FC' => 'First Class'
+];
+$classLabel = $classLabelMap[$classId] ?? 'Unknown';
+$bookingIds = $_SESSION['booking_ids'] ?? [];
+if (empty($bookingIds)) {
+    echo "<p>No booking info found.</p>";
+    exit;
+}
 
-      <section class="layout">
-        <div class="ticket">
-          <div class="flight-times">
-            <div class="departure">
-              <h2>12:00 pm</h2>
-              <p>Newark(EWR)</p>
-            </div>
-            <div class="flight-path">
-              <div class="line"></div>
-              <i class="fas fa-plane"></i>
-              <div class="line"></div>
-            </div>
-            <div class="arrival">
-              <h2>12:00 pm</h2>
-              <p>Newark(EWR)</p>
-            </div>
-          </div>
-          <div class="boarding-pass">
-            <div class="passenger-info">
-              <img src="icon/avatar.svg" alt="Passenger" class="avatar">
-              <div>
-                <h3>James Doe</h3>
-                <p>Boarding Pass N'123</p>
-              </div>
-              <span class="class">Business Class</span>
-            </div>
-            <div class="flight-details">
-              <div class="detail">
-                <div class="icon">
-                  <img src="icon/calendar1.svg" alt="Calendar">
-                </div>
-                <div>
-                  <p>Date</p>
-                  <span>Newark(EWR)</span>
-                </div>
-              </div>
-              <div class="detail">
-                <div class="icon">
-                  <img src="icon/timmer.svg" alt="Clock">
-                </div>
-                <div>
-                  <p>Flight time</p>
-                  <span>12:00</span>
-                </div>
-              </div>
-              <div class="detail">
-                <div class="icon">
-                  <img src="icon/door.svg" alt="Gate">
-                </div>
-                <div>
-                  <p>Gate</p>
-                  <span>A12</span>
-                </div>
-              </div>
-              <div class="detail">
-                <div class="icon">
-                  <img src="icon/seat.svg" alt="Seat">
-                </div>
-                <div>
-                  <p>Seat</p>
-                  <span>128</span>
-                </div>
-              </div>
-            </div>
-            <div class="flight-code">
-              <div class="flight-code-content">
-                <h3>MYS</h3>
-                <p>TSI-MH-A2301</p>
-              </div>
-              <img src="icon/barcode.svg" alt="Barcode" class="barcode">
-            </div>
-          </div>
-        </div>
-        <div class="price-breakdown">
-          <h3>Price breakdown</h3>
-          <div class="price-items">
-            <div class="price-item">
-              <span>Subtotal</span>
-              <span>RM 340</span>
-            </div>
-            <div class="price-item">
-              <span>Baggage fees</span>
-              <span>RM 20</span>
-            </div>
-            <div class="price-item">
-              <span>Multi-meal</span>
-              <span>RM 30</span>
-            </div>
-            <div class="price-item">
-              <span>Taxes and Fees</span>
-              <span>RM 121</span>
-            </div>
-            <div class="price-total">
-              <span>Amount Paid</span>
-              <span>RM 491</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="action-buttons">
-        <div class="share-btn">
-          <img src="icon/share.svg" alt="btn"> 
-        </div>
-        <button class="download-btn">
-          Download
-        </button>
-        <button class="home-btn">
-          Back to Homepage
-        </button>
-      </section>
-    <!-- Ratings Section -->
-
-      <section class="ratings">
-        <p>Your feedback matters to us. Let us know how we can improve your experience.</p>
-        <div class="stars">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-        </div>
-        <textarea placeholder="Share your thoughts..."></textarea>
-        <div class="rating-buttons">
-          <button class="cancel-btn">Cancel</button>
-          <button class="submit-btn">Submit</button>
-        </div>
-      </section>
-
-      <section class ="cancel-flight">
-        <h1>Cancellation Policy</h1>
-        <p>
-          This flight has a flexible cancellation policy. If you cancel or change your flight up to 24 hours before the departure date, you may be eligible for a refund or minimal fees, depending on your ticket type. Refundable ticket holders are entitled to a full or partial refund.
-        </p>
-        <p>
-          All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.
-        </p> 
-        <button class="cancel-flight-btn" onclick="showCancelConfirmation()">
-          Cancel Flight
-        </button>
-      </section>
-    </main>
-  </div>
-  <?php include 'u_footer_1.php'; ?>
-  <?php include 'u_footer_2.php'; ?>
-  
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const stars = document.querySelectorAll('.stars i');
-      let currentRating = 0;
-      
-      // Handle star hover and click
-      stars.forEach((star, index) => {
-        // Mouse enter - fill stars up to this one
-        star.addEventListener('mouseenter', () => {
-          for (let i = 0; i <= index; i++) {
-            stars[i].style.color = '#605DEC';
-          }
-        });
-        
-        // Mouse leave - return to selected state
-        star.addEventListener('mouseleave', () => {
-          if (currentRating === 0) {
-            // If no rating selected, reset all stars
-            stars.forEach(s => s.style.color = '#a8a8b7');
-          } else {
-            // If rating selected, show selected stars
-            stars.forEach((s, i) => {
-              s.style.color = i < currentRating ? '#605DEC' : '#a8a8b7';
-            });
-          }
-        });
-        
-        // Click - set rating
-        star.addEventListener('click', () => {
-          currentRating = index + 1;
-          // Update all stars to reflect selection
-          stars.forEach((s, i) => {
-            s.style.color = i < currentRating ? '#605DEC' : '#a8a8b7';
-            s.classList.toggle('selected', i < currentRating);
-          });
-        });
-      });
-      
-      // Handle submit button
-      document.querySelector('.submit-btn').addEventListener('click', function() {
-        const reviewText = document.querySelector('textarea').value.trim();
-        const userName = "James Doe"; // Get from user session
-        
-        if (currentRating === 0) {
-          alert('Please select a rating before submitting.');
-          return;
-        }
-        
-        if (reviewText === '') {
-          alert('Please enter your review before submitting.');
-          return;
-        }
-        
-        // Save the review using AJAX
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'save_review.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        
-        xhr.onload = function() {
-          if (this.status === 200) {
-            try {
-              const response = JSON.parse(this.responseText);
-              if (response.success) {
-                alert('Thank you for your review! It has been added to the flight details page.');
-                // Reset form
-                stars.forEach(s => {
-                  s.style.color = '#a8a8b7';
-                  s.classList.remove('selected');
-                });
-                document.querySelector('textarea').value = '';
-                currentRating = 0;
-              } else {
-                alert('Error: ' + response.message);
-              }
-            } catch (e) {
-              alert('Thank you for your review! It has been added to the flight details page.');
-              // Reset form even if there's an error parsing the response
-              stars.forEach(s => {
-                s.style.color = '#a8a8b7';
-                s.classList.remove('selected');
-              });
-              document.querySelector('textarea').value = '';
-              currentRating = 0;
-            }
-          } else {
-            alert('There was an error submitting your review. Please try again.');
-          }
-        };
-        
-        xhr.onerror = function() {
-          alert('There was an error submitting your review. Please try again.');
-        };
-        
-        // Send the data - specify this is a flight review
-        const data = `rating=${currentRating}&review=${encodeURIComponent(reviewText)}&user=${encodeURIComponent(userName)}&type=flight`;
-        xhr.send(data);
-      });
-      
-      // Handle cancel button
-      document.querySelector('.cancel-btn').addEventListener('click', function() {
-        // Reset all stars
-        stars.forEach(s => {
-          s.style.color = '#a8a8b7';
-          s.classList.remove('selected');
-        });
-        document.querySelector('textarea').value = '';
-        currentRating = 0;
-      });
-    });
-    
-    // Function to show cancel confirmation popup
-    function showCancelConfirmation() {
-      // Create an iframe for the confirmation popup
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.top = '0';
-      iframe.style.left = '0';
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
-      iframe.style.border = 'none';
-      iframe.style.zIndex = '10000';
-      
-      // Set the source URL with parameters
-      iframe.src = 'confirm_popup.php?title=' + encodeURIComponent('Are you sure to cancel your flight?') +
-                  '&description=' + encodeURIComponent('If you cancel your flight, you may be subject to cancellation fees depending on the airline\'s policy. Please check the cancellation policy for details.') +
-                  '&confirmText=' + encodeURIComponent('Cancel Flight') +
-                  '&confirmClass=btn-danger' +
-                  '&actionType=cancelFlight';
-      
-      // Add to document
-      document.body.appendChild(iframe);
-      
-      // Listen for messages from the iframe
-      window.addEventListener('message', function(event) {
-        if (event.data === 'closeModal') {
-          // Remove the iframe when closed
-          document.body.removeChild(iframe);
-        } else if (event.data && event.data.action === 'cancelFlight' && event.data.confirmed) {
-          // Handle flight cancellation
-          alert('Your flight has been cancelled successfully.');
-          // Redirect to homepage or booking list
-          window.location.href = 'index.php';
-        }
-      });
+$flightDetails = [];
+foreach ($bookingIds as $bookingId) {
+    $query = "SELECT fb.f_book_id, fb.flight_id, fb.book_date, ud.fst_name, ud.lst_name,
+                     ft.departure_time, ft.arrival_time, ft.orig_airport_id, ft.dest_airport_id,
+                     ft.date AS flight_date,
+                     a.airline_name
+              FROM flight_booking_t fb
+              JOIN flight_info_t ft ON fb.flight_id = ft.flight_id
+              JOIN airline_t a ON ft.airline_id = a.airline_id
+              JOIN user_detail_t ud ON fb.user_id = ud.user_id
+              WHERE fb.f_book_id = '$bookingId'";
+    $result = mysqli_query($connection, $query);
+    if ($row = mysqli_fetch_assoc($result)) {
+        $flightDetails[] = $row;
     }
-  </script>
+}
+?>
+  <main class="container">
+    <h1 class="title">Have a good trip, <?= $flightDetails[0]['fst_name'] ?? 'Guest' ?>!</h1>
+    <p class="reference">Booking Reference:
+      <span>
+        <?= count($bookingIds) > 1 ? implode(", ", $bookingIds) : $bookingIds[0] ?>
+      </span>
+    </p>
+    <p class="description">
+        Thank you for booking your travel with <span>Travooli</span>!<br>
+        Below is a summary of your trip.
+        A copy of your booking confirmation has been sent to your email address. You can always revisit this information in the My Trips section of our app. Safe travels!
+    </p>
+    <?php foreach ($flightDetails as $index => $flight): ?>
+    <section class="layout flex-layout">
+      <div class="ticket">
+        <div class="flight-times">
+          <div class="departure">
+            <h2><?= date("h:i A", strtotime($flight['departure_time'])) ?></h2>
+            <p><?= $flight['orig_airport_id'] ?></p>
+          </div>
+          <div class="flight-path">
+            <div class="line"></div>
+            <i class="fas fa-plane"></i>
+            <div class="line"></div>
+          </div> 
+          <br>
+          <br>
+          <div class="arrival">
+            <h2><?= date("h:i A", strtotime($flight['arrival_time'])) ?></h2>
+            <p><?= $flight['dest_airport_id'] ?></p>
+          </div>
+        </div>
+        <div class="boarding-pass">
+          <div class="passenger-info">
+            <img src="icon/avatar.svg" alt="Passenger" class="avatar">
+            <div>
+              <h3><?= $flight['fst_name'] . ' ' . $flight['lst_name'] ?></h3>
+              <p>Boarding Pass <?= $flight['f_book_id'] ?></p>
+            </div>
+            <?php echo "<div class='ticket-class' style='margin-left: 100px;'>$classLabel ($classId)</div>"; ?>
+          </div>
+          <div class="flight-details">
+            <div class="detail">
+              <div class="icon"><img src="icon/calendar1.svg" alt="Calendar"></div>
+              <div><p>Date</p><span><?= $flight['flight_date'] ?></span></div>
+            </div>
+            <div class="detail">
+              <div class="icon"><img src="icon/timmer.svg" alt="Clock"></div>
+              <div><p>Flight time</p><span><?= date("H:i", strtotime($flight['departure_time'])) ?></span></div>
+            </div>
+            <div class="detail">
+              <div class="icon"><img src="icon/door.svg" alt="Gate"></div>
+              <div><p>Gate</p><span>A12</span></div>
+            </div>
+            <div class="detail">
+              <div class="icon"><img src="icon/seat.svg" alt="Seat"></div>
+              <div><p>Seat</p><span>128</span></div>
+            </div>
+          </div>
+          <div class="flight-code">
+            <div class="flight-code-content">
+            <?php echo "<h3>{$row['airline_name']}</h3>"; ?>
+              <p><?= $flight['flight_id'] ?></p>
+            </div>
+            <img src="icon/barcode.svg" alt="Barcode" class="barcode">
+          </div>
+        </div>
+      </div>
+      <?php if ($index === 0): ?>
+  <div class="price-breakdown">
+    <h3>Price breakdown</h3>
+    <div class="price-items">
+      <div class="price-item"><span>Flight-price</span><span>RM 340</span></div>
+      <div class="price-item"><span>Baggage fees</span><span>RM 20</span></div>
+      <div class="price-item"><span>Multi-meal</span><span>RM 30</span></div>
+      <div class="price-item"><span>Taxes and Fees</span><span>RM 121</span></div>
+      <div class="price-total"><span>Amount Paid</span><span>RM 491</span></div>
+    </div>
+  </div>
+  <?php endif; ?>
+    </section>
+    <?php endforeach; ?>
+    <section class="action-buttons">
+      <div class="share-btn"><img src="icon/share.svg" alt="btn"></div>
+      <button class="download-btn">Download</button>
+      <button class="home-btn" onclick="window.location.href='index.php'">Back to Homepage</button>
+    </section>
+
+    <section class="ratings">
+      <p>Your feedback matters to us. Let us know how we can improve your experience.</p>
+      <div class="stars">
+        <i class="fas fa-star"></i><i class="fas fa-star"></i>
+        <i class="fas fa-star"></i><i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+      </div>
+      <textarea placeholder="Share your thoughts..."></textarea>
+      <div class="rating-buttons">
+        <button class="cancel-btn">Cancel</button>
+        <button class="submit-btn">Submit</button>
+      </div>
+    </section>
+
+    <section class="cancel-flight">
+      <h1>Cancellation Policy</h1>
+      <p>This flight has a flexible cancellation policy. You may be eligible for a refund if cancelled at least 24 hours before departure.</p>
+      <p>All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee.</p>
+      <button class="cancel-flight-btn" onclick="showCancelConfirmation()">Cancel Flight</button>
+    </section>
+  </main>
+</body>
+</html>
+<?php include 'u_footer_1.php'; ?>
+<?php include 'u_footer_2.php'; ?>
+<script src="js/flight_Complete.js"></script>
 </body>
 </html>

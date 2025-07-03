@@ -123,34 +123,34 @@ if (!empty($flight_id)) {
             <div class="price-details">
             <div class="price-card">
                 <h2>Price Details</h2>
-                <p>Tickets (2 Adults, 1 Child)</p>
-                
+                <p id="ticket-count-label">Tickets</p>               
                 <div class="price-item">
                     <span>Subtotal</span>
-                    <span>$340</span>
+                    <span id="flight-price">RM 0</span>
                 </div>
                 <div class="price-item">
                     <span>Baggage Fees</span>
-                    <span>$20</span>
+                    <span class="baggage-price">RM 0</span>
                 </div>
                 <div class="price-item">
                     <span>Multi-meal</span>
-                    <span>$30</span>
+                    <span class="meal-price">RM 0</span>
                 </div>
                 <div class="price-item">
                     <span>Taxes & Fees</span>
-                    <span>$121</span>
+                    <span>RM 121</span>
                 </div>
                 <div class="price-item">
                     <span>Discount</span>
-                    <span>$0</span>
+                    <span>RM 0</span>
                 </div>
                 <hr>
                 <div class="total">
                     <span>Total</span>
-                    <span>$491</span>
+                    <span id="total">RM 0</span>
                 </div>
             </div>
+            <a href="payment.php" class="proceed-btn">Proceed to Payment</a>
 
             <button class="proceed-btn">Proceed to Payment</button>
         </div>

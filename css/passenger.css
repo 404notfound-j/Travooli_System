@@ -8,6 +8,10 @@ body {
   color: #FFFFFF;
 }
 
+.hidden {
+  display: none;
+}
+
 .main-content {
   display: flex;
   flex-direction: column; 
@@ -208,6 +212,7 @@ body {
   padding: 10px 16px;
   width: 100%;
   box-sizing: border-box;
+  margin-bottom: 12px;
 }
 
 .addons-row {
@@ -306,6 +311,8 @@ body {
   font-weight: 600;
   font-size: 25px;
   color: #605DEC;
+  text-align: right;
+  flex: 1; 
 }
 
 .button-row {
