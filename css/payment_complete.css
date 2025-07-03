@@ -65,6 +65,7 @@ body {
     max-width: 856px;
     height: 309px;
     align-items: flex-start;
+    margin-bottom: 20px;
 }
 
 .flight-times {

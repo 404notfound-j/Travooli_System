@@ -341,8 +341,12 @@ hr {
 }
 
 .airline-logo {
-  width: 80px;
-  margin-bottom: 12px;
+  display: block;
+  padding-top: 50px;
+  margin: 0 auto;           
+  height: auto;  
+  object-fit: contain; 
+  width: 130px;    
 }
 
 .content-section {
