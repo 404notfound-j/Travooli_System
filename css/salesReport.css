@@ -118,3 +118,68 @@
     margin-left: 12px;
     font-size: 20px;
 }
+
+.airlines-boxes-container {
+    display: flex;
+    gap:30px;
+    margin-top: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.airline-box {
+    width: 240px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    background: #f8fafd;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.airline-box-top {
+    background: #D6E3FF; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.airline-logo {
+    width:250px;
+    height: 250px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.airline-box-middle {
+    background: #FFFFFF;
+    text-align: center;
+    padding: 12px 0 0 0;
+}
+
+.airline-name {
+    font-weight: 600;
+    color: #4379EE;
+}
+
+.airline-box-bottom {
+    background: #FFFFFF;
+    padding: 12px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.airline-info {
+    background: rgba(217, 217, 217, 0.4);
+    border-radius: 10px;
+    padding: 10px 0;
+    width: 85%;
+    text-align: center;
+    font-size: 15px;
+    color: #4379EE;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}

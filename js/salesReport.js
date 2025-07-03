@@ -1,21 +1,15 @@
-// Sample data for airlines and ticket sales
-const airlineLabels = [
-    'AirAsia', 'Malaysia Airline', 'Batix Air', 'Qatar Airline', 'Singapore Airline',
-    'Firefly', 'MASwings', 'Malindo', 'Emirates', 'Scoot', 'Turkish Airline'
-];
-const ticketSales = [
-    65000, 33000, 25000, 53000, 42000,
-    29000, 36000, 44000, 15000, 74000, 26000, 48000
-];
+const labels = salesData.map(item => item.name);
+const data = salesData.map(item => Number(item.revenue.replace(/[^\d]/g, '')));
+const chartLabel = 'Revenue (RM)';
 
 const ctx = document.getElementById('salesBarChart').getContext('2d');
 const salesBarChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: airlineLabels,
+        labels: labels,
         datasets: [{
-            label: 'Tickets Sold',
-            data: ticketSales,
+            label: chartLabel,
+            data: data,
             backgroundColor: '#5286F8',
             borderWidth: 1,
             borderRadius: 8,
@@ -49,7 +43,7 @@ const salesBarChart = new Chart(ctx, {
                     color: '#F0F4FA',
                     borderDash: [4, 4]
                 },
-                suggestedMax: 80000
+                suggestedMax: 120000
             }
         }
     }
