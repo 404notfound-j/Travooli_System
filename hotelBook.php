@@ -12,6 +12,17 @@ if (!$connection) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+// Fetch all distinct cities from the hotel_t table for the dropdown
+$cities_query = "SELECT DISTINCT city FROM hotel_t ORDER BY city";
+$cities_result = mysqli_query($connection, $cities_query);
+
+$cities = array();
+if ($cities_result && mysqli_num_rows($cities_result) > 0) {
+    while ($row = mysqli_fetch_assoc($cities_result)) {
+        $cities[] = $row;
+    }
+}
+
 // Get search parameter if exists
 $search_location = isset($_GET['destination']) ? trim($_GET['destination']) : '';
 
@@ -209,7 +220,22 @@ $hotel_images = [
                 <div class="search-input-group">
                     <div class="input-group">
                         <img src="icon/hotelDestination.svg" alt="Destination" class="search-icon">
-                        <input type="text" id="destination" name="destination" placeholder="Destination?" value="<?php echo isset($_GET['destination']) ? htmlspecialchars($_GET['destination']) : ''; ?>">
+                        <input type="text" 
+                               id="destination" 
+                               name="destination" 
+                               placeholder="Destination?" 
+                               value="<?php echo isset($_GET['destination']) ? htmlspecialchars($_GET['destination']) : ''; ?>"
+                               autocomplete="off"
+                               readonly>
+                        <div class="city-dropdown" id="cityDropdown">
+                            <?php foreach($cities as $city): ?>
+                                <div class="city-option" data-city="<?= htmlspecialchars($city['city']) ?>">
+                                    <div class="city-main">
+                                        <span class="city-name"><?= htmlspecialchars($city['city']) ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                         <span class="input-border"></span>
                     </div>
                 </div>
@@ -219,6 +245,7 @@ $hotel_images = [
                 <input type="hidden" name="adult" id="adultHidden" value="<?php echo isset($_GET['adult']) ? htmlspecialchars($_GET['adult']) : '1'; ?>">
                 <input type="hidden" name="child" id="childHidden" value="<?php echo isset($_GET['child']) ? htmlspecialchars($_GET['child']) : '0'; ?>">
                 <input type="hidden" name="room" id="roomHidden" value="<?php echo isset($_GET['room']) ? htmlspecialchars($_GET['room']) : '1'; ?>">
+                <div class="search-divider"></div>
                 <div class="search-divider"></div>
                 <div class="search-input-group hotel-date-picker-wrapper" id="hotelDatePicker">
                     <div class="input-group">
@@ -446,7 +473,7 @@ $hotel_images = [
                                         <div class="hotel-card-title"><?php echo $hotel['name']; ?></div>
                                         <div class="hotel-card-price-block">
                                             <span class="hotel-card-price-label">starting from</span>
-                                            <span class="hotel-card-price-main">$<?php echo $hotel['min_price']; ?><span class="hotel-card-price-night">/night</span></span>
+                                            <span class="hotel-card-price-main">RM<?php echo number_format($hotel['min_price'], 2); ?><span class="hotel-card-price-night">/night</span></span>
                                             <span class="hotel-card-price-tax">excl. tax</span>
                                         </div>
                                     </div>
@@ -525,28 +552,6 @@ $hotel_images = [
     <script>
         // Direct form submission handler
         document.addEventListener('DOMContentLoaded', function() {
-            const searchBtn = document.querySelector('.search-btn');
-            const searchForm = document.getElementById('hotelSearchForm');
-            const destinationInput = document.getElementById('destination');
-            
-            if (searchBtn && searchForm) {
-                searchBtn.addEventListener('click', function(e) {
-                    // Submit the form directly
-                    searchForm.submit();
-                });
-            }
-            
-            // Handle Enter key press in the destination input
-            if (destinationInput && searchForm) {
-                destinationInput.addEventListener('keypress', function(e) {
-                    // Check if Enter key was pressed
-                    if (e.key === 'Enter') {
-                        e.preventDefault(); // Prevent default form submission
-                        searchForm.submit(); // Submit the form manually
-                    }
-                });
-            }
-            
             // Check user login status from PHP session
             const userLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
             

@@ -230,7 +230,7 @@ $room_type_images = [
             </div>
             <div class="hotel-details-header-right">
                 <div class="hotel-details-price-block">
-                    <span class="hotel-details-price-main">$<?php echo $hotel['min_price']; ?><span class="hotel-details-price-night">/night</span></span>
+                    <span class="hotel-details-price-main">RM<?php echo number_format($hotel['min_price'], 2); ?><span class="hotel-details-price-night">/night</span></span>
                 </div>
                 <div class="hotel-details-action-buttons">
                     <button class="hotel-card-fav-btn" type="button">
@@ -312,7 +312,7 @@ $room_type_images = [
                         <b><?php echo $room['type_name']; ?></b><br>
                         <?php echo $room_desc; ?>
                     </div>
-                    <div class="hotel-details-room-price">$<?php echo $room['price_per_night']; ?><span class="hotel-details-room-night">/night</span></div>
+                    <div class="hotel-details-room-price">RM<?php echo number_format($room['price_per_night'], 2); ?><span class="hotel-details-room-night">/night</span></div>
                     <a href="hotelBookInfo.php?hotel_id=<?php echo $hotel_id; ?>&r_type_id=<?php echo $room['r_type_id']; ?>&checkin=<?php echo $checkin; ?>&checkout=<?php echo $checkout; ?>&adult=<?php echo $adult; ?>&child=<?php echo $child; ?>&room=<?php echo $room_count; ?>" class="hotel-details-book-btn" onclick="return handleBookNowClick(event, this.href)">Book now</a>
                     <!-- DEBUG: room_count=<?php echo $room_count; ?> -->
             </div>

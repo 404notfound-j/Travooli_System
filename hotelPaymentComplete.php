@@ -178,20 +178,20 @@
           <h3>Price breakdown</h3>
           <div class="price-items">
             <div class="price-item">
-              <span>Room Price ($<?php echo $price_per_night; ?> × <?php echo $nights; ?> nights × <?php echo $room_count; ?> rooms)</span>
-              <span>$<?php echo number_format($subtotal, 0); ?></span>
+              <span>Room Price (RM<?php echo number_format($price_per_night, 2); ?> × <?php echo $nights; ?> nights × <?php echo $room_count; ?> rooms)</span>
+              <span>RM<?php echo number_format($subtotal, 2); ?></span>
             </div>
             <div class="price-item">
               <span>Taxes and Fees</span>
-              <span>$<?php echo htmlspecialchars($tax); ?></span>
+              <span>RM<?php echo number_format($tax, 2); ?></span>
             </div>
             <div class="price-item">
               <span>Discount</span>
-              <span>$0</span>
+              <span>RM0.00</span>
             </div>
             <div class="price-total">
               <span>Amount Paid</span>
-              <span>$<?php echo htmlspecialchars($total_amount); ?></span>
+              <span>RM<?php echo number_format($total_amount, 2); ?></span>
             </div>
           </div>
         </div>
