@@ -1242,3 +1242,40 @@ input[type="range"]::-webkit-slider-thumb {
     border: none;
     margin: 24px 0 18px 0;
 }
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.pagination-link, .pagination-current {
+    display: inline-block;
+    padding: 8px 14px;
+    margin: 0 5px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.pagination-link {
+    background-color: #f0f4f8;
+    color: #605DEC;
+    border: 1px solid #e0e4e8;
+    transition: all 0.2s ease;
+}
+
+.pagination-link:hover {
+    background-color: #605DEC;
+    color: white;
+    border-color: #605DEC;
+}
+
+.pagination-current {
+    background-color: #605DEC;
+    color: white;
+    border: 1px solid #605DEC;
+}

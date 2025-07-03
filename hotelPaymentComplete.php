@@ -1,3 +1,90 @@
+<?php
+  // Start session to check login status
+  session_start();
+  include 'connection.php';
+
+  // --- Cancel Booking Backend Logic (AJAX/POST) ---
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancelBooking') {
+    $booking_id = isset($_POST['booking_id']) ? $_POST['booking_id'] : '';
+    $response = ['success' => false, 'message' => 'Unknown error'];
+
+    if ($booking_id) {
+      // Update booking status to 'Cancelled'
+      $update = "UPDATE hotel_booking_t SET status='Cancelled' WHERE h_book_id='$booking_id'";
+      if (mysqli_query($connection, $update)) {
+        $response = ['success' => true, 'message' => 'Booking cancelled successfully.'];
+      } else {
+        $response = ['success' => false, 'message' => 'Database error: ' . mysqli_error($connection)];
+      }
+    } else {
+      $response = ['success' => false, 'message' => 'Booking ID missing.'];
+    }
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit();
+  }
+
+  // Get the latest booking info
+  $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'U001'; // Default to U001 if not logged in
+  
+  // Check if there's a booking ID in the session (set by hotelPayment.php)
+  $booking_id = isset($_SESSION['last_booking_id']) ? $_SESSION['last_booking_id'] : null;
+  
+  // Build the query - if we have a specific booking ID, use it, otherwise get the latest
+  $booking_query = "SELECT hb.*, hp.amount, hp.method, hp.payment_date, c.fst_name, c.lst_name, 
+                    h.name AS hotel_name, rt.type_name
+                    FROM hotel_booking_t hb 
+                    JOIN hotel_payment_t hp ON hb.h_book_id = hp.h_book_id
+                    JOIN customer_t c ON hb.customer_id = c.customer_id
+                    JOIN hotel_t h ON hb.hotel_id = h.hotel_id
+                    JOIN room_type_t rt ON hb.r_type_id = rt.r_type_id
+                    WHERE hb.user_id = '$user_id'";
+                    
+  // Add booking ID filter if available
+  if ($booking_id) {
+    $booking_query .= " AND hb.h_book_id = '$booking_id'";
+  } else {
+    $booking_query .= " ORDER BY hp.payment_date DESC, hb.h_book_id DESC LIMIT 1";
+  }
+  
+  $booking_result = mysqli_query($connection, $booking_query);
+  
+  if ($booking_result && mysqli_num_rows($booking_result) > 0) {
+    $booking = mysqli_fetch_assoc($booking_result);
+    $customer_name = $booking['fst_name'] . ' ' . $booking['lst_name'];
+    $hotel_name = $booking['hotel_name'];
+    $room_type = $booking['type_name'];
+    $booking_id = $booking['h_book_id'];
+    $check_in = date('D, M j', strtotime($booking['check_in_date']));
+    $check_out = date('D, M j', strtotime($booking['check_out_date']));
+    $room_count = isset($booking['room_count']) ? (int)$booking['room_count'] : 1;
+    $adult_count = isset($booking['adult_count']) ? (int)$booking['adult_count'] : 1;
+    $child_count = isset($booking['child_count']) ? (int)$booking['child_count'] : 0;
+    
+    // Calculate nights
+    $checkin_date = new DateTime($booking['check_in_date']);
+    $checkout_date = new DateTime($booking['check_out_date']);
+    $interval = $checkin_date->diff($checkout_date);
+    $nights = $interval->days > 0 ? $interval->days : 1;
+    
+    // Get room price from DB
+    $hotel_id = $booking['hotel_id'];
+    $r_type_id = $booking['r_type_id'];
+    $room_price_query = "SELECT price_per_night FROM hotel_room_t WHERE hotel_id = '$hotel_id' AND r_type_id = '$r_type_id'";
+    $room_price_result = mysqli_query($connection, $room_price_query);
+    $room_price_row = mysqli_fetch_assoc($room_price_result);
+    $price_per_night = $room_price_row ? (float)$room_price_row['price_per_night'] : 0;
+    
+    // Calculate subtotal, tax, total
+    $subtotal = $price_per_night * $nights * $room_count;
+    $tax = round($subtotal * 0.06, 2);
+    $total_amount = $subtotal + $tax;
+
+    // Debug output
+    echo "<!-- DEBUG: check_in_date={$booking['check_in_date']}, check_out_date={$booking['check_out_date']}, room_count={$booking['room_count']}, adult_count={$booking['adult_count']}, child_count={$booking['child_count']} -->";
+  } 
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,11 +103,11 @@
         <?php include 'userHeader.php';?>
     </header>
     <main class="container">
-      <h1 class="title">Have a good trip, Peter!</h1>
-      <p class="reference">Booking Reference: <span>#BK0012345678</span></p>
+      <h1 class="title">Have a good trip, <?php echo htmlspecialchars($customer_name); ?>!</h1>
+      <p class="reference">Booking Reference: <span>#<?php echo htmlspecialchars($booking_id); ?></span></p>
       <p class="description">
-          Thank you for booking your travel with <span>Travooli</span> !<br>
-          Below is a summary of your trip to Tokyo. 
+          Thank you for booking your stay with <span>Travooli</span>!<br>
+          Below is a summary of your trip to <?php echo htmlspecialchars($hotel_name); ?>. 
           A copy of your booking confirmation has been sent to your email address. You can always revisit this information in the My Trips section of our app. Safe travels!
       </p>
 
@@ -28,14 +115,14 @@
         <div class="ticket">
           <div class="flight-times">
             <div class="departure">
-              <h2>Thur, Dec 8</h2>
+              <h2><?php echo htmlspecialchars($check_in); ?></h2>
               <p>Check-in</p>
             </div>
             <div class="flight-path">
                 <img src="icon/hotelPaymentComplete.svg">
             </div>
             <div class="arrival">
-              <h2>Fri, Dec 9</h2>
+              <h2><?php echo htmlspecialchars($check_out); ?></h2>
               <p>Check-out</p>
             </div>
           </div>
@@ -43,9 +130,9 @@
             <div class="passenger-info">
               <img src="icon/avatar.svg" alt="Passenger" class="avatar">
               <div>
-                <h3>James Doe</h3>
+                <h3><?php echo htmlspecialchars($customer_name); ?></h3>
               </div>
-              <span class="class">Superior room - 1 double bed<br>or 2 twin beds</span>
+              <span class="class"><?php echo htmlspecialchars($room_type); ?></span>
             </div>
             <div class="flight-details">
               <div class="detail">
@@ -78,8 +165,10 @@
             </div>
             <div class="flight-code">
               <div class="flight-code-content">
-                <h3>MYS</h3>
-                <p>TSI-MH-A2301</p>
+                <h3 style="font-size: 0.8em;font-weight: normal;">
+                  Rooms: <?php echo $room_count; ?> | Adults: <?php echo $adult_count; ?> | Children: <?php echo $child_count; ?> | Nights: <?php echo $nights; ?>
+                </h3>
+                <p><?php echo htmlspecialchars($booking_id); ?></p>
               </div>
               <img src="icon/barcode.svg" alt="Barcode" class="barcode">
             </div>
@@ -89,24 +178,21 @@
           <h3>Price breakdown</h3>
           <div class="price-items">
             <div class="price-item">
-              <span>Subtotal</span>
-              <span>RM 340</span>
-            </div>
-            <div class="price-item">
-              <span>Baggage fees</span>
-              <span>RM 20</span>
-            </div>
-            <div class="price-item">
-              <span>Multi-meal</span>
-              <span>RM 30</span>
+              <span>Room Price ($<?php echo $price_per_night; ?> × <?php echo $nights; ?> nights × <?php echo $room_count; ?> rooms)</span>
+              <span>$<?php echo number_format($subtotal, 0); ?></span>
             </div>
             <div class="price-item">
               <span>Taxes and Fees</span>
-              <span>RM 121</span>
+              <span>$<?php echo htmlspecialchars($tax); ?></span>
+            </div>
+            <div class="price-item">
+              <span>Discount</span>
+              <span>$0</span>
             </div>
             <div class="price-total">
               <span>Amount Paid</span>
-              <span>RM 491</span>
+              <span>$<?php echo htmlspecialchars($total_amount); ?></span>
+            </div>
           </div>
         </div>
       </section>
@@ -136,7 +222,12 @@
         <textarea placeholder="Share your thoughts..."></textarea>
         <div class="rating-buttons">
           <button class="cancel-btn">Cancel</button>
-          <button class="submit-btn">Submit</button>
+          <button class="submit-btn"
+            data-booking-id="<?php echo htmlspecialchars($booking_id); ?>"
+            data-hotel-id="<?php echo htmlspecialchars($booking['hotel_id']); ?>"
+            data-customer-id="<?php echo htmlspecialchars($booking['customer_id']); ?>">
+            Submit
+          </button>
         </div>
       </section>
 
@@ -148,7 +239,7 @@
         <p>
           All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.
         </p> 
-        <button class="cancel-flight-btn" onclick="showCancelConfirmation()">
+        <button class="cancel-flight-btn" onclick="showCancelBookingReminder('<?php echo $booking_id; ?>')">
           Cancel Booking
         </button>
       </section>
@@ -156,152 +247,6 @@
   </div>
   <?php include 'u_footer_1.php'; ?>
   <?php include 'u_footer_2.php'; ?>
-  
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const stars = document.querySelectorAll('.stars i');
-      let currentRating = 0;
-      
-      // Handle star hover
-      stars.forEach((star, index) => {
-        // Mouse enter - fill stars up to this one
-        star.addEventListener('mouseenter', () => {
-          for (let i = 0; i <= index; i++) {
-            stars[i].style.color = '#605DEC';
-          }
-        });
-        
-        // Mouse leave - return to selected state
-        star.addEventListener('mouseleave', () => {
-          if (currentRating === 0) {
-            // If no rating selected, reset all stars
-            stars.forEach(s => s.style.color = '#a8a8b7');
-          } else {
-            // If rating selected, show selected stars
-            stars.forEach((s, i) => {
-              s.style.color = i < currentRating ? '#605DEC' : '#a8a8b7';
-            });
-          }
-        });
-        
-        // Click - set rating
-        star.addEventListener('click', () => {
-          currentRating = index + 1;
-          // Update all stars to reflect selection
-          stars.forEach((s, i) => {
-            s.style.color = i < currentRating ? '#605DEC' : '#a8a8b7';
-            s.classList.toggle('selected', i < currentRating);
-          });
-        });
-      });
-      
-      // Handle submit button
-      document.querySelector('.submit-btn').addEventListener('click', function() {
-        const reviewText = document.querySelector('textarea').value.trim();
-        const userName = "James Doe"; // Get from user session
-        
-        if (currentRating === 0) {
-          alert('Please select a rating before submitting.');
-          return;
-        }
-        
-        if (reviewText === '') {
-          alert('Please enter your review before submitting.');
-          return;
-        }
-        
-        // Save the review using AJAX
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'save_review.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        
-        xhr.onload = function() {
-          if (this.status === 200) {
-            try {
-              const response = JSON.parse(this.responseText);
-              if (response.success) {
-                alert('Thank you for your review! It has been added to the hotel details page.');
-                // Reset form
-                stars.forEach(s => {
-                  s.style.color = '#a8a8b7';
-                  s.classList.remove('selected');
-                });
-                document.querySelector('textarea').value = '';
-                currentRating = 0;
-              } else {
-                alert('Error: ' + response.message);
-              }
-            } catch (e) {
-              alert('Thank you for your review! It has been added to the hotel details page.');
-              // Reset form even if there's an error parsing the response
-              stars.forEach(s => {
-                s.style.color = '#a8a8b7';
-                s.classList.remove('selected');
-              });
-              document.querySelector('textarea').value = '';
-              currentRating = 0;
-            }
-          } else {
-            alert('There was an error submitting your review. Please try again.');
-          }
-        };
-        
-        xhr.onerror = function() {
-          alert('There was an error submitting your review. Please try again.');
-        };
-        
-        // Send the data
-        const data = `rating=${currentRating}&review=${encodeURIComponent(reviewText)}&user=${encodeURIComponent(userName)}&type=hotel`;
-        xhr.send(data);
-      });
-      
-      // Handle cancel button
-      document.querySelector('.cancel-btn').addEventListener('click', function() {
-        // Reset all stars
-        stars.forEach(s => {
-          s.style.color = '#a8a8b7';
-          s.classList.remove('selected');
-        });
-        document.querySelector('textarea').value = '';
-        currentRating = 0;
-      });
-    });
-
-    // Function to show cancel confirmation popup
-    function showCancelConfirmation() {
-      // Create an iframe for the confirmation popup
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.top = '0';
-      iframe.style.left = '0';
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
-      iframe.style.border = 'none';
-      iframe.style.zIndex = '10000';
-      
-      // Set the source URL with parameters
-      iframe.src = 'confirm_popup.php?title=' + encodeURIComponent('Are you sure to cancel your room?') +
-                  '&description=' + encodeURIComponent('If you cancel your booking, you may be subject to cancellation fees depending on the hotel\'s policy. Please check the cancellation policy for details.') +
-                  '&confirmText=' + encodeURIComponent('Cancel Booking') +
-                  '&confirmClass=btn-danger' +
-                  '&actionType=cancelHotel';
-      
-      // Add to document
-      document.body.appendChild(iframe);
-      
-      // Listen for messages from the iframe
-      window.addEventListener('message', function(event) {
-        if (event.data === 'closeModal') {
-          // Remove the iframe when closed
-          document.body.removeChild(iframe);
-        } else if (event.data && event.data.action === 'cancelHotel' && event.data.confirmed) {
-          // Handle hotel cancellation
-          alert('Your hotel booking has been cancelled successfully.');
-          // Redirect to homepage or booking list
-          window.location.href = 'index.php';
-        }
-      });
-    }
-  </script>
+  <script src="js/hotelpaymentcomplete.js"></script>
 </body>
 </html>
