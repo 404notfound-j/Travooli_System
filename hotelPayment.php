@@ -45,9 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tax = isset($_GET['tax']) ? $_GET['tax'] : '';
     $total = isset($_GET['total']) ? $_GET['total'] : '';
     
-    if (empty($payment_method)) {
-        $error_message = "Please select a payment method.";
-    } else {
+    if (!empty($payment_method)) {
         try {
             // Start transaction
             mysqli_begin_transaction($connection, MYSQLI_TRANS_START_READ_WRITE);
@@ -159,13 +157,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <h2 class="section-title">Payment method</h2>
                         
                         <p class="section-description">
-                            Select a payment method below. Tripma processes your payment
+                            Select a payment method below. Travooli processes your payment
                             securely with end-to-end encryption.
                         </p>
 
-                        <?php if ($error_message): ?>
-                            <div class="alert alert-danger"><?php echo $error_message; ?></div>
-                        <?php endif; ?>
+
 
                         <form method="post" action="">
                             <div class="payment-methods-card">
@@ -175,9 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <img src="icon/card.svg" alt="Credit Card" class="method-icon">
                                             <div class="method-name">Debit/Credit Card</div>
                                         </div>
-                                        <div class="radio-button">
-                                            <input type="radio" id="credit_card" name="payment_method" value="Credit Card">
-                                        </div>
+                                        <input type="radio" id="credit_card" name="payment_method" value="Credit Card" class="radio-button">
                                     </div>
                                     
                                     <div class="method-divider"></div>
@@ -187,9 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <img src="icon/google.svg" alt="Google Pay" class="method-icon">
                                             <div class="method-name">Google Pay</div>
                                         </div>
-                                        <div class="radio-button">
-                                            <input type="radio" id="google_pay" name="payment_method" value="Google Pay">
-                                        </div>
+                                        <input type="radio" id="google_pay" name="payment_method" value="Google Pay" class="radio-button">
                                     </div>
                                     
                                     <div class="method-divider"></div>
@@ -199,9 +191,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <img src="icon/apple.svg" alt="Apple Pay" class="method-icon">
                                             <div class="method-name">Apple Pay</div>
                                         </div>
-                                        <div class="radio-button">
-                                            <input type="radio" id="apple_pay" name="payment_method" value="Apple Pay">
-                                        </div>
+                                        <input type="radio" id="apple_pay" name="payment_method" value="Apple Pay" class="radio-button">
                                     </div>
                                     
                                     <div class="method-divider"></div>
@@ -211,9 +201,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <img src="icon/paypal.svg" alt="PayPal" class="method-icon">
                                             <div class="method-name">Paypal</div>
                                         </div>
-                                        <div class="radio-button">
-                                            <input type="radio" id="paypal" name="payment_method" value="Paypal">
-                                        </div>
+                                        <input type="radio" id="paypal" name="payment_method" value="Paypal" class="radio-button">
                                     </div>
                                     
                                     <div class="method-divider"></div>
@@ -223,9 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <img src="icon/amazonpay.svg" alt="Amazon Pay" class="method-icon">
                                             <div class="method-name">Amazon Pay</div>
                                         </div>
-                                        <div class="radio-button">
-                                            <input type="radio" id="amazon_pay" name="payment_method" value="Amazon Pay">
-                                        </div>
+                                        <input type="radio" id="amazon_pay" name="payment_method" value="Amazon Pay" class="radio-button">
                                     </div>
                                 </div>
                             </div>

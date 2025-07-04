@@ -138,6 +138,37 @@ body {
     border-radius: 50%;
 }
 
+/* Style for actual radio input elements */
+input.radio-button {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+    margin: 0;
+    cursor: pointer;
+    background: white;
+}
+
+input.radio-button:checked {
+    border-color: #605dec;
+}
+
+input.radio-button:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: #605dec;
+    border-radius: 50%;
+}
+
 .method-divider {
     width: 1px;
     height: 96px;
