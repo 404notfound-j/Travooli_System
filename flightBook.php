@@ -92,12 +92,10 @@
     <!-- Date Picker Section -->
     <div class="date-picker-wrapper">
         <div class="search-input">
-            <div class="input-group">
+            <div class="input-group" style="position: relative;">
                 <img src="icon/calendar.svg" alt="Calendar" class="icon" style="width: 32px; height: 32px;">
-                <input type="text" 
-                       placeholder="Depart" 
-                       id="dateInput" 
-                       readonly>
+                <input type="text" placeholder="Depart" id="dateInput" readonly style="opacity:0;position:absolute;left:0;top:0;width:100%;height:100%;z-index:2;cursor:pointer;">
+                <span id="dateDisplay" style="position:absolute;left:48px;top:0;height:100%;display:flex;align-items:center;z-index:1;color:#888;font-size:16px;pointer-events:none;">Depart</span>
                 <span class="input-border"></span>
             </div>
         </div>
@@ -285,25 +283,12 @@
         </div>
       </div>
       <hr>
-      <div class="filter-group">
-        <h4>Trips</h4>
-        <div class="checkbox-group">
-          <label><input type="checkbox"class="trip-filter" value="round">Round trip</label>
-          <label><input type="checkbox"class="trip-filter" value="one">On Way</label>
-        </div>
-      </div>
       <div class="action-buttons">
-        <button class="cancel-btn" onclick="location.reload();">Cancel</button>
+      <button class="cancel-btn" id="cancelBtn">Cancel</button>
         <button class="apply-btn">Apply Filters</button>
       </div>
     </div>
     <div class="main-panel">
-      <div class="sort-bar">
-        <div class="sort-option" id="sortCheapest">Cheapest<br><span>RM ?</span></div>
-        <div class="sort-option selected">Best<br><span>RM ?/span></div>
-        <div class="sort-option" id="sortQuickest">Quickest<br><span>RM ?</span></div>
-        <div class="sort-other"><span>&#9776;</span><span>Other sort</span></div>
-      </div>
   <div id="flightResults" class="results-container"></div>
 </div>
 </div>

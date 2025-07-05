@@ -584,44 +584,8 @@
                 </div>
             </div>
         </div>
-    </section>
-    
+    </section> 
     <script src="js/script.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('searchBtn').addEventListener('click', function () {
-    const fromInput = document.getElementById('fromAirport');
-    const toInput = document.getElementById('toAirport');
-    const tripType = document.querySelector('input[name="tripType"]:checked').value;
-    const departDate = document.getElementById('departDate').value;
-    const returnDate = document.getElementById('returnDate').value;
-    const adults = document.getElementById('adultCount').textContent;
-    const children = document.getElementById('childCount').textContent;
-    const fromCode = fromInput.dataset.code || extractCode(fromInput.value);
-    const toCode = toInput.dataset.code || extractCode(toInput.value);
-    
-    function extractCode(value) {
-    // expects format like "Kuala Lumpur (KUL)"
-    const match = value.match(/\(([^)]+)\)$/);
-    return match ? match[1] : value.trim();
-}
-
-    if (!fromCode || !toCode || !departDate) {
-        alert("Please complete all required fields (From, To, Depart Date)");
-        return;
-    }
-
-    // Build query string
-    let url = `flightBook.php?from=${fromCode}&to=${toCode}&departDate=${encodeURIComponent(departDate)}&adults=${adults}&children=${children}&trip=${tripType}`;
-
-    if (tripType === 'round' && returnDate) {
-        url += `&returnDate=${encodeURIComponent(returnDate)}`;
-    }
-
-    window.location.href = url;
-});
-    });
-    </script>
     <?php include 'u_footer_1.php'; ?>
     <?php include 'u_footer_2.php'; ?>
 </body>

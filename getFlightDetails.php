@@ -10,7 +10,7 @@ if (!$flightId) {
 }
 
 $query = "SELECT f.flight_id, f.airline_id, a.airline_name, 
-                 f.orig_airport_id, f.dest_airport_id, f.departure_time, f.arrival_time, f.date, s.class_id, 
+                 f.orig_airport_id, f.dest_airport_id, f.departure_time, f.arrival_time, s.class_id, 
                  s.price, s.available_seats, 
                  oa.airport_full AS origin_airport_full, oa.city_full AS origin_airport_address, 
                  da.airport_full AS dest_airport_full, da.city_full AS dest_airport_address
