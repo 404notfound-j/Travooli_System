@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;400&display=swap');
+
+.page-title {
+    color: #4379EE;
+    font-size: 32px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.user-management-content h2 {
+    color: #4a6cf7;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+.user-list-label {
+    display: flex;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #4379EE;
+    transition: color 0.2s;
+    border-bottom: 3px solid #4379EE;
+    width: fit-content;
+    padding-bottom: 2px;
+}
+
+.user-table {
+    font-family: 'Poppins', sans-serif;
+    width: 95%;
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #FFFFFF;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1.5px solid #B9B9B9;
+}
+
+.user-table th, .user-table td {
+    padding: 18px 20px;
+    text-align: center;
+}
+
+.user-table th {
+    background: #FCFDFD;
+    color: #202224;
+    font-weight: 600;
+    border-bottom: 2px solid #D5D5D5;
+}
+
+.user-table tr {
+    background: #FFFFFF;
+}
+
+.user-table a {
+    color: #4a6cf7;
+    text-decoration: underline;
+}
+.modify-btn, .delete-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-right: 6px;
+    transition: background 0.2s;
+}
+.modify-btn {
+    background: #ffffff;
+    color: #4a6cf7;
+    border: 1px solid #4a6cf7;
+}
+.modify-btn:hover {
+    background: #4a6cf7;
+    color: #fff;
+}
+.delete-btn {
+    background: #ffffff;
+    color: #f44336;
+    border: 1px solid #f44336;
+}
+.delete-btn:hover {
+    background: #f44336;
+    color: #fff;
+}
+.pagination-wrapper {
+    width: 95%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+}
+.pagination {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #202224;
+    width: 100%;
+    justify-content: space-between;
+}
+.pagination span {
+    margin-right: 16px;
+}
+.pagination-arrows {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+.arrow {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: #eaf0fb;
+    color: #4a6cf7;
+    text-decoration: none;
+    font-size: 1.2rem;
+    border: 1px solid #4a6cf7;
+    transition: background 0.2s;
+}
+.arrow:hover:not(.disabled) {
+    background: #4a6cf7;
+    color: #fff;
+}
+.arrow.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.user-table td {
+    color: #494B50;
+    font-weight: 500;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+.user-table tbody td {
+    border-bottom: 1.5px solid #B9B9B9;
+    transition: background 0.2s;
+    box-sizing: border-box;
+}
+
+.user-table tbody tr:last-child td {
+    border-bottom: none;
+}
