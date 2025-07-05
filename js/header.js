@@ -148,16 +148,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Check if current page matches the nav item
-            if (currentPage === 'signIn.php' && href === 'signIn.php') {
-                item.classList.add('active');
-            } else if (currentPage === 'U_dashboard.php' && href === 'U_dashboard.php') {
-                item.classList.add('active');
-            } else if ((currentPage === '' || currentPage === 'index.php') && href === '#flights') {
-                item.classList.add('active');
-            } else if (currentPage === href) {
-                item.classList.add('active');
-            }
+                    // Check if current page matches the nav item
+        if (currentPage === 'signIn.php' && href === 'signIn.php') {
+            item.classList.add('active');
+        } else if (currentPage === 'U_dashboard.php' && href === 'U_dashboard.php') {
+            item.classList.add('active');
+        } else if ((currentPage === '' || currentPage === 'index.php') && href === '#flights') {
+            item.classList.add('active');
+        } else if (href === 'hotelPaymentComplete.php' && (currentPage === 'hotelPaymentComplete.php' || currentPage === 'noBooking.php')) {
+            // Handle My Reservations highlighting for both reservation pages
+            item.classList.add('active');
+        } else if (currentPage === href) {
+            item.classList.add('active');
+        }
         }
     });
     

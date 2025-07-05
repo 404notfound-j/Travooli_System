@@ -57,7 +57,7 @@ if (isset($_SESSION['user_id'])) {
                 <li class="nav-item"><a href="hotelBook.php">Hotels</a></li>
                 <li class="nav-item"><a href="#notifications">Notifications</a></li>
                 <li class="nav-item"><a href="#tickets">My Tickets</a></li>
-                <li class="nav-item"><a href="#reservations">My Reservations</a></li>
+                <li class="nav-item"><a href="hotelPaymentComplete.php">My Reservations</a></li>
                 <li class="nav-item"><a href="signIn.php">Sign in</a></li>
                 <li class="nav-item"><a href="signUp.php" class="btn btn-primary">Sign up</a></li>
             </ul>
@@ -86,7 +86,7 @@ if (isset($_SESSION['user_id'])) {
                 <li class="nav-item"><a href="hotelBook.php">Hotels</a></li>
                 <li class="nav-item"><a href="#notifications">Notifications</a></li>
                 <li class="nav-item"><a href="#tickets">My Tickets</a></li>
-                <li class="nav-item"><a href="#reservations">My Reservations</a></li>
+                <li class="nav-item"><a href="hotelPaymentComplete.php">My Reservations</a></li>
                 
                 <!-- Profile Section -->
                 <li class="nav-item profile-item">

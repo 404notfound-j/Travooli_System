@@ -24,8 +24,17 @@
     exit();
   }
 
+  // Check if user is logged in
+  if (!isset($_SESSION['user_id'])) {
+    // Redirect to sign in if not logged in
+    error_log("User not logged in, redirecting to signIn.php");
+    header("Location: signIn.php");
+    exit();
+  }
+  
   // Get the latest booking info
-  $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'U001'; // Default to U001 if not logged in
+  $user_id = $_SESSION['user_id'];
+  error_log("User ID: $user_id - Checking for bookings");
   
   // Check if there's a booking ID in the session (set by hotelPayment.php)
   $booking_id = isset($_SESSION['last_booking_id']) ? $_SESSION['last_booking_id'] : null;
@@ -38,9 +47,9 @@
                     JOIN customer_t c ON hb.customer_id = c.customer_id
                     JOIN hotel_t h ON hb.hotel_id = h.hotel_id
                     JOIN room_type_t rt ON hb.r_type_id = rt.r_type_id
-                    WHERE hb.user_id = '$user_id'";
+                    WHERE hb.user_id = '$user_id' AND hb.status != 'Cancelled'";
                     
-  // Add booking ID filter if available
+  // Add booking ID filter if available, otherwise get the latest
   if ($booking_id) {
     $booking_query .= " AND hb.h_book_id = '$booking_id'";
   } else {
@@ -49,7 +58,14 @@
   
   $booking_result = mysqli_query($connection, $booking_query);
   
-  if ($booking_result && mysqli_num_rows($booking_result) > 0) {
+  // Check for database errors
+  if (!$booking_result) {
+    error_log("Database error in hotelPaymentComplete.php: " . mysqli_error($connection));
+    header("Location: noBooking.php");
+    exit();
+  }
+  
+  if (mysqli_num_rows($booking_result) > 0) {
     $booking = mysqli_fetch_assoc($booking_result);
     $customer_name = $booking['fst_name'] . ' ' . $booking['lst_name'];
     $hotel_name = $booking['hotel_name'];
@@ -82,7 +98,13 @@
 
     // Debug output
     echo "<!-- DEBUG: check_in_date={$booking['check_in_date']}, check_out_date={$booking['check_out_date']}, room_count={$booking['room_count']}, adult_count={$booking['adult_count']}, child_count={$booking['child_count']} -->";
-  } 
+  } else {
+    // No hotel bookings found - clear session and redirect to no booking page
+    error_log("No bookings found for user ID: $user_id - Redirecting to noBooking.php");
+    unset($_SESSION['last_booking_id']);
+    header("Location: noBooking.php");
+    exit();
+  }
 ?>
 
 <!DOCTYPE html>

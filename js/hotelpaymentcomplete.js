@@ -115,6 +115,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Handle back to homepage button
+  const homeBtn = document.querySelector('.home-btn');
+  if (homeBtn) {
+    homeBtn.addEventListener('click', function() {
+      window.location.href = 'U_dashboard.php';
+    });
+  }
+
   // Expose showCancelBookingReminder globally
   window.showCancelBookingReminder = function(bookingId) {
     // Create an iframe for the confirmation popup
@@ -154,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
           if (data.success) {
             alert('Your hotel booking has been cancelled successfully.');
-            window.location.href = 'index.php';
+            window.location.href = 'U_dashboard.php';
           } else {
             alert('Error: ' + data.message);
           }

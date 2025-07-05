@@ -104,6 +104,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $payment_success = true;
             
             if ($payment_success) {
+                // Clear any previous booking sessions to ensure fresh data
+                unset($_SESSION['booking_ids']);
+                
                 header("Location: hotelPaymentComplete.php");
                 exit();
             }
