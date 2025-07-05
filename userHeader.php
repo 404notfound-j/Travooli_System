@@ -53,7 +53,6 @@ if (isset($_SESSION['user_id'])) {
         
     <nav class="nav">
             <ul class="nav-list" id="nav-menu">
-<<<<<<< HEAD
                 <li class="nav-item active"><a href="U_dashboard.php">Flights</a></li>
                 <li class="nav-item"><a href="hotelBook.php">Hotels</a></li>
                 <li class="nav-item"><a href="#notifications">Notifications</a></li>
@@ -63,17 +62,6 @@ if (isset($_SESSION['user_id'])) {
                 <li class="nav-item"><a href="signUp.php" class="btn btn-primary">Sign up</a></li>
             </ul>
         </nav>
-=======
-            <li class="nav-item active"><a href="U_dashboard.php">Flights</a></li>
-            <li class="nav-item"><a href="#hotels">Hotels</a></li>
-            <li class="nav-item"><a href="#notifications">Notifications</a></li>
-            <li class="nav-item"><a href="#tickets">My Tickets</a></li>
-            <li class="nav-item"><a href="#reservations">My Reservations</a></li>
-            <li class="nav-item"><a href="signIn.php">Sign in</a></li>
-            <li class="nav-item"><a href="signUp.php" class="btn btn-primary">Sign up</a></li>
-        </ul>
-    </nav>
->>>>>>> 3e4f8561b239387f8bf8860ed7da195c9c971dd5
         
         <!-- Hamburger Menu for Mobile -->
         <div class="hamburger" id="hamburger">
