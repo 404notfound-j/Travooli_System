@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
             item.classList.add('active');
         } else if ((currentPage === '' || currentPage === 'index.php') && href === '#flights') {
             item.classList.add('active');
-        } else if (href === 'hotelPaymentComplete.php' && (currentPage === 'hotelPaymentComplete.php' || currentPage === 'noBooking.php')) {
+        } else if (href === 'hotelPaymentComplete.php' && (currentPage === 'hotelPaymentComplete.php' || currentPage === 'noHotelBooking.php')) {
             // Handle My Reservations highlighting for both reservation pages
             item.classList.add('active');
         } else if (currentPage === href) {

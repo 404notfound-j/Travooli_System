@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnLogin'])) {
                 <?php if (!empty($loginError)): ?>
                     <p id="signin-error-message" style="color: red; font-size: 14px; margin-bottom: 15px;"> <?php echo $loginError; ?> </p>
                 <?php endif; ?>
-                <input type="email" id="email" name="email" placeholder="Email or phone number" required>
+                <input type="email" id="email" name="email" placeholder="Email" required>
                 <input type="password" id="password" name="password" placeholder="Password" required>
                 <button type="submit" name="btnLogin" class="btn btn-primary">Sign In</button>
             </form>

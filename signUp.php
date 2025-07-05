@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSignUp'])) {
                 <?php elseif (!empty($signupSuccess)): ?>
                     <p id="signup-success-message" style="color: green; font-size: 14px; margin-bottom: 15px;"> <?php echo $signupSuccess; ?> </p>
                 <?php endif; ?>
-                <input type="email" id="email" name="email" placeholder="Email or phone number" required>
+                <input type="email" id="email" name="email" placeholder="Email" required>
                 <input type="password" id="password" name="password" placeholder="Password" required>
                 <small class="password-hint">Password must be 8-20 characters, contain at least 1 number, and no spaces.</small>
                 <div class="name-container">

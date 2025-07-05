@@ -61,7 +61,7 @@
   // Check for database errors
   if (!$booking_result) {
     error_log("Database error in hotelPaymentComplete.php: " . mysqli_error($connection));
-    header("Location: noBooking.php");
+    header("Location: noHotelBooking.php");
     exit();
   }
   
@@ -100,9 +100,9 @@
     echo "<!-- DEBUG: check_in_date={$booking['check_in_date']}, check_out_date={$booking['check_out_date']}, room_count={$booking['room_count']}, adult_count={$booking['adult_count']}, child_count={$booking['child_count']} -->";
   } else {
     // No hotel bookings found - clear session and redirect to no booking page
-    error_log("No bookings found for user ID: $user_id - Redirecting to noBooking.php");
+    error_log("No bookings found for user ID: $user_id - Redirecting to noHotelBooking.php");
     unset($_SESSION['last_booking_id']);
-    header("Location: noBooking.php");
+    header("Location: noHotelBooking.php");
     exit();
   }
 ?>
