@@ -167,43 +167,53 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
             <div class="add-on-container">
                  <!-- new passenger add-on placeholder -->
         </div>
+            <!-- Price and Button Section -->
             <div class="price-and-button-container">
-                <div class="price-details-section">
-                    <h2>Price Details</h2>
-                    <div class="price-items">
-                        <div class="price-item">
-                        <span class="item-name" id="ticket-count-label">Tickets (1 Adult)</span>
-                            <span class="item-price" id="flight-price">RM 0</span>
-                        </div>
-                        <div class="price-item">
-                            <span class="item-name">Baggage Fees</span>
-                            <span class="baggage-price">RM 0</span>
-                        </div>
-                         <div class="price-item">
-                            <span class="item-name">Multi-meal</span>
-                            <span class="meal-price">RM 0</span>
-                        </div>
-                         <div class="price-item">
-                            <span class="item-name">Taxes & Fees</span>
-                            <span class="item-price">RM 121</span>
-                        </div>
-                         <div class="price-item">
-                            <span class="item-name">Discount</span>
-                            <span class="item-price">RM 0</span>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="total-price">
-                        <span class="total-text">Total </span>
-                        <span class="total-value" id="totalText">RM 0</span>
-                        </form>
-                    </div>
+            <div class="price-details-section">
+                <h2>Price Details</h2>
+                <div class="price-items">
+                <div class="price-item">
+                    <span class="item-name" id="ticket-count-label">Tickets (1 Adult)</span>
+                    <span class="item-price" id="flight-price">RM 0</span>
                 </div>
-                 <div class="button-row">
-                 <a href="#" class="select-seats-btn">Select seats</a>
-                 </div>
+                <div class="price-item">
+                    <span class="item-name">Baggage Fees</span>
+                    <span class="baggage-price">RM 0</span>
+                </div>
+                <div class="price-item">
+                    <span class="item-name">Multi-meal</span>
+                    <span class="meal-price">RM 0</span>
+                </div>
+                <div class="price-item">
+                    <span class="item-name">Taxes & Fees</span>
+                    <span class="item-price" id="tax-fees">RM 121</span>
+                </div>
+                <div class="price-item">
+                    <span class="item-name">Discount</span>
+                    <span class="item-price">RM 0</span>
+                </div>
+                </div>
+                <hr>
+                <div class="total-price">
+                <span class="total-text">Total </span>
+                <span class="total-value" id="totalText">RM 0</span>
+                </div>
             </div>
-        </div>
+
+            <!-- ✅ Updated button for JS -->
+            <div class="button-row">
+                <button class="select-seats-btn">Select Seats</button>
+            </div>
+
+            <!-- Required hidden fields -->
+            <input type="hidden" id="depart_flight_id" value="<?= htmlspecialchars($_GET['depart'] ?? '') ?>">
+            <input type="hidden" id="return_flight_id" value="<?= htmlspecialchars($_GET['return'] ?? '') ?>">
+            <input type="hidden" id="flight_id" value="<?= htmlspecialchars($_GET['flightId'] ?? '') ?>">
+            <input type="hidden" id="seat_class_field" value="<?= htmlspecialchars($_GET['class_id'] ?? 'PE') ?>">
+
+
+            </div>
+
 </div>
 <!-- Popup Overlay -->
 <div class="popup-bg hidden" id="popup-overlay">

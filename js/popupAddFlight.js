@@ -122,6 +122,53 @@ document.addEventListener("DOMContentLoaded", function () {
   // Generate initial passenger list based on sessionStorage
   generatePassengerList();
 
+  const selectBtn = document.querySelector('.select-seats-btn');
+  if (selectBtn) {
+    selectBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      console.log("✅ Select Seats button clicked");
+
+      const clean = (val) => parseFloat((val || '').replace(/[^\d.]/g, '').replace(',', '') || '0').toFixed(2);
+
+      const total = clean(document.querySelector('.total-value')?.textContent);
+      const ticket = clean(document.getElementById('flight-price')?.textContent);
+      const baggage = clean(document.querySelector('.baggage-price')?.textContent);
+      const meal = clean(document.querySelector('.meal-price')?.textContent);
+
+      const departId = document.getElementById('depart_flight_id')?.value || '';
+      const returnId = document.getElementById('return_flight_id')?.value || '';
+      const classId = document.getElementById('seat_class_field')?.value || '';
+      const oneWayId = document.getElementById('flight_id')?.value || '';
+      const flightId = departId || returnId || oneWayId;
+
+      // Save to sessionStorage only
+      sessionStorage.setItem('departId', departId);
+      sessionStorage.setItem('returnId', returnId);
+      sessionStorage.setItem('classId', classId);
+      sessionStorage.setItem('flightId', flightId);
+      sessionStorage.setItem('ticketPrice', ticket);
+      sessionStorage.setItem('baggagePrice', baggage);
+      sessionStorage.setItem('mealPrice', meal);
+      sessionStorage.setItem('totalPrice', total);
+
+      const adultCount = document.querySelectorAll('.passenger-type')
+        ? Array.from(document.querySelectorAll('.passenger-type')).filter(el => el.textContent.startsWith('Adult')).length
+        : 1;
+      const childCount = document.querySelectorAll('.passenger-type')
+        ? Array.from(document.querySelectorAll('.passenger-type')).filter(el => el.textContent.startsWith('Child')).length
+        : 0;
+
+      sessionStorage.setItem('adultCount', adultCount);
+      sessionStorage.setItem('childCount', childCount);
+
+      console.log("🧾 Stored passenger counts:", adultCount, childCount);
+
+      // Redirect directly (no query parameters)
+      window.location.href = 'seat_selection.php';
+    });
+  }
+
+
   addBtn.addEventListener('click', () => {
     fetch('pass_info_popup.php')
       .then(res => res.text())
@@ -330,22 +377,22 @@ document.addEventListener('click', function (e) {
   }
 });
 // Defined only once
-function setupMealPopupEvents() {
-  const mealOptions = popupBody.querySelectorAll('.meal-option');
+  function setupMealPopupEvents() {
+    const mealOptions = popupBody.querySelectorAll('.meal-option');
 
-  mealOptions.forEach(option => {
-    option.addEventListener('click', function () {
-      mealOptions.forEach(opt => opt.classList.remove('selected'));
-      this.classList.add('selected');
+    mealOptions.forEach(option => {
+      option.addEventListener('click', function () {
+        mealOptions.forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+      });
     });
+    const closeBtn = popupBody.querySelector('.popup-close');
+      closeBtn?.addEventListener('click', () => {
+      popupOverlay.classList.add('hidden');
+      popupBody.innerHTML = ''; 
+      document.body.classList.remove('blurred');
+      document.querySelectorAll('.edit-meals-btn').forEach(btn => btn.classList.remove('active')); // optional cleanup
   });
-  const closeBtn = popupBody.querySelector('.popup-close');
-    closeBtn?.addEventListener('click', () => {
-    popupOverlay.classList.add('hidden');
-    popupBody.innerHTML = ''; 
-    document.body.classList.remove('blurred');
-    document.querySelectorAll('.edit-meals-btn').forEach(btn => btn.classList.remove('active')); // optional cleanup
-});
   const saveBtn = popupBody.querySelector('.popup-save-btn');
   if (saveBtn) {
     saveBtn.addEventListener('click', function (e) {
@@ -385,80 +432,58 @@ function setupBagPopupEvents() {
     });
   });
 
-  // Quantity buttons
-  const plusBtn = popupBody.querySelector('.quantity-btn.plus');
-  const minusBtn = popupBody.querySelector('.quantity-btn.minus');
-  const display = popupBody.querySelector('.quantity-display');
+    // Quantity buttons
+    const plusBtn = popupBody.querySelector('.quantity-btn.plus');
+    const minusBtn = popupBody.querySelector('.quantity-btn.minus');
+    const display = popupBody.querySelector('.quantity-display');
 
-  plusBtn?.addEventListener('click', () => {
-    let val = parseInt(display.textContent);
-    if (val < 10) display.textContent = val + 1;
-  });
+    plusBtn?.addEventListener('click', () => {
+      let val = parseInt(display.textContent);
+      if (val < 10) display.textContent = val + 1;
+    });
 
-  minusBtn?.addEventListener('click', () => {
-    let val = parseInt(display.textContent);
-    if (val > 1) display.textContent = val - 1;
-  });
+    minusBtn?.addEventListener('click', () => {
+      let val = parseInt(display.textContent);
+      if (val > 1) display.textContent = val - 1;
+    });
 
-  // Save & Close button
-  const saveBtn = popupBody.querySelector('.popup-save-btn');
-  const closeBtn = popupBody.querySelector('.popup-close');
+    // Save & Close button
+    const saveBtn = popupBody.querySelector('.popup-save-btn');
+    const closeBtn = popupBody.querySelector('.popup-close');
 
-  closeBtn?.addEventListener('click', () => {
-    popupOverlay.classList.add('hidden');
-    document.body.classList.remove('blurred');
-  });
-
-  saveBtn?.addEventListener('click', function (e) {
-    e.preventDefault();
-  
-    const selectedOption = popupBody.querySelector('.bag-option.selected');
-    const selectedBag = selectedOption?.getAttribute('data-bag');
-    const pricePerUnit = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
-    const quantity = parseInt(popupBody.querySelector('.quantity-display')?.textContent) || 1;
-  
-    const totalBaggagePrice = pricePerUnit * quantity;
-  
-    if (selectedBag) {
-      const openerButton = document.querySelector('.edit-baggage-btn.active');
-  
-      if (openerButton) {
-        const addonValue = openerButton.closest('.addon-details')?.querySelector('.addon-value');
-        if (addonValue) {
-          addonValue.textContent = `${quantity} piece${quantity > 1 ? 's' : ''}, ${selectedBag}`;
-          addonValue.setAttribute('data-price', totalBaggagePrice); 
-        } 
-        openerButton.classList.remove('active');
-      }
+    closeBtn?.addEventListener('click', () => {
       popupOverlay.classList.add('hidden');
       document.body.classList.remove('blurred');
-      if (typeof updatePrices === 'function') {
-        updatePrices();
+    });
+
+    saveBtn?.addEventListener('click', function (e) {
+      e.preventDefault();
+    
+      const selectedOption = popupBody.querySelector('.bag-option.selected');
+      const selectedBag = selectedOption?.getAttribute('data-bag');
+      const pricePerUnit = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
+      const quantity = parseInt(popupBody.querySelector('.quantity-display')?.textContent) || 1;
+    
+      const totalBaggagePrice = pricePerUnit * quantity;
+    
+      if (selectedBag) {
+        const openerButton = document.querySelector('.edit-baggage-btn.active');
+    
+        if (openerButton) {
+          const addonValue = openerButton.closest('.addon-details')?.querySelector('.addon-value');
+          if (addonValue) {
+            addonValue.textContent = `${quantity} piece${quantity > 1 ? 's' : ''}, ${selectedBag}`;
+            addonValue.setAttribute('data-price', totalBaggagePrice); 
+          } 
+          openerButton.classList.remove('active');
+        }
+        popupOverlay.classList.add('hidden');
+        document.body.classList.remove('blurred');
+        if (typeof updatePrices === 'function') {
+          updatePrices();
+        }
       }
-    }
-  });      
-}
+    });      
+  }
 });
 
-document.querySelector('.select-seats-btn').addEventListener('click', function (e) {
-  e.preventDefault(); // Stop default link behavior
-
-  // Get price values from the DOM
-  const total = document.querySelector('.total-value')?.textContent.trim().replace('RM', '').trim() || '0';
-  const ticket = document.getElementById('flight-price')?.textContent.trim().replace('RM', '').trim() || '0';
-  const baggage = document.querySelector('.baggage-price')?.textContent.trim().replace('RM', '').trim() || '0';
-  const meal = document.querySelector('.meal-price')?.textContent.trim().replace('RM', '').trim() || '0';
-
-  // Save them in sessionStorage
-  sessionStorage.setItem('total_price', total);
-  sessionStorage.setItem('ticket_price', ticket);
-  sessionStorage.setItem('baggage_price', baggage);
-  sessionStorage.setItem('meal_price', meal);
-  console.log("Total:", total);
-  console.log("Ticket:", ticket);
-  console.log("Baggage:", baggage);
-  console.log("Meal:", meal);
-  
-  // Redirect to next page
-  window.location.href = "seat_selection.php";
-});
