@@ -173,8 +173,20 @@ if (bookButton) {
     const totalPrice = parseFloat(totalText.replace('RM', '').trim()).toFixed(2);
 
     const urlParams = new URLSearchParams(window.location.search);
+    const flightPrice = (window.departFlightPrice || 0) + (window.returnFlightPrice || 0);
     urlParams.set('price', totalPrice);
 
+    // ✅ Get actual selected values from existing flightSearch
+    const flightSearch = JSON.parse(sessionStorage.getItem("flightSearch") || "{}");
+
+    const adults = flightSearch.adults || '1';
+    const children = flightSearch.children || '0';
+
+    // ✅ Save correctly
+    sessionStorage.setItem("selectedAdults", adults);
+    sessionStorage.setItem("selectedChildren", children);
+
+    // ✅ Save searchData with correct values
     const searchData = {
       selectedFlight: urlParams.get('flightId') || urlParams.get('depart'),
       returnFlight: urlParams.get('return') || null,
@@ -183,12 +195,13 @@ if (bookButton) {
       returnDate: urlParams.get('returnDate') || '',
       from: urlParams.get('from') || '',
       to: urlParams.get('to') || '',
-      adults: urlParams.get('adults') || '1',
-      children: urlParams.get('children') || '0',
-      trip: urlParams.get('return') ? 'round' : 'one'
+      adults: adults,
+      children: children,
+      trip: urlParams.get('return') ? 'round' : 'one',
+      flightPrice: flightPrice
     };
-    sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
 
+    sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
     window.location.href = `passengerCheck.php?${urlParams.toString()}`;
   });
 }

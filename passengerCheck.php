@@ -210,6 +210,9 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
   <div class="popup" id="popup-body"></div>
 </div>
 </body>
+<script>
+  window.loggedUser = <?php echo json_encode($loggedUser); ?>;
+</script>
 <script src="js/popupAddFlight.js"></script>
 <script src="js/passenger.js"></script>
 </html>

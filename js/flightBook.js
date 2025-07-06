@@ -416,23 +416,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // CANCEL FILTERS
   document.getElementById('cancelBtn').addEventListener('click', function () {
+    // 1. Remove selected seat class filters
     document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('selected'));
+  
+    // 2. Uncheck all airline checkboxes
     document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => cb.checked = false);
+  
+    // 3. Reset time slider if exists
     const timeSlider = document.getElementById('timeRange');
     if (timeSlider) {
       timeSlider.value = 0;
-      showSelectedTime(0);
+      showSelectedTime(0); // Reset display text
     }
+  
+    // 4. Reset sort dropdown
+    const sortSelect = document.getElementById('sortBy');
+    if (sortSelect) {
+      sortSelect.value = '';
+    }
+  
+    // 5. Clear filters from searchInfo
     const searchInfo = getSearchInfo();
     searchInfo.seatClass = '';
     searchInfo.airlines = '';
     searchInfo.timeFrom = '00:00';
     searchInfo.timeTo = '23:59';
     searchInfo.sortBy = '';
+  
+    // 6. Save the cleaned filter values
     saveSearchInfo(searchInfo);
-    fetchFlights(searchInfo, data => renderFlights(data, 'flightResults'));
+  
+    // ⚠️ DO NOT call fetchFlights here — keep current results!
   });
-
+  
+  
   // APPLY FILTERS BUTTON
   document.querySelector('.apply-btn').addEventListener('click', function () {
     const searchInfo = getSearchInfo();
