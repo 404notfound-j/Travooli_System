@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;800&display=swap');
 
 body {
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   background: #031E2F;
   color: #FFFFFF;
@@ -74,8 +75,7 @@ body {
   line-height: 2em;
   color: #112211;
   text-align: justify;
-  margin-bottom: 5px;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .passenger-list,
@@ -289,7 +289,7 @@ body {
 }
 
 .item-price,.meal-price,
-.baggage-price {
+.baggage-price,.tax-price {
   font-weight: 600;
   font-size: 16px;
   color: #112211;

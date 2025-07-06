@@ -62,10 +62,12 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
                     <h2>Who's Travelling ?</h2>
                     <strong>Passengers</strong>
                     <div class="info-box">
-                        <p class="info-text">
-                            Names must match ID Please make sure that you enter the name exactly as it appears on the ID that will be used when checking in<br><br>
+                        <li class="info-text">
+                            Names must match ID Please make sure that you enter the name exactly as it appears on the ID that will be used when checking in
+                        </li>
+                        <li class="info-text">
                             ID validity requirements To ensure your trip goes smoothly, please make sure that the passenger's travel document is valid on the date the trip ends
-                        </p>
+                        </li>
                     </div>
                     <div class="passenger-list">
                         <div class="passenger-item">
@@ -81,16 +83,17 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
                         </div>
                         <!-- New passengers will be inserted here -->
                         <div id="passenger-list"></div>
-                </div>
-                    <button class="add-passenger-btn">Add Passengers</button>   
-</div>
+                </div>    
+            </div>
                 <div class="additional-info-section">
                      <h2>Additional Information</h2>
                      <div class="info-box">
-                        <p class="info-text">
-                           Meal Add-on Choose from meal options based on your preferences, whether it's no meal, a single meal, or multiple meals for longer flights.<br><br>
+                        <li class="info-text">
+                           Meal Add-on Choose from meal options based on your preferences, whether it's no meal, a single meal, or multiple meals for longer flights.
+                        </li>
+                        <li class="info-text">
                            Additional Baggage Select your baggage options to manage weight and quantity, with one free carry-on and personal item. Additional baggage can be added for a fee.
-                        </p>
+                        </li>
                     </div>
                     <div class="trip-details">
                         <div class="trip-segment" data-segment="depart">
@@ -183,9 +186,9 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
                             <span class="item-name">Multi-meal</span>
                             <span class="meal-price">RM 0</span>
                         </div>
-                         <div class="price-item">
-                            <span class="item-name">Taxes & Fees</span>
-                            <span class="item-price">RM 121</span>
+                        <div class="price-item">
+                            <span class="item-name">Taxes & Fees (6%)</span>
+                            <span class="tax-price">RM 0.00</span>
                         </div>
                          <div class="price-item">
                             <span class="item-name">Discount</span>
@@ -215,5 +218,7 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
 </script>
 <script src="js/popupAddFlight.js"></script>
 <script src="js/passenger.js"></script>
+<script src="js/bag_popup.js"></script>
+<script src="js/meal_popup.js"></script>
 </html>
 

@@ -26,6 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     alert('No flight selected');
   }
+
+  // REMOVE ALL CLICK LISTENERS from .seat-option
+  document.querySelectorAll('.seat-option').forEach(btn => {
+    const newBtn = btn.cloneNode(true); // clone without any listeners
+    btn.replaceWith(newBtn);            // replace original with clone
+  });
 });
 
 function highlightSeatClass(classCode, type = 'depart') {
@@ -138,27 +144,6 @@ function formatDuration(minutes) {
   return `${hours}h ${mins}m`;
 }
 
-document.querySelectorAll('.seat-option').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const selectedClass = this.dataset.class;
-    sessionStorage.setItem("selectedSeatClass", selectedClass);
-    const urlParams = new URLSearchParams(window.location.search);
-
-    if (urlParams.has('depart') && urlParams.has('return')) {
-      const isDepart = document.getElementById('depart-airplane-image')?.contains(this);
-      if (isDepart) {
-        urlParams.set('departClass', selectedClass);
-      } else {
-        urlParams.set('returnClass', selectedClass);
-      }
-    } else {
-      urlParams.set('classId', selectedClass);
-    }
-
-    window.location.search = urlParams.toString();
-  });
-});
-
 const likeButton = document.querySelector('.like-button');
 if (likeButton) {
   likeButton.addEventListener('click', () => {
@@ -166,9 +151,38 @@ if (likeButton) {
   });
 }
 
+// Check login status from PHP
+const userLoggedIn = window.userLoggedIn !== undefined ? window.userLoggedIn : false;
+
+if (userLoggedIn) {
+  localStorage.setItem('user_logged_in', 'true');
+} else {
+  localStorage.removeItem('user_logged_in');
+}
+
+// Function to handle Book Now click
+window.handleBookNowClick = function(event) {
+  if (!userLoggedIn) {
+    event.preventDefault(); // stop default action (like navigation)
+    if (typeof window.showLoginReminder === 'function') {
+      window.showLoginReminder(); // show your custom modal popup
+    } else {
+      alert('Please sign in or create an account before booking.');
+    }
+    return false;
+  }
+  return true;
+};
+
+
 const bookButton = document.querySelector('.book-now-btn');
+
 if (bookButton) {
-  bookButton.addEventListener('click', () => {
+  bookButton.addEventListener('click', function(e) {
+    // Check if user is logged in
+   
+
+    // Proceed with booking
     const totalText = document.getElementById('total-flight-price')?.textContent || 'RM 0.00';
     const totalPrice = parseFloat(totalText.replace('RM', '').trim()).toFixed(2);
 
@@ -176,17 +190,14 @@ if (bookButton) {
     const flightPrice = (window.departFlightPrice || 0) + (window.returnFlightPrice || 0);
     urlParams.set('price', totalPrice);
 
-    // ✅ Get actual selected values from existing flightSearch
     const flightSearch = JSON.parse(sessionStorage.getItem("flightSearch") || "{}");
 
     const adults = flightSearch.adults || '1';
     const children = flightSearch.children || '0';
 
-    // ✅ Save correctly
     sessionStorage.setItem("selectedAdults", adults);
     sessionStorage.setItem("selectedChildren", children);
 
-    // ✅ Save searchData with correct values
     const searchData = {
       selectedFlight: urlParams.get('flightId') || urlParams.get('depart'),
       returnFlight: urlParams.get('return') || null,
@@ -202,6 +213,8 @@ if (bookButton) {
     };
 
     sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
+
+    // Redirect to passenger page with params
     window.location.href = `passengerCheck.php?${urlParams.toString()}`;
   });
 }
