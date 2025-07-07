@@ -1,22 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Navigation menu functionality
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', function(e) {
-        // Only prevent default for items without valid href or with href="#"
-        const href = this.getAttribute('href');
-        if (!href || href === '#' || href === '') {
-            e.preventDefault();
-        }
-        
-        // Remove active class from all items
-        document.querySelectorAll('.nav-item').forEach(nav => {
-            nav.classList.remove('active');
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            // Only prevent default for items without valid href or with href="#"
+            const href = this.getAttribute('href');
+            if (!href || href === '#' || href === '') {
+                e.preventDefault();
+            }
+            
+            // Remove active class from all items
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            this.classList.add('active');
         });
-        
-        // Add active class to clicked item
-        this.classList.add('active');
     });
-});
 
     // Admin profile dropdown functionality
     const adminProfileContainer = document.getElementById('admin-profile-container');

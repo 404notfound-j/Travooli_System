@@ -151,14 +151,6 @@ if (likeButton) {
   });
 }
 
-// Check login status from PHP
-const userLoggedIn = window.userLoggedIn !== undefined ? window.userLoggedIn : false;
-
-if (userLoggedIn) {
-  localStorage.setItem('user_logged_in', 'true');
-} else {
-  localStorage.removeItem('user_logged_in');
-}
 
 // Function to handle Book Now click
 window.handleBookNowClick = function(event) {
@@ -174,15 +166,24 @@ window.handleBookNowClick = function(event) {
   return true;
 };
 
-
 const bookButton = document.querySelector('.book-now-btn');
+const userLoggedIn = window.userLoggedIn !== undefined ? window.userLoggedIn : false;
 
+// This function handles the login check
+window.handleBookNowClick = function (event) {
+  if (!userLoggedIn) {
+    event.preventDefault();
+    alert('Please sign in or create an account before booking.');
+    return false;
+  }
+  return true;
+};
+
+// Handle Book Now click
 if (bookButton) {
-  bookButton.addEventListener('click', function(e) {
-    // Check if user is logged in
-   
+  bookButton.addEventListener('click', function (e) {
+    if (!window.handleBookNowClick(e)) return;
 
-    // Proceed with booking
     const totalText = document.getElementById('total-flight-price')?.textContent || 'RM 0.00';
     const totalPrice = parseFloat(totalText.replace('RM', '').trim()).toFixed(2);
 
@@ -191,7 +192,6 @@ if (bookButton) {
     urlParams.set('price', totalPrice);
 
     const flightSearch = JSON.parse(sessionStorage.getItem("flightSearch") || "{}");
-
     const adults = flightSearch.adults || '1';
     const children = flightSearch.children || '0';
 
@@ -214,7 +214,7 @@ if (bookButton) {
 
     sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
 
-    // Redirect to passenger page with params
+    // Redirect to booking page
     window.location.href = `passengerCheck.php?${urlParams.toString()}`;
   });
 }

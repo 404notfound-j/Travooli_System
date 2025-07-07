@@ -1,3 +1,20 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+
+if (isset($_GET['flightId'])) {
+    $_SESSION['selected_flight_id'] = $_GET['flightId'];
+}
+if (isset($_GET['classId'])) {
+    $_SESSION['selectedClass'] = $_GET['classId'];
+}
+if (isset($_GET['depart'])) {
+    $_SESSION['selected_depart_flight_id'] = $_GET['depart'];
+}
+if (isset($_GET['return'])) {
+    $_SESSION['selected_return_flight_id'] = $_GET['return'];
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,26 +23,17 @@
   <title>Flight Details</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/flightDetails.css">
+  
+  <!-- ✅ Inject login status for JS -->
+  <script>
+    window.userLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
+  </script>
 </head>
 <body>
   <header>
-    <?php include 'userHeader.php'; 
-    $isLoggedIn = isset($_SESSION['user_id']);
-  if (isset($_GET['flightId'])) {
-    $_SESSION['selected_flight_id'] = $_GET['flightId'];
-}
-if (isset($_GET['classId'])) {
-    $_SESSION['selectedClass'] = $_GET['classId'];
-}
-
-if (isset($_GET['depart'])) {
-    $_SESSION['selected_depart_flight_id'] = $_GET['depart'];
-}
-if (isset($_GET['return'])) {
-    $_SESSION['selected_return_flight_id'] = $_GET['return'];
-}
-    ?>
+    <?php include 'userHeader.php'; ?>
   </header>
+
   <div class="container">
     <div class="title-section">
       <div>
