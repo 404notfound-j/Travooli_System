@@ -1,55 +1,54 @@
 //DATE DISPLAY IN SEARCH BAR 
 document.addEventListener('DOMContentLoaded', function () {
-
-  // Format a date string into display text like "Mon, Jul 21"
   function formatDateToText(dateStr) {
-    let date;
-    if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
-      const [day, month, year] = dateStr.split("-");
-      date = new Date(`${year}-${month}-${day}`);
-    } else {
-      date = new Date(dateStr); // ISO or fallback
-    }
-  
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
     if (isNaN(date)) return '';
-    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
-    const day = date.getDate();
-    return `${weekday}, ${month} ${day}`;
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${weekdays[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
   }
-
-  //  Update the date display in the search bar
+  
   function updateDateDisplay(depart, ret, tripType) {
-    const departText = formatDateToText(depart);
-    const returnText = tripType === 'round' && ret ? formatDateToText(ret) : '';
-    const display = returnText ? `${departText} - ${returnText}` : departText;
     const displayElem = document.getElementById('dateDisplay');
-    if (displayElem) displayElem.textContent = display || 'Select dates';
+    const formattedDepart = formatDateToText(depart);
+    const formattedReturn = formatDateToText(ret);
+  
+    if (!formattedDepart && !formattedReturn) return;
+  
+    if (tripType === 'round' && formattedReturn) {
+      displayElem.textContent = `${formattedDepart} - ${formattedReturn}`;
+    } else {
+      displayElem.textContent = formattedDepart;
+    }
   }
 
-  // Update passenger count display 
+  
+  // ✅ When "Done" is clicked in calendar
+  document.querySelector('.btn-done').addEventListener('click', function () {
+    const tripType = document.querySelector('input[name="tripType"]:checked')?.value || 'one';
+    const departVal = document.getElementById('departDate')?.value || '';
+    const returnVal = document.getElementById('returnDate')?.value || '';
+    updateDateDisplay(departVal, returnVal, tripType);
+  
+    document.getElementById('datePickerDropdown')?.classList.add('hidden');
+  });
+  
+  // ✅ Passenger display
   function updatePassengerDisplay() {
-    const adults = window.adultCount || 1;
-    const children = window.childCount || 0;
+    if (typeof window.adultCount !== 'number') window.adultCount = 1;
+    if (typeof window.childCount !== 'number') window.childCount = 0;
   
     let label = '';
-    if (adults === 1) {
-      label += '1 Adult';
-    } else {
-      label += `${adults} Adults`;
-    }
-  
-    if (children === 1) {
-      label += ', 1 Child';
-    } else if (children > 1) {
-      label += `, ${children} Children`;
-    }
+    label += window.adultCount === 1 ? '1 Adult' : `${window.adultCount} Adults`;
+    if (window.childCount === 1) label += ', 1 Child';
+    else if (window.childCount > 1) label += `, ${window.childCount} Children`;
   
     const displayElem = document.getElementById('passengerInput');
     if (displayElem) displayElem.value = label;
   }
-
-  // LOAD SEARCH DATA FROM DASHBOARD
+  
   function preloadSearchFromDashboard() {
     const urlParams = new URLSearchParams(window.location.search);
     const fromCode = urlParams.get('from');
@@ -62,112 +61,158 @@ document.addEventListener('DOMContentLoaded', function () {
     const children = urlParams.get('children') || '0';
     const trip = urlParams.get('trip') || 'one';
     const seatClass = urlParams.get('classId') || 'PE';
-  
+    document.getElementById('fromAirport').value = fromText || '';
+    document.getElementById('toAirport').value = toText || '';
+    document.getElementById('fromAirport').setAttribute('data-code', fromCode || '');
+    document.getElementById('toAirport').setAttribute('data-code', toCode || '');
+    
     if (!fromCode && !toCode && !departDate) return;
   
-    const fromInput = document.getElementById('fromAirport');
-    const toInput = document.getElementById('toAirport');
-    if (fromInput && fromCode && fromText) {
-      fromInput.value = fromText;
-      fromInput.setAttribute('data-code', fromCode);
-    }
-    if (toInput && toCode && toText) {
-      toInput.value = toText;
-      toInput.setAttribute('data-code', toCode);
+    // ✅ Pre-fill date values
+    document.getElementById('departDate').value = departDate || '';
+    if (trip === 'round') {
+      document.getElementById('returnDate').value = returnDate || '';
     }
   
-    const departDateFinal = departDate || '';
-    const returnDateFinal = (trip === 'round') ? (returnDate || '') : '';
-  
-    const departInput = document.getElementById('departDate');
-    const returnInput = document.getElementById('returnDate');
-    if (departInput) departInput.value = departDateFinal;
-    if (returnInput && trip === 'round') returnInput.value = returnDateFinal;
-  
-    updateDateDisplay(departDateFinal, returnDateFinal, trip);
-  
+    // ✅ Pre-fill trip type selection
     const oneWayRadio = document.getElementById('oneWay');
     const roundTripRadio = document.getElementById('roundTrip');
-    const returnField = document.getElementById('returnField');
-    if (trip === 'round' && roundTripRadio) {
-      roundTripRadio.checked = true;
-      if (returnField) returnField.style.display = 'flex';
-    } else if (oneWayRadio) {
-      oneWayRadio.checked = true;
-      if (returnField) returnField.style.display = 'none';
-    }
+    if (trip === 'one' && oneWayRadio) oneWayRadio.checked = true;
+    else if (trip === 'round' && roundTripRadio) roundTripRadio.checked = true;
   
+    // ✅ Update visible date display
+    updateDateDisplay(departDate, returnDate, trip);
+  
+    // ✅ Update passenger display
     window.adultCount = parseInt(adults);
     window.childCount = parseInt(children);
-    if (typeof updatePassengerDisplay === 'function') updatePassengerDisplay();
+    updatePassengerDisplay();
   
-    // ⬇️ Now define the object before using it
+    // ✅ Build search object
     const searchInfo = {
       from: fromCode,
       to: toCode,
       fromText,
       toText,
-      departDate: departDateFinal,
-      returnDate: returnDateFinal,
-      date: departDateFinal,
+      departDate,
+      returnDate,
       adults,
       children,
       trip,
       seatClass
     };
   
-    sessionStorage.setItem("flightSearch", JSON.stringify(searchInfo));
-    document.getElementById('flightResults').innerHTML = '';
-  
-    if (searchInfo.trip === 'round') {
+    // ✅ Fetch flights
+    if (trip === 'round') {
       const returnSearch = {
         from: searchInfo.to,
         to: searchInfo.from,
         date: searchInfo.returnDate,
-        seatClass: searchInfo.seatClass || 'PE',
+        seatClass: searchInfo.seatClass,
         airlines: searchInfo.airlines || '',
         timeFrom: searchInfo.timeFrom || '00:00',
         timeTo: searchInfo.timeTo || '23:59',
         sortBy: searchInfo.sortBy || ''
       };
-    
-      fetchFlights(searchInfo, departFlights => {
-        fetchFlights(returnSearch, returnFlights => {
-          renderRoundTripOptions(departFlights, returnFlights);
-        });
+  
+      Promise.all([
+        new Promise(resolve => fetchFlights(searchInfo, resolve)),
+        new Promise(resolve => fetchFlights(returnSearch, resolve))
+      ]).then(([departData, returnData]) => {
+        const pairedData = departData.map((depart, i) => ({
+          depart,
+          ret: returnData[i % returnData.length] || returnData[0]
+        }));
+        renderFlights(pairedData, 'flightResults', 'round');
+      });
+    } else {
+      fetchFlights(searchInfo, function(data) {
+        renderFlights(data, 'flightResults', 'one');
       });
     }
   }
-
-  // INITIALIZE SEARCH BAR FROM URL PARAMETERS
+  
   preloadSearchFromDashboard();
-
-  // DATE HANDLING (Click on display → open picker, update text
+  
+  // ✅ Restore display from sessionStorage after reload
+  const prevSearch = JSON.parse(sessionStorage.getItem("flightSearch") || '{}');
+  if (prevSearch.departDate) {
+    updateDateDisplay(prevSearch.departDate, prevSearch.returnDate || '', prevSearch.trip || 'one');
+  }
+  
+  // ✅ Click on visible display triggers calendar
   document.getElementById('dateDisplay').addEventListener('click', () => {
     document.getElementById('departDate').click();
   });
-
-  document.getElementById('departDate').addEventListener('change', () => {
+  
+  // ✅ Live update when user picks a date
+  document.getElementById('departDate').addEventListener('change', (e) => {
     const trip = document.querySelector('input[name="tripType"]:checked')?.value || 'one';
+    const departDateVal = e.target.value;
+    const returnDateVal = document.getElementById('returnDate').value;
     if (trip === 'round') document.getElementById('returnDate').click();
-    updateDateDisplay(departDate.value, returnDate.value, trip);
+    updateDateDisplay(departDateVal, returnDateVal, trip);
   });
-
+  
   document.getElementById('returnDate').addEventListener('change', () => {
-    updateDateDisplay(departDate.value, returnDate.value, 'round');
+    const d = document.getElementById('departDate').value;
+    const r = document.getElementById('returnDate').value;
+    updateDateDisplay(d, r, 'round');
   });
+  
 
-  document.querySelectorAll('input[name="tripType"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      const trip = radio.value;
-      if (trip === 'round') {
-        if (returnDate.value) updateDateDisplay(departDate.value, returnDate.value, 'round');
-        else returnDate.click();
-      } else {
-        updateDateDisplay(departDate.value, '', 'one');
-      }
-    });
+  
+  // ✅ SEARCH button — updates session and display
+  document.getElementById('searchBtn').addEventListener('click', function (e) {
+    e.preventDefault();
+  
+    const fromInput = document.getElementById('fromAirport');
+    const toInput = document.getElementById('toAirport');
+    const departInput = document.getElementById('departDate');
+    const returnInput = document.getElementById('returnDate');
+    const tripType = document.querySelector('input[name="tripType"]:checked')?.value || 'one';
+  
+    updateDateDisplay(departInput.value, returnInput?.value || '', tripType);
+  
+    const departDate = departInput.value;
+    const returnDate = returnInput?.value || '';
+  
+    const fromCode = fromInput.getAttribute('data-code') || extractCode(fromInput.value);
+    const toCode = toInput.getAttribute('data-code') || extractCode(toInput.value);
+  
+    if (!fromCode || !toCode || !departDate) {
+      alert("Please complete all required fields (From, To, Depart Date)");
+      return;
+    }
+  
+    if (fromCode === toCode) {
+      alert("Departure and destination airports cannot be the same.");
+      return;
+    }
+  
+    const searchInfo = {
+      from: fromCode,
+      to: toCode,
+      fromText: fromInput.value,
+      toText: toInput.value,
+      departDate,
+      returnDate,
+      trip: tripType,
+      adults: window.adultCount || 1,
+      children: window.childCount || 0,
+      seatClass: 'PE'
+    };
+  
+    sessionStorage.setItem('flightSearch', JSON.stringify(searchInfo));
+    document.getElementById('flightResults').innerHTML = '';
+  
+    if (tripType === 'round') {
+      fetchFlights(searchInfo, data => renderFlights(data, 'flightResults', 'depart'));
+    } else {
+      fetchFlights(searchInfo, data => renderFlights(data, 'flightResults', 'one'));
+    }
   });
+  
 
   // CLASS FILTER BUTTONS (Economy, Business, etc.)
   document.querySelectorAll('.filter-button').forEach(btn => {
@@ -176,10 +221,8 @@ document.addEventListener('DOMContentLoaded', function () {
       this.classList.add('selected');
     });
   });
-
    // Save search filters (currently empty function stub)
    function saveSearchInfo(searchInfo) { }
-
   //  Retrieve previous search from sessionStorage
   function getSearchInfo() {
     return JSON.parse(sessionStorage.getItem("flightSearch") || '{}');
@@ -187,10 +230,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   //FETCH FLIGHTS from backend with filters applied
   function fetchFlights(params, callback) {
-    const formData = new FormData();
+    const formData = new FormData();  
     formData.append("origin", params.from);
     formData.append("destination", params.to);
-    formData.append("date", params.date); 
+    formData.append("date", params.departDate || params.date); 
     formData.append("seatClass", params.seatClass || "");
     formData.append("airlines", params.airlines || "");
     formData.append("timeFrom", params.timeFrom || "00:00");
@@ -208,237 +251,209 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   
   // Render Flight
-  function renderFlights(flights, containerId, tripType) {
+  function renderFlights(data, containerId, tripType) {
     const container = document.getElementById(containerId);
-    console.log(`🧭 Rendering flights for tripType: ${tripType}`);
-
-   // Clear previous results depending on trip type
-  if (tripType === 'depart' || tripType === 'one') {
-    container.innerHTML = '';
-  }
-
-  if (tripType === 'return') {
-    const oldReturnSection = container.querySelector('.return-section');
-    if (oldReturnSection) oldReturnSection.remove();
-  }
+    if (!container) return;
   
-    // Handle empty results
-    if (!flights || flights.length === 0) {
-      container.innerHTML += `<p>No ${tripType === 'return' ? 'return' : 'departure'} flights found.</p>`;
-      return;
+    let html = '';
+  
+    if (tripType === 'round') {
+      for (const pair of data) {
+        const { depart, ret } = pair;
+  
+        html += `
+          <div class="flight-card roundtrip-card">
+            <div class="airline-section">
+              <img src="images/${depart.airline_id}.png" class="airline-logo" alt="${depart.airline_id} Logo">
+            </div>
+      
+            <div class="content-section">
+              <div class="top-row">
+                <div class="rating-box">
+                  <span class="rating-score">4.2</span>
+                  <span class="reviews"><strong>Very Good</strong> 54 reviews</span>
+                </div>
+                <div class="price-box">
+                  <span class="from">starting from</span>
+                  <span class="price">RM ${(Number(depart.price) + Number(ret.price)).toFixed(2)}</span>
+                </div>
+              </div>
+      
+              <!-- Schedule -->
+              <div class="schedule">
+                <!-- Depart -->
+                <div class="flight-detail">
+                  <span class="flight-time">
+                    <span class="part time">${formatTime(depart.departure_time)} - ${formatTime(depart.arrival_time)}</span>
+                    <span class="part stop">non-stop</span> 
+                    <span class="part duration">${calculateDuration(depart.departure_time, depart.arrival_time)}</span>
+                  </span>
+                  <div class="flight-meta">${depart.orig_airport_id} → ${depart.dest_airport_id}</div>
+                </div>
+      
+                <!-- Return -->
+                <div class="flight-detail">
+                  <span class="flight-time">
+                    <span class="part time">${formatTime(ret.departure_time)} - ${formatTime(ret.arrival_time)}</span>
+                    <span class="part stop">non-stop</span> 
+                    <span class="part duration">${calculateDuration(ret.departure_time, ret.arrival_time)}</span>
+                  </span>
+                  <div class="flight-meta">${ret.orig_airport_id} → ${ret.dest_airport_id}</div>
+                </div>
+              </div>
+      
+              <div class="buttons-row">
+                <button class="heart-btn"><i class="fa-solid fa-heart"></i></button>
+                <button class="view-details-btn" 
+                  data-depart-id="${depart.flight_id}" 
+                  data-return-id="${ret.flight_id}" 
+                  data-type="roundtrip">
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+  
+    } else {
+      // One-way layout
+      for (const flight of data) {
+        const duration = calculateDuration(flight.departure_time, flight.arrival_time);
+  
+        html += `
+          <div class="flight-card">
+            <div class="airline-section">
+              <img src="images/${flight.airline_id}.png" class="airline-logo" alt="${flight.airline_id} Logo">
+            </div>
+            <div class="content-section">
+              <div class="top-row">
+                <div class="rating-box">
+                  <span class="rating-score">4.2</span>
+                  <span class="reviews"><strong>Very Good</strong> 54 reviews</span>
+                </div>
+                <div class="price-box">
+                  <span class="from">starting from</span>
+                  <span class="price">RM ${parseFloat(flight.price).toFixed(2)}</span>
+                </div>
+              </div>
+               <div class="schedule">
+                <!-- Depart -->
+                <div class="flight-detail">
+                  <span class="flight-time">
+                    <span class="part time">${formatTime(flight.departure_time)} - ${formatTime(flight.arrival_time)}</span>
+                    <span class="part stop">non-stop</span> 
+                    <span class="part duration">${calculateDuration(flight.departure_time, flight.arrival_time)}</span>
+                  </span>
+                  <div class="flight-meta">${flight.orig_airport_id} → ${flight.dest_airport_id}</div>
+                </div>
+              <div class="buttons-row">
+                <button class="heart-btn"><i class="fa-solid fa-heart"></i></button>
+                <button class="view-details-btn" 
+                    data-flight-id="${flight.flight_id}" 
+                    data-type="oneway">
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
     }
   
-    const label = tripType === 'return'
-      ? 'Select Return Flight'
-      : tripType === 'depart'
-      ? 'Select Departure Flight'
-      : 'Available Flights';
-  
-    let html = `
-      <div class="flight-section ${tripType}-section">
-        <h3 class="flight-section-label">${label}</h3>
-    `;
-  
-    flights.forEach(flight => {
-      const duration = calculateDuration(flight.departure_time, flight.arrival_time);
-      html += `
-        <div class="flight-card">
-          <div class="airline-section">
-            <img src="images/${flight.airline_id}.png" class="airline-logo" alt="${flight.airline_id} Logo">
-            <span class="airline-name">${flight.airline_id}</span>
-          </div>
-          <div class="content-section">
-            <div class="top-row">
-              <div class="rating-box">
-                <span class="rating-score">4.2</span>
-                <span class="reviews"><strong>Very Good</strong> 54 reviews</span>
-              </div>
-              <div class="price-box">
-                <span class="from">starting from</span>
-                <span class="price">RM ${parseFloat(flight.price).toFixed(2)}</span>
-              </div>
-            </div>
-            <div class="schedule">
-              <div class="flight-detail">
-                <span class="flight-time">${formatTime(flight.departure_time)} - ${formatTime(flight.arrival_time)}</span>
-                <span class="flight-meta">${flight.airline_id}</span>
-              </div>
-              <div class="flight-detail">
-                <span class="flight-time">non stop</span>
-              </div>
-              <div class="flight-detail">
-                <span class="flight-meta-duration">${duration}</span>
-                <span class="flight-meta">${flight.orig_airport_id} - ${flight.dest_airport_id}</span>
-              </div>
-            </div>
-            <div class="buttons-row">
-              <button class="heart-btn"><i class="fa-solid fa-heart"></i></button>
-              <button class="view-details-btn" 
-                  data-flight-id="${flight.flight_id}" 
-                  data-type="${tripType}">
-                View Details
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-  
-    html += `</div>`;
-    container.innerHTML += html;
-  
-    attachViewHandlers();
+    container.innerHTML = html;
+    attachViewHandlers() 
   }
-  
-  
-  
-  //Attach event handlers to "View Details" buttons 
   function attachViewHandlers() {
     document.querySelectorAll('.view-details-btn').forEach(btn => {
       btn.addEventListener('click', function () {
-        const flightId = this.dataset.flightId;
         const type = this.dataset.type;
-        const searchData = getSearchInfo();
+  
+        const searchData = getSearchInfo(); // safely get session data
+        const seatClass = searchData.seatClass || 'PE';
+  
+        // Build query parameters to send to flightDetails.php
+        const params = new URLSearchParams();
+        params.set('classId', seatClass);
+        params.set('departClass', seatClass);
+        params.set('returnClass', seatClass);
+        params.set('from', searchData.from);
+        params.set('to', searchData.to);
+        params.set('departDate', searchData.departDate || '');
+        params.set('returnDate', searchData.returnDate || '');
+        params.set('adults', searchData.adults || '1');
+        params.set('children', searchData.children || '0');
   
         if (type === 'depart') {
-          // 1️⃣ Store selected departure flight
+          const flightId = this.dataset.flightId;
           searchData.depart = flightId;
           sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
           console.log("✈️ Selected DEPARTURE flight:", flightId);
   
-          // 2️⃣ Remove existing departure section to clean UI
           const departSection = document.querySelector('.depart-section');
           if (departSection) departSection.remove();
   
-          // 3️⃣ Prepare reverse search for return flights
           const reversedSearch = {
             from: searchData.to,
             to: searchData.from,
             date: searchData.returnDate,
-            seatClass: searchData.seatClass || 'PE',
+            seatClass: seatClass,
             airlines: searchData.airlines || '',
             timeFrom: searchData.timeFrom || '00:00',
             timeTo: searchData.timeTo || '23:59',
             sortBy: searchData.sortBy || ''
           };
-          console.log("🔁 Searching RETURN flights:", reversedSearch);
   
+          console.log("🔁 Searching for return flights:", reversedSearch);
           fetchFlights(reversedSearch, data => {
             renderFlights(data, 'flightResults', 'return');
           });
   
         } else if (type === 'return') {
-          // 4️⃣ Store selected return flight
+          const flightId = this.dataset.flightId;
           searchData.return = flightId;
           sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
-          console.log("🔁 Selected RETURN flight:", flightId);
+          console.log("🔙 Selected RETURN flight:", flightId);
   
-          // 5️⃣ Fetch full details of both selected flights
-          fetch("getFlightDetails.php", {
-            method: "POST",
-            body: new URLSearchParams({
-              departId: searchData.depart,
-              returnId: searchData.return
-            })
-          })
-          .then(res => res.json())
-          .then(data => {
-            // 6️⃣ Render BOTH flights in a single unified card
-            renderRoundTripCard(data.depart, data.return);
-          });
+          params.set('depart', searchData.depart);
+          params.set('return', searchData.return);
+          params.set('trip', 'round');
+  
+          window.location.href = `flightDetails.php?${params.toString()}`;
+  
+        } else if (type === 'roundtrip') {
+          // Roundtrip button has both depart and return ID
+          const departId = this.dataset.departId;
+          const returnId = this.dataset.returnId;
+  
+          searchData.depart = departId;
+          searchData.return = returnId;
+          sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
+  
+          console.log("✈️ Roundtrip selected: Depart =", departId, ", Return =", returnId);
+  
+          params.set('depart', departId);
+          params.set('return', returnId);
+          params.set('trip', 'round');
+  
+          window.location.href = `flightDetails.php?${params.toString()}`;
   
         } else {
-          // 7️⃣ One-way trip — redirect with flight ID
+          // One-way fallback
+          const flightId = this.dataset.flightId;
           searchData.selectedFlight = flightId;
           sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
           console.log("🧳 One-way selected flight:", flightId);
   
-          window.location.href = `flightDetails.php?flightId=${flightId}&classId=${searchData.seatClass}`;
+          params.set('flightId', flightId);
+          params.set('trip', 'one');
+  
+          window.location.href = `flightDetails.php?${params.toString()}`;
         }
       });
     });
   }
   
-  function renderRoundTripOptions(departFlights, returnFlights) {
-    const container = document.getElementById('flightResults');
-    container.innerHTML = '';
-  
-    if (!departFlights.length || !returnFlights.length) {
-      container.innerHTML = '<p>No round-trip flights found.</p>';
-      return;
-    }
-  
-    departFlights.forEach(depart => {
-      returnFlights.forEach(ret => {
-        const departDuration = calculateDuration(depart.departure_time, depart.arrival_time);
-        const returnDuration = calculateDuration(ret.departure_time, ret.arrival_time);
-  
-        const html = `
-        <div class="flight-card roundtrip-card">
-          <div class="airline-section">
-            <img src="images/${depart.airline_id}.png" class="airline-logo" alt="${depart.airline_id} Logo">
-            <span class="airline-name">${depart.airline_id}</span>
-          </div>
-          <div class="content-section">
-            <div class="top-row">
-              <div class="rating-box">
-                <span class="rating-score">4.2</span>
-                <span class="reviews"><strong>Very Good</strong> 54 reviews</span>
-              </div>
-              <div class="price-box">
-                <span class="from">round trip from</span>
-                <span class="price">RM ${(Number(depart.price) + Number(ret.price)).toFixed(2)}</span>
-              </div>
-            </div>
-            
-            <!-- Schedule: 2 separate lines -->
-            <div class="schedule">
-              <div class="flight-detail">
-                ${formatTime(depart.departure_time)} - ${formatTime(depart.arrival_time)} 
-                ${depart.orig_airport_id} - ${depart.dest_airport_id} 
-                (${calculateDuration(depart.departure_time, depart.arrival_time)})
-              </div>
-              <div class="flight-detail">
-                ${formatTime(ret.departure_time)} - ${formatTime(ret.arrival_time)} 
-                ${ret.orig_airport_id} - ${ret.dest_airport_id} 
-                (${calculateDuration(ret.departure_time, ret.arrival_time)})
-              </div>
-            </div>
-      
-            <div class="buttons-row">
-              <button class="heart-btn"><i class="fa-solid fa-heart"></i></button>
-              <button class="view-details-btn" 
-                data-depart-id="${depart.flight_id}" 
-                data-return-id="${ret.flight_id}" 
-                data-type="roundtrip">
-                View Details
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-        container.innerHTML += html;
-      });
-    });
-  
-    attachRoundViewHandlers(); // ✅ Attach handlers to these new buttons
-  }
-
-  function attachRoundViewHandlers() {
-    document.querySelectorAll('.view-details-btn').forEach(btn => {
-      btn.addEventListener('click', function () {
-        const departId = this.dataset.departId;
-        const returnId = this.dataset.returnId;
-  
-        const searchData = getSearchInfo();
-        searchData.depart = departId;
-        searchData.return = returnId;
-        sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
-  
-        window.location.href = `flightDetails.php?departId=${departId}&returnId=${returnId}&classId=${searchData.seatClass}`;
-      });
-    });
-  }
   
   // CALCULATE DURATION between departure and arrival
   function calculateDuration(start, end) {
@@ -491,66 +506,109 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // SEARCH BUTTON → Validates & updates sessionStorage with new search
   document.getElementById('searchBtn').addEventListener('click', function (e) {
-    e.preventDefault(); 
-
+    e.preventDefault();
+  
     const fromInput = document.getElementById('fromAirport');
     const toInput = document.getElementById('toAirport');
     const departDate = document.getElementById('departDate').value;
     const returnDate = document.getElementById('returnDate')?.value || '';
     const tripType = document.querySelector('input[name="tripType"]:checked')?.value || 'one';
-
+  
     const fromCode = fromInput.getAttribute('data-code') || extractCode(fromInput.value);
     const toCode = toInput.getAttribute('data-code') || extractCode(toInput.value);
-
+  
     if (!fromCode || !toCode || !departDate) {
       alert("Please complete all required fields (From, To, Depart Date)");
       return;
     }
-
+  
     if (fromCode === toCode) {
       alert("Departure and destination airports cannot be the same.");
       return;
     }
-
+  
+    const searchInfo = {
+      from: fromCode,
+      to: toCode,
+      fromText: fromInput.value,
+      toText: toInput.value,
+      departDate,
+      returnDate,
+      trip: tripType,
+      adults: window.adultCount || 1,
+      children: window.childCount || 0,
+      seatClass: 'PE'
+    };
+  
+    sessionStorage.setItem('flightSearch', JSON.stringify(searchInfo));
+  
     updateDateDisplay(departDate, returnDate, tripType);
+    document.getElementById('flightResults').innerHTML = '';
+  
+    if (tripType === 'round') {
+      const returnSearch = {
+        from: searchInfo.to,
+        to: searchInfo.from,
+        date: searchInfo.returnDate,
+        seatClass: searchInfo.seatClass || 'PE',
+        airlines: searchInfo.airlines || '',
+        timeFrom: searchInfo.timeFrom || '00:00',
+        timeTo: searchInfo.timeTo || '23:59',
+        sortBy: searchInfo.sortBy || ''
+      };
+  
+      Promise.all([
+        new Promise(resolve => fetchFlights(searchInfo, resolve)),      // Depart
+        new Promise(resolve => fetchFlights(returnSearch, resolve))     // Return
+      ]).then(([departData, returnData]) => {
+        const pairedData = departData.map((depart, i) => ({
+          depart,
+          ret: returnData[i % returnData.length] || returnData[0]
+        }));
+        renderFlights(pairedData, 'flightResults', 'round');
+      });
+  
+    } else {
+      fetchFlights(searchInfo, data => renderFlights(data, 'flightResults', 'one'));
+    }
   });
-
+  
+  
   // CANCEL FILTERS
   document.getElementById('cancelBtn').addEventListener('click', function () {
-    // 1. Remove selected seat class buttons
+    // 1. Remove selected seat class filters
     document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('selected'));
   
     // 2. Uncheck all airline checkboxes
     document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => cb.checked = false);
   
-    // 3. Reset time range slider (if exists)
+    // 3. Reset time slider if exists
     const timeSlider = document.getElementById('timeRange');
     if (timeSlider) {
       timeSlider.value = 0;
-      showSelectedTime(0); // Update time display
+      showSelectedTime(0); // Reset display text
     }
   
-    // 4. Reset sort dropdown (if applicable)
+    // 4. Reset sort dropdown
     const sortSelect = document.getElementById('sortBy');
     if (sortSelect) {
       sortSelect.value = '';
     }
   
-    // 5. Update session/local storage filter values only (DO NOT refetch)
+    // 5. Clear filters from searchInfo
     const searchInfo = getSearchInfo();
-  
-    // Clear only the filter parts
     searchInfo.seatClass = '';
     searchInfo.airlines = '';
     searchInfo.timeFrom = '00:00';
     searchInfo.timeTo = '23:59';
     searchInfo.sortBy = '';
   
-    // Save back to sessionStorage or local
+    // 6. Save the cleaned filter values
     saveSearchInfo(searchInfo);
   
-    // Do NOT call fetchFlights – keep existing flight result container
-  });  
+    // ⚠️ DO NOT call fetchFlights here — keep current results!
+  });
+  
   
   // APPLY FILTERS BUTTON
   document.querySelector('.apply-btn').addEventListener('click', function () {
@@ -566,17 +624,9 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
   
+    // Extract filters
     const seatClassBtn = document.querySelector('.filter-button.selected');
     const seatClassText = seatClassBtn ? seatClassBtn.textContent.trim() : '';
-    let seatClass = '';
-    switch (seatClassText) {
-      case 'Economy': seatClass = 'EC'; break;
-      case 'Premium Economy': seatClass = 'PE'; break;
-      case 'Business Class': seatClass = 'BC'; break;
-      case 'First Class': seatClass = 'FC'; break;
-      default: seatClass = 'PE'; break;
-    }
-  
     const airlineNameToCode = { 'AirAsia': 'AK', 'Mas': 'MH', 'FireFly': 'FY' };
     const airlineChecks = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'));
     const airlines = airlineChecks
@@ -585,48 +635,50 @@ document.addEventListener('DOMContentLoaded', function () {
   
     const timeFrom = '06:00';
     const timeTo = '23:59';
- 
-    searchInfo.seatClass = seatClass;
+    const sortBy = '';
+  
+    // ✅ Update filters in searchInfo
+    searchInfo.seatClass = seatClassText === 'Economy' ? 'EC' :
+                           seatClassText === 'Premium Economy' ? 'PE' :
+                           seatClassText === 'Business Class' ? 'BC' :
+                           seatClassText === 'First Class' ? 'FC' : 'PE';
     searchInfo.airlines = airlines;
     searchInfo.timeFrom = timeFrom;
     searchInfo.timeTo = timeTo;
-    searchInfo.sortBy = '';
-
+    searchInfo.sortBy = sortBy;
+  
     sessionStorage.setItem("flightSearch", JSON.stringify(searchInfo));
     updateDateDisplay(searchInfo.departDate, searchInfo.returnDate, searchInfo.trip);
-    
-    const isRoundTrip = searchInfo.trip === 'round';
-    const isDepartSelected = !!searchInfo.depart;
-    
-    if (isRoundTrip) {
-      if (isDepartSelected) {
-        // ✅ Apply filters to return ONLY if departure flight is selected
-        const returnSearch = {
-          from: searchInfo.to,
-          to: searchInfo.from,
-          date: searchInfo.returnDate,
-          seatClass: searchInfo.seatClass,
-          airlines: searchInfo.airlines,
-          timeFrom: searchInfo.timeFrom,
-          timeTo: searchInfo.timeTo,
-          sortBy: searchInfo.sortBy
-        };
-    
-        console.log('📦 Applying filters to RETURN flight:', returnSearch);
-        fetchFlights(returnSearch, data => renderFlights(data, 'flightResults', 'return'));
-    
-      } else {
-        // ✅ Apply filters only to departure
-        console.log('📦 Applying filters to DEPARTURE flight:', searchInfo);
-        fetchFlights(searchInfo, data => renderFlights(data, 'flightResults', 'depart'));
-      }
-    
+  
+    // ✅ Full fetch for round trip
+    if (searchInfo.trip === 'round') {
+      const returnSearch = {
+        from: searchInfo.to,
+        to: searchInfo.from,
+        date: searchInfo.returnDate,
+        seatClass: searchInfo.seatClass,
+        airlines: searchInfo.airlines,
+        timeFrom: searchInfo.timeFrom,
+        timeTo: searchInfo.timeTo,
+        sortBy: searchInfo.sortBy
+      };
+  
+      Promise.all([
+        new Promise(resolve => fetchFlights(searchInfo, resolve)),      // Depart
+        new Promise(resolve => fetchFlights(returnSearch, resolve))     // Return
+      ]).then(([departData, returnData]) => {
+        const pairedData = departData.map((depart, i) => ({
+          depart,
+          ret: returnData[i % returnData.length] || returnData[0]
+        }));
+        renderFlights(pairedData, 'flightResults', 'round');
+      });
+  
     } else {
-      // One-way trip
       fetchFlights(searchInfo, data => renderFlights(data, 'flightResults', 'one'));
     }
-    
-  });  
+  });
+  
 
   // HEART LIKE BUTTON INTERACTION
   document.addEventListener('click', function(e) {
@@ -642,4 +694,5 @@ document.addEventListener('DOMContentLoaded', function () {
   const style = document.createElement('style');
   style.textContent = `.fa-heart.liked { color: red !important; }`;
   document.head.appendChild(style);
-});
+})
+
