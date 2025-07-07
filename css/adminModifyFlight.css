@@ -1,0 +1,424 @@
+/* Admin Modify Flight Booking Styles */
+
+.main-content {
+    padding-left: 10px;
+}
+
+.modify-booking-container {
+    width: 100%;
+    padding: 0 30px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Header section with back button */
+.modify-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 16px 0;
+    position: relative;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    color: #4379EE;
+    margin-right: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    position: absolute;
+    left: -40px;
+}
+
+.back-button:hover {
+    background: rgba(67, 121, 238, 0.1);
+}
+
+.modify-header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 28px;
+    color: #4379EE;
+    margin: 0;
+    padding-left: 10px;
+}
+
+/* Booking ID display */
+.booking-id-display {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #64748b;
+    margin: -10px 0 20px 10px; /* Align with the header title, but below it */
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #e2e8f0;
+    font-style: italic;
+}
+
+/* Section styling */
+.section-container {
+    background: transparent;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    padding: 0 0 0 10px;
+}
+
+.section-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #0F52C9; /* Darker, more saturated blue */
+    margin: 0 0 16px 0;
+    text-transform: none;
+}
+
+/* Booking Summary */
+.booking-summary {
+    background: #EFF6FF;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-row {
+    display: flex;
+    margin-bottom: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.summary-row:last-child {
+    margin-bottom: 0;
+}
+
+.summary-label {
+    font-weight: 500;
+    color: #1e293b;
+    width: 150px;
+    flex-shrink: 0;
+}
+
+.summary-value {
+    color: #1e293b;
+    font-weight: 500;
+}
+
+/* Cancel booking button */
+.cancel-booking-btn {
+    background-color: #ffffff;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 0; /* Move to left side */
+    margin-right: auto;
+}
+
+.cancel-booking-btn:hover {
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+/* Traveler details table */
+.traveler-details {
+    overflow-x: auto;
+}
+
+.traveler-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.traveler-table th {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #1e293b;
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.traveler-table td {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1e293b;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.traveler-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Column widths for traveler table */
+.traveler-table th:nth-child(1), .traveler-table td:nth-child(1) { width: 18%; }
+.traveler-table th:nth-child(2), .traveler-table td:nth-child(2) { width: 16%; }
+.traveler-table th:nth-child(3), .traveler-table td:nth-child(3) { width: 19%; }
+.traveler-table th:nth-child(4), .traveler-table td:nth-child(4) { width: 19%; }
+.traveler-table th:nth-child(5), .traveler-table td:nth-child(5) { width: 14%; }
+.traveler-table th:nth-child(6), .traveler-table td:nth-child(6) { 
+    width: 14%; 
+    text-align: right;
+}
+
+/* Editable fields */
+.editable-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.editable-field span {
+    flex: 1;
+}
+
+.edit-btn {
+    background: transparent;
+    border: none;
+    color: #4379EE;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 12px;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-btn:hover {
+    opacity: 1;
+}
+
+.edit-btn.editing {
+    opacity: 1;
+}
+
+.edit-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+/* Editing mode styles */
+.editable-field.editing span {
+    display: none;
+}
+
+.editable-field input {
+    flex: 1;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1e293b;
+    padding: 6px 10px;
+    border: 1px solid #4379EE;
+    border-radius: 4px;
+    outline: none;
+}
+
+/* Dropdown styling */
+.dropdown-select {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-select select {
+    appearance: none;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1e293b;
+    padding: 8px 30px 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.dropdown-select i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    pointer-events: none;
+}
+
+/* Flight details table */
+.flight-details {
+    overflow-x: auto;
+}
+
+.flight-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.flight-table th {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #1e293b;
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.flight-table td {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1e293b;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.flight-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Fare update styling */
+.fare-update {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.fare-row {
+    display: flex;
+    margin-bottom: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.fare-row:last-child {
+    margin-bottom: 0;
+}
+
+.fare-label {
+    font-weight: 600;
+    color: #1e293b;
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.fare-value {
+    color: #1e293b;
+}
+
+.fare-total-value {
+    color: #4379EE;
+}
+
+.fare-divider {
+    height: 2px;
+    background-color: #cbd5e1;
+    margin: 16px 0;
+    width: 30%; /* Make divider line shorter */
+}
+
+.fare-row.total {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.discard-btn {
+    color: #4379EE;
+    border: 1px solid #4379EE;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.discard-btn:hover {
+    background-color: rgba(67, 121, 238, 0.05);
+}
+
+.save-btn {
+    background-color: #4379EE;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+    background-color: #3b6fd9;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .modify-header h1 {
+        font-size: 24px;
+    }
+    
+    .booking-id-display {
+        margin-left: 10px;
+    }
+    
+    .summary-row,
+    .fare-row {
+        flex-direction: column;
+        margin-bottom: 16px;
+    }
+    
+    .summary-label,
+    .fare-label {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .discard-btn,
+    .save-btn {
+        width: 100%;
+    }
+} 
