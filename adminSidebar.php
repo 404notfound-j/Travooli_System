@@ -66,7 +66,7 @@ $initials = strtoupper(substr($adminData['fst_name'], 0, 1) . substr($adminData[
         </div>
         
         <nav class="nav-menu">
-            <a href="A_dashboard.php" class="nav-item active">Dashboard</a>
+            <a href="A_dashboard.php" class="nav-item">Dashboard</a>
             <a href="#" class="nav-item">Flight</a>
             <a href="#" class="nav-item">Booking</a>
             <a href="salesReport.php" class="nav-item">Report</a>
