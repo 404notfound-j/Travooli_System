@@ -1,0 +1,28 @@
+/* Admin Cancel Flight Popup Custom Styles */
+
+/* We're reusing most styles from dlt_acc_popup.css */
+/* This file contains only overrides and custom styles specific to flight cancellation */
+
+/* Make the background semi-transparent */
+.modal-overlay {
+    background-color: rgba(103, 103, 103, 0.65);
+}
+
+.modal-dialog {
+    box-shadow: 0px 12px 24px 0px rgba(27, 59, 119, 0.15), 
+                0px 24px 60px 0px rgba(6, 47, 125, 0.15), 
+                0px 2px 4px 0px rgba(7, 4, 146, 0.2);
+}
+
+.modal-title {
+    color: #6E7491;
+}
+
+/* Custom button color if needed */
+.btn-primary.btn-danger {
+    background: rgba(246, 49, 49, 0.82);
+}
+
+.btn-primary.btn-danger:hover {
+    background: rgba(246, 49, 49, 0.9);
+} 

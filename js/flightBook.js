@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
       toText,
       departDate: departDateFinal,
       returnDate: returnDateFinal,
+      date: departDateFinal,
       adults,
       children,
       trip,
@@ -119,11 +120,24 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('flightResults').innerHTML = '';
   
     if (searchInfo.trip === 'round') {
-      fetchFlights(searchInfo, data => renderFlights(data, 'flightResults', 'depart'));
-    } else {
-      fetchFlights(searchInfo, data => renderFlights(data, 'flightResults', 'one'));
+      const returnSearch = {
+        from: searchInfo.to,
+        to: searchInfo.from,
+        date: searchInfo.returnDate,
+        seatClass: searchInfo.seatClass || 'PE',
+        airlines: searchInfo.airlines || '',
+        timeFrom: searchInfo.timeFrom || '00:00',
+        timeTo: searchInfo.timeTo || '23:59',
+        sortBy: searchInfo.sortBy || ''
+      };
+    
+      fetchFlights(searchInfo, departFlights => {
+        fetchFlights(returnSearch, returnFlights => {
+          renderRoundTripOptions(departFlights, returnFlights);
+        });
+      });
     }
-  }  
+  }
 
   // INITIALIZE SEARCH BAR FROM URL PARAMETERS
   preloadSearchFromDashboard();
@@ -287,58 +301,145 @@ document.addEventListener('DOMContentLoaded', function () {
         const searchData = getSearchInfo();
   
         if (type === 'depart') {
+          // 1️⃣ Store selected departure flight
           searchData.depart = flightId;
           sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
-  
           console.log("✈️ Selected DEPARTURE flight:", flightId);
-          console.log("📦 Stored searchData after departure:", searchData);
   
+          // 2️⃣ Remove existing departure section to clean UI
           const departSection = document.querySelector('.depart-section');
           if (departSection) departSection.remove();
   
-          // ✅ Use latest filters for return flight search
-          const fullSearch = getSearchInfo();
+          // 3️⃣ Prepare reverse search for return flights
           const reversedSearch = {
-            from: fullSearch.to,
-            to: fullSearch.from,
-            date: fullSearch.returnDate,
-            seatClass: fullSearch.seatClass || 'PE',
-            airlines: fullSearch.airlines || '',
-            timeFrom: fullSearch.timeFrom || '00:00',
-            timeTo: fullSearch.timeTo || '23:59',
-            sortBy: fullSearch.sortBy || ''
+            from: searchData.to,
+            to: searchData.from,
+            date: searchData.returnDate,
+            seatClass: searchData.seatClass || 'PE',
+            airlines: searchData.airlines || '',
+            timeFrom: searchData.timeFrom || '00:00',
+            timeTo: searchData.timeTo || '23:59',
+            sortBy: searchData.sortBy || ''
           };
-  
-          console.log("🔁 Reversed return search:", reversedSearch);
+          console.log("🔁 Searching RETURN flights:", reversedSearch);
   
           fetchFlights(reversedSearch, data => {
             renderFlights(data, 'flightResults', 'return');
           });
   
         } else if (type === 'return') {
+          // 4️⃣ Store selected return flight
           searchData.return = flightId;
           sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
+          console.log("🔁 Selected RETURN flight:", flightId);
   
-          console.log("🔙 Selected RETURN flight:", flightId);
-          console.log("📦 Stored searchData after return:", searchData);
-  
-          // Redirect to flight details with both depart and return
-          window.location.href = `flightDetails.php?depart=${searchData.depart}&classId=${searchData.seatClass}&return=${searchData.return}&classId=${searchData.seatClass}`;
+          // 5️⃣ Fetch full details of both selected flights
+          fetch("getFlightDetails.php", {
+            method: "POST",
+            body: new URLSearchParams({
+              departId: searchData.depart,
+              returnId: searchData.return
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            // 6️⃣ Render BOTH flights in a single unified card
+            renderRoundTripCard(data.depart, data.return);
+          });
   
         } else {
+          // 7️⃣ One-way trip — redirect with flight ID
           searchData.selectedFlight = flightId;
           sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
-  
           console.log("🧳 One-way selected flight:", flightId);
-          console.log("📦 Stored searchData for one-way:", searchData);
   
-          // Redirect to one-way flight details
           window.location.href = `flightDetails.php?flightId=${flightId}&classId=${searchData.seatClass}`;
         }
       });
     });
-  }  
+  }
+  
+  function renderRoundTripOptions(departFlights, returnFlights) {
+    const container = document.getElementById('flightResults');
+    container.innerHTML = '';
+  
+    if (!departFlights.length || !returnFlights.length) {
+      container.innerHTML = '<p>No round-trip flights found.</p>';
+      return;
+    }
+  
+    departFlights.forEach(depart => {
+      returnFlights.forEach(ret => {
+        const departDuration = calculateDuration(depart.departure_time, depart.arrival_time);
+        const returnDuration = calculateDuration(ret.departure_time, ret.arrival_time);
+  
+        const html = `
+        <div class="flight-card roundtrip-card">
+          <div class="airline-section">
+            <img src="images/${depart.airline_id}.png" class="airline-logo" alt="${depart.airline_id} Logo">
+            <span class="airline-name">${depart.airline_id}</span>
+          </div>
+          <div class="content-section">
+            <div class="top-row">
+              <div class="rating-box">
+                <span class="rating-score">4.2</span>
+                <span class="reviews"><strong>Very Good</strong> 54 reviews</span>
+              </div>
+              <div class="price-box">
+                <span class="from">round trip from</span>
+                <span class="price">RM ${(Number(depart.price) + Number(ret.price)).toFixed(2)}</span>
+              </div>
+            </div>
+            
+            <!-- Schedule: 2 separate lines -->
+            <div class="schedule">
+              <div class="flight-detail">
+                ${formatTime(depart.departure_time)} - ${formatTime(depart.arrival_time)} 
+                ${depart.orig_airport_id} - ${depart.dest_airport_id} 
+                (${calculateDuration(depart.departure_time, depart.arrival_time)})
+              </div>
+              <div class="flight-detail">
+                ${formatTime(ret.departure_time)} - ${formatTime(ret.arrival_time)} 
+                ${ret.orig_airport_id} - ${ret.dest_airport_id} 
+                (${calculateDuration(ret.departure_time, ret.arrival_time)})
+              </div>
+            </div>
+      
+            <div class="buttons-row">
+              <button class="heart-btn"><i class="fa-solid fa-heart"></i></button>
+              <button class="view-details-btn" 
+                data-depart-id="${depart.flight_id}" 
+                data-return-id="${ret.flight_id}" 
+                data-type="roundtrip">
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+        container.innerHTML += html;
+      });
+    });
+  
+    attachRoundViewHandlers(); // ✅ Attach handlers to these new buttons
+  }
 
+  function attachRoundViewHandlers() {
+    document.querySelectorAll('.view-details-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const departId = this.dataset.departId;
+        const returnId = this.dataset.returnId;
+  
+        const searchData = getSearchInfo();
+        searchData.depart = departId;
+        searchData.return = returnId;
+        sessionStorage.setItem("flightSearch", JSON.stringify(searchData));
+  
+        window.location.href = `flightDetails.php?departId=${departId}&returnId=${returnId}&classId=${searchData.seatClass}`;
+      });
+    });
+  }
+  
   // CALCULATE DURATION between departure and arrival
   function calculateDuration(start, end) {
     const [sh, sm] = start.split(":"), [eh, em] = end.split(":");
@@ -416,23 +517,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // CANCEL FILTERS
   document.getElementById('cancelBtn').addEventListener('click', function () {
+    // 1. Remove selected seat class buttons
     document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('selected'));
+  
+    // 2. Uncheck all airline checkboxes
     document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => cb.checked = false);
+  
+    // 3. Reset time range slider (if exists)
     const timeSlider = document.getElementById('timeRange');
     if (timeSlider) {
       timeSlider.value = 0;
-      showSelectedTime(0);
+      showSelectedTime(0); // Update time display
     }
+  
+    // 4. Reset sort dropdown (if applicable)
+    const sortSelect = document.getElementById('sortBy');
+    if (sortSelect) {
+      sortSelect.value = '';
+    }
+  
+    // 5. Update session/local storage filter values only (DO NOT refetch)
     const searchInfo = getSearchInfo();
+  
+    // Clear only the filter parts
     searchInfo.seatClass = '';
     searchInfo.airlines = '';
     searchInfo.timeFrom = '00:00';
     searchInfo.timeTo = '23:59';
     searchInfo.sortBy = '';
+  
+    // Save back to sessionStorage or local
     saveSearchInfo(searchInfo);
-    fetchFlights(searchInfo, data => renderFlights(data, 'flightResults'));
-  });
-
+  
+    // Do NOT call fetchFlights – keep existing flight result container
+  });  
+  
   // APPLY FILTERS BUTTON
   document.querySelector('.apply-btn').addEventListener('click', function () {
     const searchInfo = getSearchInfo();

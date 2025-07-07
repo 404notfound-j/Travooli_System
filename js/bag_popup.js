@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle click on all edit baggage buttons
     document.querySelectorAll('.edit-baggage-btn').forEach(button => {
         button.addEventListener('click', () => {
-          // Remove .active from any other button
           document.querySelectorAll('.edit-baggage-btn').forEach(btn => btn.classList.remove('active'));
           button.classList.add('active');
       
@@ -20,60 +19,76 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       });      
   
-    function setupBagPopupEvents() {
-      const bagOptions = popupBody.querySelectorAll('.bag-option');
-  
-      bagOptions.forEach(option => {
-        option.addEventListener('click', function () {
-          // Deselect all, then select clicked
-          bagOptions.forEach(opt => opt.classList.remove('selected'));
-          this.classList.add('selected');
-          console.log('Selected bag:', this.getAttribute('data-bag'));
+      function setupBagPopupEvents() {
+        const bagOptions = popupBody.querySelectorAll('.bag-option');
+        const quantitySection = popupBody.querySelector('.bag-quantity-section');
+        const plusBtn = popupBody.querySelector('.quantity-btn.plus');
+        const minusBtn = popupBody.querySelector('.quantity-btn.minus');
+        const quantityDisplay = popupBody.querySelector('.quantity-display');
+        const saveBtn = popupBody.querySelector('.popup-save-btn');
+        const closeBtn = popupBody.querySelector('.popup-close');
+      
+        let selectedBagType = "10kg"; 
+        let quantity = 1;
+      
+        function updateQuantityDisplay() {
+          quantityDisplay.textContent = quantity;
+        }
+      
+        bagOptions.forEach(option => {
+          option.addEventListener('click', function () {
+            bagOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedBagType = this.getAttribute('data-bag');
+            quantity = 1;
+            updateQuantityDisplay();
+          });
         });
-      });
-  
-      // Quantity buttons
-      const plusBtn = popupBody.querySelector('.quantity-btn.plus');
-      const minusBtn = popupBody.querySelector('.quantity-btn.minus');
-      const display = popupBody.querySelector('.quantity-display');
-  
-      plusBtn?.addEventListener('click', () => {
-        let val = parseInt(display.textContent);
-        if (val < 10) display.textContent = val + 1;
-      });
-  
-      minusBtn?.addEventListener('click', () => {
-        let val = parseInt(display.textContent);
-        if (val > 1) display.textContent = val - 1;
-      });
-  
-      // Save & Close button
-      const saveBtn = popupBody.querySelector('.popup-save-btn');
-      const closeBtn = popupBody.querySelector('.popup-close');
-  
-      closeBtn?.addEventListener('click', () => {
-        popupOverlay.classList.add('hidden');
-        document.body.classList.remove('blurred');
-      });
-  
-      saveBtn?.addEventListener('click', function (e) {
-        e.preventDefault();
       
-        const selectedOption = popupBody.querySelector('.bag-option.selected');
-        const selectedBag = selectedOption?.getAttribute('data-bag');
-        const pricePerUnit = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
-        const quantity = parseInt(popupBody.querySelector('.quantity-display')?.textContent) || 1;
+        plusBtn?.addEventListener('click', () => {
+          if (selectedBagType === "10kg") {
+            if (quantity < 2) {
+              quantity++;
+              updateQuantityDisplay();
+            } else {
+              alert("You can only select up to 2 free 10kg bags.");
+            }
+          } else {
+            if (quantity < 10) {
+              quantity++;
+              updateQuantityDisplay();
+            } else {
+              alert("Maximum 10 pieces allowed.");
+            }
+          }
+        });
       
-        const totalBaggagePrice = pricePerUnit * quantity;
+        minusBtn?.addEventListener('click', () => {
+          if (quantity > 1) {
+            quantity--;
+            updateQuantityDisplay();
+          }
+        });
       
-        if (selectedBag) {
+        closeBtn?.addEventListener('click', () => {
+          popupOverlay.classList.add('hidden');
+          document.body.classList.remove('blurred');
+        });
+      
+        saveBtn?.addEventListener('click', function (e) {
+          e.preventDefault();
+      
+          const selectedOption = popupBody.querySelector('.bag-option.selected');
+          const pricePerUnit = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
+      
           const openerButton = document.querySelector('.edit-baggage-btn.active');
+          const totalCost = pricePerUnit * quantity;
       
           if (openerButton) {
             const addonValue = openerButton.closest('.addon-details')?.querySelector('.addon-value');
             if (addonValue) {
-              addonValue.textContent = `${quantity} piece${quantity > 1 ? 's' : ''}, ${selectedBag}`;
-              addonValue.setAttribute('data-price', totalBaggagePrice); 
+              addonValue.textContent = `${quantity} piece${quantity > 1 ? 's' : ''}, ${selectedBagType}`;
+              addonValue.setAttribute('data-price', totalCost.toFixed(2));
             }
       
             openerButton.classList.remove('active');
@@ -84,8 +99,8 @@ document.addEventListener('DOMContentLoaded', function () {
           if (typeof updatePrices === 'function') {
             updatePrices();
           }
-        }
-      });      
-    }
+        });
+      }
+
   });
   

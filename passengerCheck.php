@@ -62,10 +62,12 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
                     <h2>Who's Travelling ?</h2>
                     <strong>Passengers</strong>
                     <div class="info-box">
-                        <p class="info-text">
-                            Names must match ID Please make sure that you enter the name exactly as it appears on the ID that will be used when checking in<br><br>
+                        <li class="info-text">
+                            Names must match ID Please make sure that you enter the name exactly as it appears on the ID that will be used when checking in
+                        </li>
+                        <li class="info-text">
                             ID validity requirements To ensure your trip goes smoothly, please make sure that the passenger's travel document is valid on the date the trip ends
-                        </p>
+                        </li>
                     </div>
                     <div class="passenger-list">
                         <div class="passenger-item">
@@ -81,16 +83,17 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
                         </div>
                         <!-- New passengers will be inserted here -->
                         <div id="passenger-list"></div>
-                </div>
-                    <button class="add-passenger-btn">Add Passengers</button>   
-</div>
+                </div>    
+            </div>
                 <div class="additional-info-section">
                      <h2>Additional Information</h2>
                      <div class="info-box">
-                        <p class="info-text">
-                           Meal Add-on Choose from meal options based on your preferences, whether it's no meal, a single meal, or multiple meals for longer flights.<br><br>
+                        <li class="info-text">
+                           Meal Add-on Choose from meal options based on your preferences, whether it's no meal, a single meal, or multiple meals for longer flights.
+                        </li>
+                        <li class="info-text">
                            Additional Baggage Select your baggage options to manage weight and quantity, with one free carry-on and personal item. Additional baggage can be added for a fee.
-                        </p>
+                        </li>
                     </div>
                     <div class="trip-details">
                         <div class="trip-segment" data-segment="depart">
@@ -169,34 +172,36 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
         </div>
             <!-- Price and Button Section -->
             <div class="price-and-button-container">
-            <div class="price-details-section">
-                <h2>Price Details</h2>
-                <div class="price-items">
-                <div class="price-item">
-                    <span class="item-name" id="ticket-count-label">Tickets (1 Adult)</span>
-                    <span class="item-price" id="flight-price">RM 0</span>
-                </div>
-                <div class="price-item">
-                    <span class="item-name">Baggage Fees</span>
-                    <span class="baggage-price">RM 0</span>
-                </div>
-                <div class="price-item">
-                    <span class="item-name">Multi-meal</span>
-                    <span class="meal-price">RM 0</span>
-                </div>
-                <div class="price-item">
-                    <span class="item-name">Taxes & Fees</span>
-                    <span class="item-price" id="tax-fees">RM 121</span>
-                </div>
-                <div class="price-item">
-                    <span class="item-name">Discount</span>
-                    <span class="item-price">RM 0</span>
-                </div>
-                </div>
-                <hr>
-                <div class="total-price">
-                <span class="total-text">Total </span>
-                <span class="total-value" id="totalText">RM 0</span>
+                <div class="price-details-section">
+                    <h2>Price Details</h2>
+                    <div class="price-items">
+                        <div class="price-item">
+                        <span class="item-name" id="ticket-count-label">Tickets (1 Adult)</span>
+                            <span class="item-price" id="flight-price">RM 0</span>
+                        </div>
+                        <div class="price-item">
+                            <span class="item-name">Baggage Fees</span>
+                            <span class="baggage-price">RM 0</span>
+                        </div>
+                         <div class="price-item">
+                            <span class="item-name">Multi-meal</span>
+                            <span class="meal-price">RM 0</span>
+                        </div>
+                        <div class="price-item">
+                            <span class="item-name">Taxes & Fees (6%)</span>
+                            <span class="tax-price">RM 0.00</span>
+                        </div>
+                         <div class="price-item">
+                            <span class="item-name">Discount</span>
+                            <span class="item-price">RM 0</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="total-price">
+                        <span class="total-text">Total </span>
+                        <span class="total-value" id="totalText">RM 0</span>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -220,7 +225,12 @@ $returnInfo = $returnFlightId ? getFlightRoute($connection, $returnFlightId) : n
   <div class="popup" id="popup-body"></div>
 </div>
 </body>
+<script>
+  window.loggedUser = <?php echo json_encode($loggedUser); ?>;
+</script>
 <script src="js/popupAddFlight.js"></script>
 <script src="js/passenger.js"></script>
+<script src="js/bag_popup.js"></script>
+<script src="js/meal_popup.js"></script>
 </html>
 

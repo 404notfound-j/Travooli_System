@@ -10,6 +10,7 @@
 <body>
   <header>
     <?php include 'userHeader.php'; 
+    $isLoggedIn = isset($_SESSION['user_id']);
   if (isset($_GET['flightId'])) {
     $_SESSION['selected_flight_id'] = $_GET['flightId'];
 }
