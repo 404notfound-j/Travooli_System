@@ -1,3 +1,12 @@
+/* 
+Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
+Project Name: sign.js
+Description: To handle the sign in and sign up page
+Date first written: 10-May-2025
+Date last modified: 6-Jul-2025 
+ */
+
+
 /**
  * Slide-in Message Animation System for Sign In/Sign Up Pages
  * Creates animated notification messages that slide in from the right

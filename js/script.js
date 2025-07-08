@@ -1,4 +1,12 @@
-// Wait for the DOM to be fully loaded
+/* 
+Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
+Project Name: script.js
+Description: To handle the main page
+Date first written: 10-May-2025
+Date last modified: 6-Jul-2025 
+ */
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all functionality
     initializeAirportDropdowns();

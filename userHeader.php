@@ -1,3 +1,11 @@
+<!-- 
+Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
+Project Name: userHeader.php
+Description: To generate a new password and send it to webspace email address of the users
+Date first written: 10-May-2025
+Date last modified: 30-Jun-2025 
+ -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -1,3 +1,11 @@
+<!-- 
+Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
+Project Name: profile.php
+Description: To display the profile of the user
+Date first written: 10-May-2025
+Date last modified: 6-Jul-2025 
+ -->
+
 <?php
 if (session_status() == PHP_SESSION_NONE) {
     session_start();

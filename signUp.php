@@ -1,3 +1,11 @@
+<!-- 
+Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
+Project Name: signUp.php
+Description: To sign up the user
+Date first written: 10-May-2025
+Date last modified: 6-Jul-2025 
+ -->
+
 <?php
 session_start();
 include 'connection.php';
