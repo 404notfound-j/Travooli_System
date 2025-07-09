@@ -240,6 +240,6 @@ if (bookButton) {
     sessionStorage.setItem("flightSearch", JSON.stringify(flightSearch));
 
     // Redirect to booking page without URL parameters
-    window.location.href = passengerCheck.php;
+    window.location.href = 'passengerCheck.php';
   });
 }
