@@ -1,4 +1,13 @@
-/**
+/* 
+Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
+Project Name: profile.css
+Description: To style the profile page
+Date first written: 10-May-2025
+Date last modified: 6-Jul-2025 
+ */
+
+
+/*
  * Profile Page JavaScript - Form validation and slide-in messages
  */
 
