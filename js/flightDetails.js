@@ -15,14 +15,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial load: determine the selected seat class from searchData, defaulting to 'PE'
   let currentSelectedClass = searchData.seatClass || "PE";
 
+  // --- NEW: Define classMap here ---
+  const classMap = {
+    'EC': 'Economy Class',
+    'PE': 'Premium Economy',
+    'BC': 'Business Class',
+    'FC': 'First Class'
+  };
+  // --- END NEW ---
+
   highlightSeatClass(currentSelectedClass, 'depart'); // Highlight for depart flight initially
 
   // Store the initial flight IDs for later use in seat class selection
-  // This is crucial because when a seat class changes, we need to re-fetch details
-  // for the same depart/return flights but with the new class.
-  window.currentDepartFlightId = departId || oneWayId; // Use oneWayId if it's a one-way trip
+  window.currentDepartFlightId = departId || oneWayId;
   window.currentReturnFlightId = returnId;
-  window.currentTripType = tripType; // Store the trip type as well
+  window.currentTripType = tripType;
 
   if (window.currentDepartFlightId && tripType === 'round' && window.currentReturnFlightId) {
     loadFlightDetails(window.currentDepartFlightId, 'depart', currentSelectedClass);
@@ -32,28 +39,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (returnSection) returnSection.style.display = 'none';
   } else {
     alert('No flight selected or invalid trip type.');
-    // Optionally redirect back to search page if no valid data
-    // window.location.href = 'U_dashboard.php';
   }
 
-  // --- START NEW/MODIFIED CODE FOR SEAT CLASS SELECTION ---
-  // REMOVED THE PREVIOUS BLOCK THAT CLONED AND REPLACED BUTTONS, AS IT PREVENTED EVENT LISTENERS.
   document.querySelectorAll('.seat-option').forEach(button => {
     button.addEventListener('click', function() {
-      const newClassCode = this.dataset.class; // Get the new class code from data-class attribute
+      const newClassCode = this.dataset.class;
 
-      // 1. Update current selected class
       currentSelectedClass = newClassCode;
 
-      // 2. Update searchData in sessionStorage with the new seatClass
       searchData.seatClass = newClassCode;
+      searchData.classId = newClassCode; // Ensure classId is also updated in flightSearch for payment.js
       sessionStorage.setItem('flightSearch', JSON.stringify(searchData));
 
-      // 3. Highlight the newly selected seat class
-      highlightSeatClass(newClassCode, 'depart'); // Apply highlight to depart section
+      highlightSeatClass(newClassCode, 'depart');
 
-      // 4. Re-fetch flight details with the new seat class
-      // Reset prices to null before fetching new ones, to ensure total is recalculated correctly
       window.departFlightPrice = null;
       window.returnFlightPrice = null;
 
@@ -63,10 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (window.currentDepartFlightId && window.currentTripType === 'one') {
         loadFlightDetails(window.currentDepartFlightId, 'depart', newClassCode);
       }
-      // updateTotalFlightPriceIfReady() will be called inside loadFlightDetails after fetch completes for both (or one) flights
     });
   });
-  // --- END NEW/MODIFIED CODE ---
 });
 
 function highlightSeatClass(classCode, type = 'depart') {
@@ -75,9 +72,7 @@ function highlightSeatClass(classCode, type = 'depart') {
   });
 }
 
-// Modified loadFlightDetails to accept classCode directly
 function loadFlightDetails(flightId, type, classCode) {
-  // Use the classCode passed to the function, which comes from searchData.seatClass
   const classParam = classCode;
 
   fetch(`getFlightDetails.php?flightId=${flightId}&classId=${classParam}`)
@@ -109,6 +104,20 @@ function loadFlightDetails(flightId, type, classCode) {
       const price = parseFloat(flight.price);
       updateText(`${type}-flight-price`, `RM ${price.toFixed(2)}`);
 
+      // --- NEW: Update the class name display ---
+      const classMap = { // Re-define classMap inside or move to global scope if not already
+        'EC': 'Economy Class',
+        'PE': 'Premium Economy',
+        'BC': 'Business Class',
+        'FC': 'First Class'
+      };
+      const classDisplayName = classMap[classCode] || 'Unknown Class';
+      const classDisplayEl = document.getElementById('flight-class-display'); // This ID must exist in your HTML
+      if (classDisplayEl) {
+          classDisplayEl.textContent = classDisplayName;
+      }
+      // --- END NEW ---
+
       // Retrieve searchData again to ensure it's the latest from sessionStorage before modification
       const searchData = JSON.parse(sessionStorage.getItem('flightSearch') || '{}');
 
@@ -123,8 +132,7 @@ function loadFlightDetails(flightId, type, classCode) {
           logoImage.alt = `${flight.airline_name} Logo`;
         }
         window.departFlightPrice = price;
-        // Store per-passenger price for the depart flight in sessionStorage
-        searchData.departFlightPricePerPax = price; // NEW LINE
+        searchData.departFlightPricePerPax = price;
       } else {
         const logoImage = document.getElementById("return-airline-logo");
         if (logoImage) {
@@ -132,12 +140,10 @@ function loadFlightDetails(flightId, type, classCode) {
           logoImage.alt = `${flight.airline_name} Logo`;
         }
         window.returnFlightPrice = price;
-        // Store per-passenger price for the return flight in sessionStorage
-        searchData.returnFlightPricePerPax = price; // NEW LINE
+        searchData.returnFlightPricePerPax = price;
       }
 
-      // Always update session storage after modifying searchData within this function
-      sessionStorage.setItem('flightSearch', JSON.stringify(searchData)); // Moved to ensure updates are saved
+      sessionStorage.setItem('flightSearch', JSON.stringify(searchData));
 
       updateTotalFlightPriceIfReady();
       highlightSeatClass(classParam, type);
@@ -149,7 +155,6 @@ function updateTotalFlightPriceIfReady() {
   const totalDisplay = document.getElementById('total-flight-price');
   if (!totalDisplay || window.departFlightPrice === null) return;
 
-  // Retrieve searchData again to ensure it's the latest from sessionStorage
   const searchData = JSON.parse(sessionStorage.getItem('flightSearch') || '{}');
   const adults = parseInt(searchData.adults) || 1;
   const children = parseInt(searchData.children) || 0;
@@ -159,9 +164,8 @@ function updateTotalFlightPriceIfReady() {
   const total = (window.departFlightPrice + ret) * passengerCount;
   totalDisplay.textContent = `RM ${total.toFixed(2)}`;
 
-  // This is the place where initial total flight price is stored for passengerCheck.php to read
-  searchData.totalPrice = total; // Ensure total price is updated in session storage
-  sessionStorage.setItem('flightSearch', JSON.stringify(searchData)); // Save updated searchData
+  searchData.totalPrice = total;
+  sessionStorage.setItem('flightSearch', JSON.stringify(searchData));
 }
 
 function formatTimeTo12Hour(timeString) {
@@ -195,12 +199,11 @@ if (likeButton) {
 }
 
 
-// Function to handle Book Now click
 window.handleBookNowClick = function(event) {
   if (!userLoggedIn) {
-    event.preventDefault(); // stop default action (like navigation)
+    event.preventDefault();
     if (typeof window.showLoginReminder === 'function') {
-      window.showLoginReminder(); // show your custom modal popup
+      window.showLoginReminder();
     } else {
       alert('Please sign in or create an account before booking.');
     }
@@ -212,7 +215,6 @@ window.handleBookNowClick = function(event) {
 const bookButton = document.querySelector('.book-now-btn');
 const userLoggedIn = window.userLoggedIn !== undefined ? window.userLoggedIn : false;
 
-// This function handles the login check (Duplicate, but kept for context. The one above is preferred)
 window.handleBookNowClick = function (event) {
   if (!userLoggedIn) {
     event.preventDefault();
@@ -222,7 +224,6 @@ window.handleBookNowClick = function (event) {
   return true;
 };
 
-// Handle Book Now click
 if (bookButton) {
   bookButton.addEventListener('click', function (e) {
     if (!window.handleBookNowClick(e)) return;
@@ -230,16 +231,11 @@ if (bookButton) {
     const totalText = document.getElementById('total-flight-price')?.textContent || 'RM 0.00';
     const totalPrice = parseFloat(totalText.replace('RM', '').trim()).toFixed(2);
 
-    // Retrieve the flightSearch object from sessionStorage (it's already the most updated)
     const flightSearch = JSON.parse(sessionStorage.getItem("flightSearch") || "{}");
 
-    // Update flightSearch object with final price and ensure all necessary data is present
-    flightSearch.totalPrice = totalPrice; // Add the calculated total price
-
-    // Store the updated flightSearch object back into sessionStorage
+    flightSearch.totalPrice = totalPrice;
     sessionStorage.setItem("flightSearch", JSON.stringify(flightSearch));
 
-    // Redirect to booking page without URL parameters
     window.location.href = 'passengerCheck.php';
   });
 }
