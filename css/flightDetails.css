@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 .Flight-Container {
   max-width: 1000px;
   margin: 20px auto;
@@ -7,7 +8,7 @@
 }
 .container {
   max-width: 1000px;
-  margin: 0 auto; 
+  margin: 0 auto;
   padding: 20px;
 }
 .title-section {
@@ -37,19 +38,26 @@
   padding: 10px 16px;
   border-radius: 6px;
   cursor: pointer;
+  /* Add transition for buttons */
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
+.price-cta button:hover {
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
 .price-cta button i {
-  color: white; 
+  color: white;
+  transition: color 0.3s ease; /* Transition for icon color */
 }
 .price-cta button.liked i {
-  color: red; 
+  color: red;
 }
 .book-now-btn:hover {
-  background-color: #4a50c2; 
+  background-color: #4a50c2;
 }
 .features-header{
-  display: flex; 
-  justify-content: space-between; 
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   margin-top: 20px;
 }
@@ -64,14 +72,29 @@
   margin-right: 0;
   padding: 6px 12px;
   border-radius: 5px;
+  cursor: pointer;
+  /* Add transition for seat options */
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }
+
+/* Hover effect for seat options */
+.seat-option:not(.highlighted):hover {
+  background-color: rgba(92, 99, 242, 0.2);
+  border-color: #5c63f2;
+  color: #ffffff;
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+/* Updated highlighted style for seat options */
 .seat-option.highlighted {
-  background-color: #232ef8;
-  border: 2px solid #5c63f2;
+  background-color: #605dec;
+  border: 2px solid #605dec;
+  color: #ffffff;
   font-weight: bold;
   padding: 5px 10px;
   border-radius: 5px;
 }
+
 .policies {
   background: #5c63f2;
   border-radius: 10px;
@@ -85,8 +108,18 @@
   align-items: center;
   gap: 8px;
 }
+.policy-item i {
+  /* Add transition for icons if they change color/size on hover within policy-item */
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+.policy-item:hover i {
+  transform: scale(1.1); /* Slight grow effect on icon hover */
+  color: #e0e7ff; /* A lighter color on hover */
+}
+
+
 .main-airplane-image {
-  width: 100%; 
+  width: 100%;
   height: auto;
   border-radius: 12px;
   margin-top: 20px;
@@ -96,14 +129,14 @@
   margin-top: 40px;
 }
 .rating-badge {
-  background-color: #e0e7ff; 
-  color: #5c63f2; 
-  padding: 8px 12px; 
-  border-radius: 6px; 
-  display: inline-block; 
-  margin-top: 8px; 
-  font-weight: bold; 
-  font-size: 12px; 
+  background-color: #e0e7ff;
+  color: #5c63f2;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-top: 8px;
+  font-weight: bold;
+  font-size: 12px;
 }
 .rating-info {
   display: flex;
@@ -118,6 +151,11 @@
   border-radius: 10px;
   font-weight: bold;
   font-size: 18px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.rating-score:hover {
+  background-color: #5c63f2;
+  color: white;
 }
 .rating-text {
   font-size: 18px;
@@ -151,22 +189,29 @@
   border-radius: 16px;
   margin-bottom: 24px;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
+  /* Transition for box-shadow or background if needed on hover for the entire box */
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
+.flight-box:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+  transform: translateY(-3px); /* Slight lift for the entire card */
+}
+
 .header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
-  padding-bottom: 10px; 
-  border-bottom: 1px solid #eee; 
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 .flight-title {
   font-size: 18px;
   color: #111;
 }
-.flight-box .flight-duration { 
-  font-size: 14px; 
-  color: #555; 
+.flight-box .flight-duration {
+  font-size: 14px;
+  color: #555;
 }
 .row {
   display: flex;
@@ -227,10 +272,16 @@
   padding-left: 16px;
 }
 .flight-icon-group.separated i {
-  border-left: 1px solid #dcdcdc;
-  padding-left: 12px;
   color: #111;
+  /* Add transition for these icons */
+  transition: color 0.3s ease, transform 0.2s ease;
 }
+.flight-icon-group.separated i:hover {
+  color: #5c63f2; /* Change color on hover */
+  transform: scale(1.2); /* Make them slightly larger on hover */
+}
+
+
 .flight-duration {
   color: #444;
   font-weight: 500;
@@ -241,43 +292,43 @@
   justify-content: center;
   gap: 24px;
 }
-.flight-time-details { /* Container for departure, plane line, arrival */
-  display: flex; /* Arrange children horizontally */
-  align-items: center; /* Vertically align items in the middle */
-  gap: 20px; /* Space between the three main parts */
-  justify-content: center; /* Center the content within this flex item */
-  flex-grow: 1; /* Allows this item to grow and take available space within the parent .row */
+.flight-time-details {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+  flex-grow: 1;
 }
-.flight-time-info.inline { /* Container for departure, plane line, arrival */
-  display: flex; /* Arrange children horizontally */
-  align-items: center; /* Vertically align items in the middle */
-  gap: 0px; /* Further reduced space between the three main parts */
+.flight-time-info.inline {
+  display: flex;
+  align-items: center;
+  gap: 0px;
 }
-.flight-time-info.inline > div:first-child, 
-.flight-time-info.inline > div:last-child { 
+.flight-time-info.inline > div:first-child,
+.flight-time-info.inline > div:last-child {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 .flight-time {
-  align-items: center; 
+  align-items: center;
 }
 .flight-time strong {
-  font-size: 18px; 
+  font-size: 18px;
 }
 .flight-time span {
-  font-size: 12px; 
-  color: #555; 
+  font-size: 12px;
+  color: #555;
 }
 .plane-line {
   display: flex;
   align-items: center;
-  gap: 5px; 
+  gap: 5px;
 }
 .plane-line .dot {
   width: 6px;
-  height: 6px; 
-  background-color: #111; 
+  height: 6px;
+  background-color: #111;
   border-radius: 50%;
 }
 .horizontal-line {
@@ -286,50 +337,57 @@
   background: #111;
 }
 .plane-line i {
-  font-size: 20px; /* Adjusted plane icon size */
-  color: #111; /* Adjusted plane icon color */
+  font-size: 20px;
+  color: #111;
+  /* Add transition for the plane icon in the line */
+  transition: color 0.3s ease, transform 0.3s ease;
 }
+.plane-line i:hover {
+  color: #5c63f2;
+  transform: scale(1.1);
+}
+
 /* Styles for the main row content (airline, times, icons) */
 .flight-box .row {
-  display: flex; /* Arrange children horizontally */
-  justify-content: space-between; /* Distribute space between the three main columns */
-  align-items: center; /* Align items vertically in the middle of the row */
-  padding-top: 15px; /* Space below the header */
-  margin-top: 10px; /* Add margin between the header row and this row */
-  width: 100%; /* Ensure the row takes full width */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  margin-top: 10px;
+  width: 100%;
 }
 .row-left-side {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; 
+  align-items: flex-start;
 }
 .row-center {
   display: flex;
-  justify-content: center; /* Center the content horizontally within this column */
-  align-items: center; /* Vertically align content within this column */
-  flex-grow: 1; /* Allow this column to take up available space */
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
 }
 .row-right-side {
   display: flex;
-  justify-content: flex-end; /* Align content to the right within this column */
-  align-items: center; /* Vertically align content within this column */
+  justify-content: flex-end;
+  align-items: center;
 }
 .airline-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Align airline name and aircraft to the left */
+  align-items: flex-start;
 }
 .airline-info strong {
-  font-size: 16px; /* Adjust font size to match image */
+  font-size: 16px;
 }
 .airline-info .aircraft {
-  font-size: 12px; /* Adjust font size to match image */
-  color: #555; /* Adjust color to match image */
+  font-size: 12px;
+  color: #555;
 }
 .flight-time-info.inline {
-  display: flex; /* Arrange children horizontally */
-  align-items: center; /* Vertically align items in the middle */
-  gap: 20px; /* Space between the three main parts */
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 .flight-time-info.inline > div {
   margin: 0 !important;
@@ -337,33 +395,33 @@
 }
 .flight-time {
   display: flex;
-  flex-direction: column; /* Stack time and airport vertically */
-  align-items: center; /* Center time and airport text horizontally */
+  flex-direction: column;
+  align-items: center;
 }
 .flight-time strong,
 .flight-time span {
   margin: 0 !important;
-  padding: 0 2px !important; /* Adjust padding to be very small horizontally */
+  padding: 0 2px !important;
 }
 .plane-line {
   display: flex;
   align-items: center;
-  gap: 5px; /* Space between dots, line, and plane icon */
+  gap: 5px;
 }
 .plane-line .dot {
-  width: 6px; /* Adjusted size based on your existing .dot rule */
-  height: 6px; /* Adjusted size based on your existing .dot rule */
-  background-color: #111; /* Adjusted color based on your existing rule */
+  width: 6px;
+  height: 6px;
+  background-color: #111;
   border-radius: 50%;
 }
 .horizontal-line {
   height: 1px;
-  width: 40px; /* Adjusted line length based on your existing rule */
-  background: #111; /* Adjusted color based on your existing rule */
+  width: 40px;
+  background: #111;
 }
 .plane-line i {
-  font-size: 20px; /* Adjusted plane icon size */
-  color: #111; /* Adjusted plane icon color */
+  font-size: 20px;
+  color: #111;
 }
 /* Styles for the header row */
 .header-row {
@@ -371,95 +429,95 @@
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
-  padding-bottom: 10px; /* Space below the header row */
-  border-bottom: 1px solid #eee; /* Optional: add a separator line */
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 .flight-title {
   font-size: 18px;
   color: #111;
 }
-.flight-box .flight-duration { /* Styling for duration in the header */
-  font-size: 14px; /* Adjust font size */
-  color: #555; /* Adjust color */
+.flight-box .flight-duration {
+  font-size: 14px;
+  color: #555;
 }
 /* Styles for the second row (airline info and icons) */
 .details-row-1 {
-  display: flex; /* Arrange children horizontally */
-  justify-content: space-between; /* Space out airline info and icons */
-  align-items: center; /* Vertically align items */
-  padding: 15px 0; /* Add some vertical padding */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
 }
 .airline-info-with-logo {
-  display: flex; /* Arrange logo and airline details horizontally */
-  align-items: center; /* Vertically align items */
-  gap: 10px; /* Space between logo and text */
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .airline-details {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-left: auto; /* Pushes it to the right inside a flex container */
+  margin-left: auto;
 }
 .airline-details strong {
-  font-size: 22px; /* Adjust font size */
+  font-size: 22px;
   font: bold;
 }
 .airline-details .aircraft {
-  font-size: 12px; /* Adjust font size */
-  color: #555; /* Adjust color */
+  font-size: 12px;
+  color: #555;
 }
 .icon-group-row-1 {
-  display: flex; /* Arrange plane icon and service icons horizontally */
-  align-items: center; /* Vertically align items */
-  gap: 15px; /* Adjusted space between plane icon and service icons group */
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 .icon-group-row-1 > .fa-solid.fa-plane {
-  font-size: 20px; /* Adjust size */
-  color: #111; /* Adjust color */
+  font-size: 20px;
+  color: #111;
 }
 .flight-icon-group.separated {
   display: flex;
-  gap: 15px; /* Space between service icons */
-  align-items: center; /* Vertically align icons */
+  gap: 15px;
+  align-items: center;
   border-left: none;
   padding-left: 0;
 }
 .flight-icon-group.separated i {
-  color: #111; /* Adjust icon color */
+  color: #111;
 }
 .flight-icon-group.separated i:first-child {
-  border-left: 2px solid #dcdcdc; /* Thicker separator line before the first icon */
-  padding-left: 15px; /* Space to the left of the thicker separator */
+  border-left: 2px solid #dcdcdc;
+  padding-left: 15px;
 }
 .flight-icon-group.separated i:not(:first-child) {
-  border-left: 1px solid #dcdcdc; /* Thinner separator line before each subsequent icon */
-  padding-left: 15px; /* Space to the left of the thinner separator */
+  border-left: 1px solid #dcdcdc;
+  padding-left: 15px;
 }
 /* Styles for the third row (times and plane line) */
 .details-row-2 {
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding-top: 15px;
-  gap: 30px; 
+  gap: 30px;
 }
 .details-row-2 > div {
-  margin: 0; 
+  margin: 0;
 }
 .flight-time-info-left, .flight-time-info-right {
   display: flex;
-  flex-direction: column; 
-  align-items: center; 
+  flex-direction: column;
+  align-items: center;
 }
 .flight-time {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
 }
 .flight-time strong,
 .flight-time span {
   margin: 0 !important;
-  padding: 0 2px !important; 
+  padding: 0 2px !important;
 }
 .plane-line-middle {
   display: flex;
@@ -468,7 +526,7 @@
   flex-grow: 0;
   justify-content: center;
   margin: 0 !important;
-  padding: 0 2px !important; 
+  padding: 0 2px !important;
 }
 .plane-line-middle .dot,
 .horizontal-line,
@@ -477,8 +535,8 @@
   padding: 0 !important;
 }
 .airline-picture {
-  width: 100%;             
-  max-width: 1000px;         
+  width: 100%;
+  max-width: 1000px;
   height: auto;
   object-fit: contain;
   display: block;

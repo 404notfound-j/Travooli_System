@@ -1,3 +1,143 @@
+<?php
+// payment_complete.php
+session_start();
+include 'connection.php'; // Include your database connection file
+
+// --- Retrieve booking ID ---
+// Priority: 1. From URL (after successful payment) 2. Latest for logged-in user if no URL ID
+$bookingIdFromURL = $_GET['bookingId'] ?? null;
+
+$bookingIdToQuery = $bookingIdFromURL; // Primary source
+if (empty($bookingIdToQuery) && isset($_SESSION['user_id'])) {
+    $latestBookingQuery = "SELECT flight_booking_id FROM flight_booking_t WHERE user_id = ? ORDER BY booking_date DESC LIMIT 1";
+    $stmtLatestBooking = mysqli_prepare($connection, $latestBookingQuery);
+    if ($stmtLatestBooking) {
+        mysqli_stmt_bind_param($stmtLatestBooking, "s", $_SESSION['user_id']);
+        mysqli_stmt_execute($stmtLatestBooking);
+        $resultLatestBooking = mysqli_stmt_get_result($stmtLatestBooking);
+        if ($rowLatestBooking = mysqli_fetch_assoc($resultLatestBooking)) {
+            $bookingIdToQuery = $rowLatestBooking['flight_booking_id'];
+        }
+        mysqli_stmt_close($stmtLatestBooking);
+    } else {
+        error_log("DB Query prep failed for latest booking in payment_complete.php: " . mysqli_error($connection));
+    }
+}
+
+
+// --- Initialize all booking data variables (will be populated from DB) ---
+$ticketPrice = 0;
+$baggagePrice = 0;
+$mealPrice = 0;
+$taxPrice = 0;
+$finalTotalPrice = 0;
+$numPassenger = 0;
+$selectedSeatsDisplay = [];
+$classId = 'PE';
+$classLabel = 'Premium Economy';
+
+
+$flightDetailsDB = [];
+
+
+// --- Main DB Query to get ALL booking and flight info ---
+if (!empty($bookingIdToQuery)) {
+    $query = "SELECT
+                fb.flight_booking_id, fb.user_id, fb.flight_id, fb.booking_date, fb.status AS booking_status,
+                ft.departure_time, ft.arrival_time, ft.orig_airport_id, ft.dest_airport_id,
+                a.airline_name, a.airline_id,
+                -- Data from flight_booking_info_t
+                fbi.total_amount_paid, fbi.ticket_base_price, fbi.baggage_fees,
+                fbi.meal_fees, fbi.tax_amount, -- REMOVED: fbi.discount_amount from SELECT list (as per your request)
+                fbi.num_passenger, fbi.selected_seat_numbers, fbi.class_id AS booking_class_id,
+                fbi.flight_date
+              FROM flight_booking_t fb
+              JOIN flight_info_t ft ON fb.flight_id = ft.flight_id
+              JOIN airline_t a ON ft.airline_id = a.airline_id
+              JOIN flight_booking_info_t fbi ON fb.flight_booking_id = fbi.flight_booking_id
+              WHERE fb.flight_booking_id = ?";
+    
+    $stmt = mysqli_prepare($connection, $query);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "s", $bookingIdToQuery);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        
+        if ($row = mysqli_fetch_assoc($result)) {
+            $flightDetailsDB[] = $row;
+
+            $ticketPrice = $row['ticket_base_price'];
+            $baggagePrice = $row['baggage_fees'];
+            $mealPrice = $row['meal_fees'];
+            $taxPrice = $row['tax_amount'];
+            $finalTotalPrice = $row['total_amount_paid'];
+            $numPassenger = $row['num_passenger'];
+            $classId = $row['booking_class_id'];
+            $classLabel = $classLabelMap[$classId] ?? 'Unknown';
+
+            $selectedSeatsDisplay = explode(',', $row['selected_seat_numbers']);
+
+        } else {
+            error_log("No booking found for ID: " . $bookingIdToQuery);
+        }
+        mysqli_stmt_close($stmt);
+    } else {
+        error_log("DB Query prep failed in payment_complete.php: " . mysqli_error($connection));
+    }
+}
+
+
+// --- Fetch User's Name and Profile Photo ---
+$userName = "Guest";
+$userProfilePhotoSrc = 'images/default_profile.png';
+$loggedInUserId = $_SESSION['user_id'] ?? null;
+
+if ($loggedInUserId) {
+    $userQuery = "SELECT fst_name, profile_pic FROM user_detail_t WHERE user_id = ?";
+    $stmtUser = mysqli_prepare($connection, $userQuery);
+    if ($stmtUser) {
+        mysqli_stmt_bind_param($stmtUser, "s", $loggedInUserId);
+        mysqli_stmt_execute($stmtUser);
+        $userResult = mysqli_stmt_get_result($stmtUser);
+        if ($userRow = mysqli_fetch_assoc($userResult)) {
+            $userName = htmlspecialchars($userRow['fst_name']);
+            if (!empty($userRow['profile_pic'])) {
+                $userProfilePhotoSrc = 'getProfileImage.php?user_id=' . urlencode($loggedInUserId);
+            }
+        }
+        mysqli_stmt_close($stmtUser);
+    }
+}
+
+
+// Use a default flight if DB query failed (no booking ID or DB error)
+if (empty($flightDetailsDB)) {
+    $flightDetailsDB[] = [
+        'flight_booking_id' => $bookingIdToQuery ?? 'N/A',
+        'flight_id' => 'N/A',
+        'booking_date' => date('Y-m-d H:i:s'),
+        'departure_time' => '00:00:00', 'arrival_time' => '00:00:00',
+        'orig_airport_id' => 'N/A',
+        'dest_airport_id' => 'N/A',
+        'flight_date' => date('Y-m-d'),
+        'duration' => '00:00',
+        'airline_name' => 'Travooli Airlines',
+        'airline_id' => 'TR',
+        // Default values for info fields
+        'total_amount_paid' => 0, 'ticket_base_price' => 0, 'baggage_fees' => 0,
+        'meal_fees' => 0, 'tax_amount' => 0, 
+        // REMOVED: 'discount_amount' => 0, // Removed from defaults as well
+        'num_passenger' => 0, 'selected_seat_numbers' => '', 'booking_class_id' => 'PE'
+    ];
+    // Also reset main price vars to 0 if defaults are used
+    $ticketPrice = $baggagePrice = $mealPrice = $taxPrice = $finalTotalPrice = 0;
+    $numPassenger = 0;
+    $selectedSeatsDisplay = [];
+    $classId = 'PE';
+    $classLabel = 'Premium Economy';
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +146,7 @@
   <title>Travooli - Payment Complete</title>
   <link rel="stylesheet" href="css/payment_complete.css">
   <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,900&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..1000&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,500,600,700,900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,45 +155,11 @@
     <header>
         <?php include 'userHeader.php';?>
     </header>
-    <?php
-include 'connection.php';
-if (isset($_GET['classId'])) $_SESSION['selectedClass'] = $_GET['classId'];
-$classId = $_SESSION['selectedClass'] ?? 'PE'; 
-$classLabelMap = [
-    'EC' => 'Economy Class',
-    'PE' => 'Premium Economy',
-    'BC' => 'Business Class',
-    'FC' => 'First Class'
-];
-$classLabel = $classLabelMap[$classId] ?? 'Unknown';
-$bookingIds = $_SESSION['booking_ids'] ?? [];
-if (empty($bookingIds)) {
-    echo "<p>No booking info found.</p>";
-    exit;
-}
-
-$flightDetails = [];
-foreach ($bookingIds as $bookingId) {
-    $query = "SELECT fb.f_book_id, fb.flight_id, fb.book_date, ud.fst_name, ud.lst_name,
-                     ft.departure_time, ft.arrival_time, ft.orig_airport_id, ft.dest_airport_id,
-                     ft.date AS flight_date,
-                     a.airline_name
-              FROM flight_booking_t fb
-              JOIN flight_info_t ft ON fb.flight_id = ft.flight_id
-              JOIN airline_t a ON ft.airline_id = a.airline_id
-              JOIN user_detail_t ud ON fb.user_id = ud.user_id
-              WHERE fb.f_book_id = '$bookingId'";
-    $result = mysqli_query($connection, $query);
-    if ($row = mysqli_fetch_assoc($result)) {
-        $flightDetails[] = $row;
-    }
-}
-?>
   <main class="container">
-    <h1 class="title">Have a good trip, <?= $flightDetails[0]['fst_name'] ?? 'Guest' ?>!</h1>
+    <h1 class="title">Have a good trip, <?= $userName ?>!</h1>
     <p class="reference">Booking Reference:
       <span>
-        <?= count($bookingIds) > 1 ? implode(", ", $bookingIds) : $bookingIds[0] ?>
+        <?= $flightDetailsDB[0]['flight_booking_id'] ?? ($bookingIdToQuery ?? 'N/A') ?>
       </span>
     </p>
     <p class="description">
@@ -61,7 +167,7 @@ foreach ($bookingIds as $bookingId) {
         Below is a summary of your trip.
         A copy of your booking confirmation has been sent to your email address. You can always revisit this information in the My Trips section of our app. Safe travels!
     </p>
-    <?php foreach ($flightDetails as $index => $flight): ?>
+    <?php foreach ($flightDetailsDB as $index => $flight): ?>
     <section class="layout flex-layout">
       <div class="ticket">
         <div class="flight-times">
@@ -73,7 +179,7 @@ foreach ($bookingIds as $bookingId) {
             <div class="line"></div>
             <i class="fas fa-plane"></i>
             <div class="line"></div>
-          </div> 
+          </div>
           <br>
           <br>
           <div class="arrival">
@@ -83,17 +189,17 @@ foreach ($bookingIds as $bookingId) {
         </div>
         <div class="boarding-pass">
           <div class="passenger-info">
-            <img src="icon/avatar.svg" alt="Passenger" class="avatar">
+            <img src="<?= $userProfilePhotoSrc ?>" alt="User Profile Photo" class="avatar">
             <div>
-              <h3><?= $flight['fst_name'] . ' ' . $flight['lst_name'] ?></h3>
-              <p>Boarding Pass <?= $flight['f_book_id'] ?></p>
+              <h3><?= $userName ?></h3>
+              <p>Boarding Pass <?= $flight['flight_booking_id'] ?? ($bookingIdToQuery ?? 'N/A') ?></p>
             </div>
-            <?php echo "<div class='ticket-class' style='margin-left: 100px;'>$classLabel ($classId)</div>"; ?>
+            <?php echo "<div class='ticket-class' style='margin-left: 100px;'>{$classLabel} ({$classId})</div>"; ?>
           </div>
           <div class="flight-details">
             <div class="detail">
               <div class="icon"><img src="icon/calendar1.svg" alt="Calendar"></div>
-              <div><p>Date</p><span><?= $flight['flight_date'] ?></span></div>
+              <div><p>Date</p><span><?= date("Y-m-d", strtotime($flight['flight_date'])) ?></span></div> 
             </div>
             <div class="detail">
               <div class="icon"><img src="icon/timmer.svg" alt="Clock"></div>
@@ -105,12 +211,12 @@ foreach ($bookingIds as $bookingId) {
             </div>
             <div class="detail">
               <div class="icon"><img src="icon/seat.svg" alt="Seat"></div>
-              <div><p>Seat</p><span>128</span></div>
+              <div><p>Seat</p><span><?= !empty($selectedSeatsDisplay) ? implode(", ", $selectedSeatsDisplay) : 'N/A' ?></span></div>
             </div>
           </div>
           <div class="flight-code">
             <div class="flight-code-content">
-            <?php echo "<h3>{$row['airline_name']}</h3>"; ?>
+            <h3><?= $flight['airline_name'] ?></h3>
               <p><?= $flight['flight_id'] ?></p>
             </div>
             <img src="icon/barcode.svg" alt="Barcode" class="barcode">
@@ -121,11 +227,11 @@ foreach ($bookingIds as $bookingId) {
   <div class="price-breakdown">
     <h3>Price breakdown</h3>
     <div class="price-items">
-      <div class="price-item"><span>Flight-price</span><span>RM 340</span></div>
-      <div class="price-item"><span>Baggage fees</span><span>RM 20</span></div>
-      <div class="price-item"><span>Multi-meal</span><span>RM 30</span></div>
-      <div class="price-item"><span>Taxes and Fees</span><span>RM 121</span></div>
-      <div class="price-total"><span>Amount Paid</span><span>RM 491</span></div>
+      <div class="price-item"><span>Flight Price</span><span>RM <?= number_format($ticketPrice, 2) ?></span></div>
+      <div class="price-item"><span>Baggage Fees</span><span>RM <?= number_format($baggagePrice, 2) ?></span></div>
+      <div class="price-item"><span>Meal Add-on</span><span>RM <?= number_format($mealPrice, 2) ?></span></div>
+      <div class="price-item"><span>Taxes and Fees</span><span>RM <?= number_format($taxPrice, 2) ?></span></div>
+      <div class="price-total"><span>Amount Paid</span><span>RM <?= number_format($finalTotalPrice, 2) ?></span></div>
     </div>
   </div>
   <?php endif; ?>
@@ -163,5 +269,3 @@ foreach ($bookingIds as $bookingId) {
 <?php include 'u_footer_1.php'; ?>
 <?php include 'u_footer_2.php'; ?>
 <script src="js/flight_Complete.js"></script>
-</body>
-</html>

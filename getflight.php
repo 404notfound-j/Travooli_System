@@ -1,15 +1,18 @@
 <?php
 include 'connection.php';
 
+error_log(json_encode($_POST));
+
+
 // Get POST data
 $origin = $_POST['origin'] ?? null;
 $destination = $_POST['destination'] ?? null;
 $seatClass = $_POST['seatClass'] ?? null;
-$date = $_POST['date'] ?? null;
-$timeFrom = $_POST['timeFrom'] ?? null;
-$timeTo = $_POST['timeTo'] ?? null;
+$timeFrom = ($_POST['timeFrom'] ?? '00:00:00') ; // ensures 'HH:MM:SS'
+$timeTo = ($_POST['timeTo'] ?? '23:59:00');     // ensures end of minute
 $sortBy = $_POST['sortBy'] ?? null;
 $airlinesInput = $_POST['airlines'] ?? null;
+
 
 // Start base query
 $query = "
@@ -95,6 +98,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $flights[] = $row;
 }
 
+header('Content-Type: application/json');
 echo json_encode($flights);
 
 mysqli_stmt_close($stmt);

@@ -1,126 +1,137 @@
 <?php
+// insertFlightPayment.php
 session_start();
-include 'connection.php';
+require_once 'connection.php'; // Include your database connection file
 
-// Step 1: Get user session
-$username = $_SESSION['username'] ?? null;
-if (!$username) {
-    echo "User not logged in.";
-    exit;
+header('Content-Type: application/json'); // Set header to return JSON
+
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Do not display errors to the user, but log them
+
+// Ensure request method is POST and content type is JSON
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(['success' => false, 'error' => 'Invalid request method.']);
+    exit();
 }
 
-// Step 2: Get user_id by matching full name
-$userQuery = "SELECT user_id FROM user_detail_t WHERE CONCAT(fst_name, ' ', lst_name) = ?";
-$stmt = mysqli_prepare($connection, $userQuery);
-mysqli_stmt_bind_param($stmt, "s", $username);
-mysqli_stmt_execute($stmt);
-$userResult = mysqli_stmt_get_result($stmt);
-$userRow = mysqli_fetch_assoc($userResult);
-mysqli_stmt_close($stmt);
+$input = file_get_contents('php://input');
+$data = json_decode($input, true); // Decode JSON as associative array
 
-if (!$userRow) {
-    echo "User ID not found.";
-    exit;
+if (json_last_error() !== JSON_ERROR_NONE) {
+    error_log("JSON Decode Error: " . json_last_error_msg() . " Input: " . $input);
+    echo json_encode(['success' => false, 'error' => 'Invalid JSON received: ' . json_last_error_msg()]);
+    exit();
 }
 
-$userId = $userRow['user_id'];
+// Extract data from the received JSON
+$userId = $data['user_id'] ?? null;
+$flightId = $data['flight_id'] ?? null;
+$bookingDate = $data['booking_date'] ?? null;
+$status = $data['status'] ?? 'Confirmed';
 
-// Step 3: Get flight ID(s) from session
-$departId = $_SESSION['selected_depart_flight_id'] ?? null;
-$returnId = $_SESSION['selected_return_flight_id'] ?? null;
-$oneWayFlightId = $_SESSION['selected_flight_id'] ?? null;
+// --- Extract additional data for flight_booking_info_t ---
+$classId = $data['class_id'] ?? null;
+$selectedSeats = $data['selected_seats'] ?? [];
+$totalAmountPaid = $data['total_amount'] ?? 0;
 
-// Store seat class in session if provided (optional, used for logic only)
-$data = json_decode(file_get_contents("php://input"), true);
-$_SESSION['selectedClass'] = $data['seat_class'] ?? 'PE';
+$ticketBasePrice = $data['ticket'] ?? 0;
+$baggageFees = $data['baggage'] ?? 0;
+$mealFees = $data['meal'] ?? 0;
+$taxAmount = $data['taxPrice'] ?? 0;
+// $discountAmount = $data['discount'] ?? 0; // Removed as it's not in DB table
 
-// Validate at least one flight is selected
-if (!$departId && !$returnId && !$oneWayFlightId) {
-    echo "No flight selected.";
-    exit;
+$numPassenger = $data['num_passenger'] ?? 0;
+
+$flightDate = $data['flight_date'] ?? null;
+
+$selectedSeatNumbersString = implode(',', $selectedSeats);
+
+// --- DEBUG LINE: Check received data in PHP ---
+error_log("DEBUG in insertFlightPayment.php: Received data: " . print_r($data, true));
+error_log("DEBUG: Data for info table: TotalPaid=" . $totalAmountPaid . ", Ticket=" . $ticketBasePrice . ", NumPass=" . $numPassenger . ", Seats=" . $selectedSeatNumbersString . ", FlightDate=" . $flightDate);
+// --- END DEBUG ---
+
+
+// Basic validation for core booking data
+if (empty($userId) || empty($flightId) || empty($bookingDate) || empty($totalAmountPaid) || empty($classId) || empty($selectedSeats) || empty($numPassenger) || empty($flightDate)) {
+    error_log("ERROR in insertFlightPayment.php: Missing required booking data. Received: " . print_r($data, true));
+    echo json_encode(['success' => false, 'error' => 'Missing required booking data.']);
+    exit();
 }
 
-// Step 4: Prepare for booking insertion
-$lastBookingQuery = "SELECT f_book_id FROM flight_booking_t ORDER BY f_book_id DESC LIMIT 1";
-$bookingResult = mysqli_query($connection, $lastBookingQuery);
-$bookingRow = mysqli_fetch_assoc($bookingResult);
-$lastBookingIdNum = $bookingRow ? (int)substr($bookingRow['f_book_id'], 2) : 0;
+// Start transaction for atomicity
+mysqli_autocommit($connection, false);
 
-$bookDate = date('Y-m-d');
-$status = "confirmed";
-$bookingIds = [];
+try {
+    // 1. Generate a unique flight_booking_id in the format BKXXXXXXXXXX
+    $uniquePart = substr(md5(uniqid(rand(), true)), 0, 6);
+    $datePart = date('md');
+    $flightBookingId = 'BK' . $datePart . $uniquePart;
 
-// Step 5: Generate Booking ID helper
-function createBookingId(&$counter) {
-    $counter++;
-    return "FB" . str_pad($counter, 3, "0", STR_PAD_LEFT);
+    // 2. Insert into flight_booking_t
+    $bookingQuery = "INSERT INTO flight_booking_t (flight_booking_id, user_id, flight_id, booking_date, status) VALUES (?, ?, ?, ?, ?)";
+    $stmtBooking = mysqli_prepare($connection, $bookingQuery);
+    if (!$stmtBooking) {
+        throw new Exception('Booking query prepare failed: ' . mysqli_error($connection));
+    }
+    mysqli_stmt_bind_param($stmtBooking, "sssss", $flightBookingId, $userId, $flightId, $bookingDate, $status);
+    if (!mysqli_stmt_execute($stmtBooking)) {
+        throw new Exception('Booking insert failed: ' . mysqli_stmt_error($stmtBooking));
+    }
+    mysqli_stmt_close($stmtBooking);
+
+
+    // --- Insert into flight_booking_info_t (Corrected bind_param types) ---
+    $bookingInfoQuery = "INSERT INTO flight_booking_info_t (
+        flight_booking_id, total_amount_paid, ticket_base_price, baggage_fees, 
+        meal_fees, tax_amount, num_passenger, selected_seat_numbers, class_id, flight_date
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    $stmtInfo = mysqli_prepare($connection, $bookingInfoQuery);
+    if (!$stmtInfo) {
+        throw new Exception('Booking info query prepare failed: ' . mysqli_error($connection));
+    }
+    mysqli_stmt_bind_param(
+        $stmtInfo, "sddddddisss", // CORRECTED TYPE STRING: 10 characters (s d d d d d i s s s)
+        $flightBookingId, $totalAmountPaid, $ticketBasePrice, $baggageFees,
+        $mealFees, $taxAmount, $numPassenger, $selectedSeatNumbersString, $classId, $flightDate
+    );
+    if (!mysqli_stmt_execute($stmtInfo)) {
+        throw new Exception('Booking info insert failed: ' . mysqli_stmt_error($stmtInfo));
+    }
+    mysqli_stmt_close($stmtInfo);
+    // --- END NEW ---
+
+
+    // 3. Update flight_seats_t for each selected seat
+    $seatUpdateQuery = "UPDATE flight_seats_t SET is_booked = 1, pass_id = ? WHERE flight_id = ? AND class_id = ? AND seat_no = ?";
+    $stmtSeats = mysqli_prepare($connection, $seatUpdateQuery);
+    if (!$stmtSeats) {
+        throw new Exception('Seat update query prepare failed: ' . mysqli_error($connection));
+    }
+
+    foreach ($selectedSeats as $seatNo) {
+        mysqli_stmt_bind_param($stmtSeats, "ssss", $userId, $flightId, $classId, $seatNo);
+        if (!mysqli_stmt_execute($stmtSeats)) {
+            throw new Exception('Failed to update seat ' . $seatNo . ': ' . mysqli_stmt_error($stmtSeats));
+        }
+        if (mysqli_stmt_affected_rows($stmtSeats) === 0) {
+            throw new Exception('Seat ' . $seatNo . ' was not updated (possibly already booked or does not exist for this flight/class).');
+        }
+    }
+    mysqli_stmt_close($stmtSeats);
+
+    // If all operations succeeded, commit the transaction
+    mysqli_commit($connection);
+    echo json_encode(['success' => true, 'message' => 'Booking confirmed and seats updated. Booking ID: ' . $flightBookingId, 'bookingId' => $flightBookingId]);
+
+} catch (Exception $e) {
+    // If any operation failed, rollback the transaction
+    mysqli_rollback($connection);
+    error_log("Booking Transaction Failed: " . $e->getMessage());
+    echo json_encode(['success' => false, 'error' => 'Booking failed: ' . $e->getMessage()]);
+} finally {
+    mysqli_autocommit($connection, true); // Restore autocommit mode
+    mysqli_close($connection); // Close the database connection
 }
-
-// Step 6: Insert bookings
-if ($oneWayFlightId) {
-    $bookingId = createBookingId($lastBookingIdNum);
-    $insert = "INSERT INTO flight_booking_t (f_book_id, user_id, flight_id, book_date, status)
-               VALUES (?, ?, ?, ?, ?)";
-    $stmt = mysqli_prepare($connection, $insert);
-    mysqli_stmt_bind_param($stmt, "sssss", $bookingId, $userId, $oneWayFlightId, $bookDate, $status);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-    $bookingIds[] = $bookingId;
-}
-
-if ($departId && $returnId) {
-    // Depart booking
-    $departBookingId = createBookingId($lastBookingIdNum);
-    $insertDepart = "INSERT INTO flight_booking_t (f_book_id, user_id, flight_id, book_date, status)
-                     VALUES (?, ?, ?, ?, ?)";
-    $stmt = mysqli_prepare($connection, $insertDepart);
-    mysqli_stmt_bind_param($stmt, "sssss", $departBookingId, $userId, $departId, $bookDate, $status);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-    $bookingIds[] = $departBookingId;
-
-    // Return booking
-    $returnBookingId = createBookingId($lastBookingIdNum);
-    $insertReturn = "INSERT INTO flight_booking_t (f_book_id, user_id, flight_id, book_date, status)
-                     VALUES (?, ?, ?, ?, ?)";
-    $stmt = mysqli_prepare($connection, $insertReturn);
-    mysqli_stmt_bind_param($stmt, "sssss", $returnBookingId, $userId, $returnId, $bookDate, $status);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-    $bookingIds[] = $returnBookingId;
-}
-
-// Step 7: Payment Handling
-$amount = $data['amount'] ?? null;
-$payment_method = $data['payment_method'] ?? null;
-$payment_date = $data['payment_date'] ?? null;
-
-if (!$amount || !$payment_method || !$payment_date) {
-    echo "Missing payment information.";
-    exit;
-}
-
-// Step 8: Insert payment(s)
-$lastIdQuery = "SELECT f_payment_id FROM flight_payment_t ORDER BY f_payment_id DESC LIMIT 1";
-$result = mysqli_query($connection, $lastIdQuery);
-$row = mysqli_fetch_assoc($result);
-$lastId = $row ? (int)substr($row['f_payment_id'], 2) : 0;
-
-$splitAmount = number_format($amount / count($bookingIds), 2, '.', '');
-
-foreach ($bookingIds as $bookingId) {
-    $lastId++;
-    $newPaymentId = "FP" . str_pad($lastId, 3, "0", STR_PAD_LEFT);
-    $insertPayment = "INSERT INTO flight_payment_t (f_payment_id, f_book_id, payment_date, amount, payment_method, payment_status)
-                      VALUES (?, ?, ?, ?, ?, 'paid')";
-    $stmt = mysqli_prepare($connection, $insertPayment);
-    mysqli_stmt_bind_param($stmt, "sssss", $newPaymentId, $bookingId, $payment_date, $splitAmount, $payment_method);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-}
-
-// Step 9: Save to session
-$_SESSION['booking_ids'] = $bookingIds;
-
-echo "Booking and payment recorded successfully.";
-?>

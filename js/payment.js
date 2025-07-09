@@ -1,75 +1,73 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const total = sessionStorage.getItem('total_price') || '0';
-    const ticket = sessionStorage.getItem('ticket_price') || '0';
-    const baggage = sessionStorage.getItem('baggage_price') || '0';
-    const meal = sessionStorage.getItem('meal_price') || '0';
-    const label1 = sessionStorage.getItem('ticket_label') || 'Tickets';
-    const adults = parseInt(sessionStorage.getItem('adultCount')) || 1;
-    const children = parseInt(sessionStorage.getItem('childCount')) || 0;
-    // Update the price values
-    document.getElementById('flight-price').textContent = `RM ${ticket}`;
-    document.querySelector('.meal-price').textContent = `RM ${meal}`;
-    document.querySelector('.baggage-price').textContent = `RM ${baggage}`;
-    document.getElementById('total').textContent = `RM ${total}`;
-    document.getElementById('ticket-count-label').textContent = label1;
-    // Generate dynamic passenger label
+    const flightSearch = JSON.parse(sessionStorage.getItem('flightSearch') || '{}');
+
+    const total = parseFloat(flightSearch.finalTotalPrice || 0);
+    const ticket = parseFloat(flightSearch.ticketPrice || 0);
+    const baggage = parseFloat(flightSearch.baggagePrice || 0);
+    const meal = parseFloat(flightSearch.mealPrice || 0);
+    const taxPrice = parseFloat(flightSearch.taxPrice || 0);
+    // const discount = parseFloat(flightSearch.discount || 0); // REMOVED: No longer need to retrieve discount
+
+    const activeAdults = parseInt(flightSearch.activeAdults) || 1;
+    const activeChildren = parseInt(flightSearch.children) || 0;
+    const numPassengers = activeAdults + activeChildren;
+
+    const selectedSeats = JSON.parse(sessionStorage.getItem('selectedSeats') || '[]');
+    
+    const departId = flightSearch.depart || flightSearch.selectedFlight || '';
+    const returnId = flightSearch.return || '';
+    const classId = flightSearch.classId || '';
+
+    const flightDate = flightSearch.departDate || ''; // Get the departure date
+
+    const userId = window.currentUserId || null;
+
+    document.getElementById('flight-price').textContent = `RM ${ticket.toFixed(2)}`;
+    document.querySelector('.baggage-price').textContent = `RM ${baggage.toFixed(2)}`;
+    document.querySelector('.meal-price').textContent = `RM ${meal.toFixed(2)}`;
+    
+    const taxesFeesEl = document.querySelector('.price-item span[data-tax-display]');
+    if (taxesFeesEl) {
+        taxesFeesEl.textContent = `RM ${taxPrice.toFixed(2)}`;
+    } else {
+        const defaultTaxesEl = document.querySelector('.price-item:nth-child(4) span:nth-child(2)');
+        if(defaultTaxesEl) defaultTaxesEl.textContent = `RM ${taxPrice.toFixed(2)}`;
+    }
+
+    document.getElementById('total').textContent = `RM ${total.toFixed(2)}`;
+
     let label = 'Tickets (';
-    if (adults > 0) label += `${adults} Adult${adults > 1 ? 's' : ''}`;
-    if (children > 0) {
-      if (adults > 0) label += ', ';
-      label += `${children} Child${children > 1 ? 'ren' : ''}`;
+    if (activeAdults > 0) label += `${activeAdults} Adult${activeAdults > 1 ? 's' : ''}`;
+    if (activeChildren > 0) {
+      if (activeAdults > 0) label += ', ';
+      label += `${activeChildren} Child${activeChildren > 1 ? 'ren' : ''}`;
     }
     label += ')';
-    const ticketLabel = document.getElementById('ticket-count-label');
-    
 
-  // Payment method selection
+    const ticketLabel = document.getElementById('ticket-count-label');
     if (ticketLabel) ticketLabel.textContent = label;
-    document.getElementById('ticket-count-label').textContent = label;
+
     const paymentMethods = document.querySelectorAll('.payment-method');
     const radioButtons = document.querySelectorAll('.radio-button');
-    
-    paymentMethods.forEach((method, index) => {
-        method.addEventListener('click', function() {
-            // Remove selected class from all methods
-            paymentMethods.forEach(m => m.classList.remove('selected'));
-            radioButtons.forEach(r => r.classList.remove('selected'));
-            
-            // Add selected class to clicked method
-            this.classList.add('selected');
-            this.querySelector('.radio-button').classList.add('selected');
+    const proceedBtn = document.querySelector('.proceed-btn');
+    const cardFields = document.querySelectorAll('.card-input');
+
+    function setCardFieldsEnabled(enabled) {
+        cardFields.forEach(input => {
+            input.disabled = !enabled;
+            input.style.opacity = enabled ? '1' : '0.5';
         });
-    });
-    
-    // Form validation and interactions
-    const formInputs = document.querySelectorAll('.form-input');
-    
-    formInputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.style.borderColor = '#605dec';
-        });
-        
-        input.addEventListener('blur', function() {
-            if (this.value === '') {
-                this.style.borderColor = '#a1afcc';
-            }
-        });
-    });
-    
-    // Card number formatting
+    }
+
     const cardNumberInput = document.querySelector('input[placeholder="Card Number"]');
     if (cardNumberInput) {
         cardNumberInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
             let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-            if (formattedValue.length > 19) {
-                formattedValue = formattedValue.substring(0, 19);
-            }
-            e.target.value = formattedValue;
+            e.target.value = formattedValue.substring(0, 19);
         });
     }
-    
-    // Expiration date formatting
+
     const expiryInput = document.querySelector('input[placeholder="Expiration Date"]');
     if (expiryInput) {
         expiryInput.addEventListener('input', function(e) {
@@ -80,129 +78,118 @@ document.addEventListener('DOMContentLoaded', function () {
             e.target.value = value;
         });
     }
-    
-    // CVV input restriction
+
     const cvvInput = document.querySelector('input[placeholder="CVV"]');
     if (cvvInput) {
         cvvInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 4) {
-                value = value.substring(0, 4);
-            }
-            e.target.value = value;
+            e.target.value = value.substring(0, 3);
         });
     }
-    
-    // Button interactions
-    const backButton = document.querySelector('.back-button');
-    const confirmButton = document.querySelector('.confirm-button');
-    
-    if (backButton) {
-        backButton.addEventListener('click', function() {
-            alert('Navigating back to seat selection...');
-        });
-    }
-    
-    if (confirmButton) {
-        confirmButton.addEventListener('click', function() {
-            // Basic form validation
-            const nameInput = document.querySelector('input[placeholder="Name"]');
-            const cardInput = document.querySelector('input[placeholder="Card Number"]');
-            const expiryInput = document.querySelector('input[placeholder="Expiration Date"]');
-            const cvvInput = document.querySelector('input[placeholder="CVV"]');
-            
-            if (!nameInput.value || !cardInput.value || !expiryInput.value || !cvvInput.value) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            alert('Processing payment... This is a demo, no actual payment will be processed.');
-        });
-    }
-    
-    // Smooth scrolling for mobile
-    if (window.innerWidth <= 768) {
-        const confirmButtonContainer = document.querySelector('.confirm-button-container');
-        if (confirmButtonContainer) {
-            confirmButtonContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    function checkCardValidity() {
+        const selectedMethod = document.querySelector('.payment-method.selected .method-name')?.textContent.trim();
+        if (!selectedMethod) return false;
+        if (selectedMethod === "Debit/Credit Card") {
+            return Array.from(cardFields).every(input => input.value.trim() !== '');
         }
+        return true;
     }
-    
-    // Add loading states for buttons
-    function addLoadingState(button, originalText) {
-        button.disabled = true;
-        button.textContent = 'Loading...';
-        button.style.opacity = '0.7';
-        
-        setTimeout(() => {
-            button.disabled = false;
-            button.textContent = originalText;
-            button.style.opacity = '1';
-        }, 2000);
+
+    function updateProceedButtonState() {
+        proceedBtn.disabled = !checkCardValidity();
+        if (proceedBtn.disabled) {
+            proceedBtn.classList.add('disabled');
+          } else {
+            proceedBtn.classList.remove('disabled');
+          }          
     }
-    
-    // Enhanced button click handlers
-    if (confirmButton) {
-        confirmButton.addEventListener('click', function() {
-            addLoadingState(this, 'Confirm and pay');
+
+    paymentMethods.forEach((method) => {
+        method.addEventListener('click', function() {
+            paymentMethods.forEach(m => m.classList.remove('selected'));
+            radioButtons.forEach(r => r.classList.remove('selected'));
+            this.classList.add('selected');
+            this.querySelector('.radio-button').classList.add('selected');
+
+            const isCard = this.querySelector('.method-name')?.textContent.includes("Card");
+            setCardFieldsEnabled(isCard);
+            updateProceedButtonState();
         });
-    }
-    document.querySelector('.proceed-btn').addEventListener('click', function () {
+    });
+
+    cardFields.forEach(input => {
+        input.addEventListener('input', updateProceedButtonState);
+    });
+
+    setCardFieldsEnabled(false); // Initially disable card fields if not default selected
+    updateProceedButtonState(); // Update button state on load
+
+    document.querySelector('.proceed-btn')?.addEventListener('click', function () {
         const selectedMethod = document.querySelector('.payment-method.selected .method-name')?.textContent.trim();
 
-        // If Credit/Debit Card selected, validate card fields
-        if (selectedMethod === "Debit/Credit Card") {
-            const nameInput = document.querySelector('input[placeholder="Name"]');
-            const cardInput = document.querySelector('input[placeholder="Card Number"]');
-            const expiryInput = document.querySelector('input[placeholder="Expiration Date"]');
-            const cvvInput = document.querySelector('input[placeholder="CVV"]');
-    
-            if (!nameInput.value || !cardInput.value || !expiryInput.value || !cvvInput.value) {
-                alert('Please complete all card details before proceeding.');
-                return;
-            }
+        if (selectedMethod === "Debit/Credit Card" && !checkCardValidity()) {
+            alert('Please complete all card details before proceeding.');
+            return;
         }
-        const amountText = document.getElementById('total').textContent;
-        const amount = amountText.replace(/[^\d.]/g, '');
-        const paymentMethodElement = document.querySelector('.payment-method.selected .method-name');
-        const paymentMethod = paymentMethodElement ? paymentMethodElement.textContent.trim() : '';
-        const departId = document.getElementById('depart_flight_id')?.value;
-        const returnId = document.getElementById('return_flight_id')?.value;
-        const classId = document.getElementById('seat_class_field')?.value;
-    
+
+        if (!userId) {
+            alert('User not logged in. Please log in to complete the booking.');
+            return;
+        }
+
+        const amount = total; 
+        const paymentMethod = selectedMethod;
         const today = new Date();
         const paymentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    
-        console.log("Preparing payment data:");
-        console.log("Amount:", amount);
-        console.log("Payment Method:", paymentMethod);
-        console.log("Payment Date:", paymentDate);
-        console.log("Depart Flight ID:", departId);
-        console.log("Return Flight ID:", returnId);
-        console.log("Seat Class:", classId);
-    
+
+        const bookingData = {
+            user_id: userId,
+            flight_id: departId,
+            booking_date: paymentDate,
+            status: 'Confirmed', 
+            class_id: classId, 
+            selected_seats: selectedSeats, 
+            total_amount: amount,
+            
+            ticket: ticket, 
+            baggage: baggage,
+            meal: meal,
+            taxPrice: taxPrice,
+            // REMOVED: discount: discount, // No longer send discount data
+            activeAdults: activeAdults, 
+            activeChildren: activeChildren, 
+            num_passenger: numPassengers, 
+            flight_date: flightDate 
+        };
+
+        console.log("DEBUG in payment.js: Sending bookingData:", bookingData);
+
         fetch('insertFlightPayment.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                amount,
-                payment_method: paymentMethod,
-                payment_date: paymentDate,
-                depart_id: departId,
-                return_id: returnId,
-                class_id: classId
-            })
+            body: JSON.stringify(bookingData)
         })
-        .then(res => res.text())
+        .then(res => res.json())
         .then(response => {
             console.log("Server Response:", response);
-            window.location.href = 'payment_complete.php';
+            if (response.success) {
+                alert('Payment successful and booking confirmed!');
+                sessionStorage.removeItem('flightSearch'); 
+                sessionStorage.removeItem('selectedSeats'); 
+                
+                sessionStorage.removeItem('lastBookingDetails'); 
+                sessionStorage.removeItem('lastSelectedSeats'); 
+                sessionStorage.removeItem('lastTotalAmount'); 
+        
+                window.location.href = `payment_complete.php?bookingId=${response.bookingId}`; 
+            } else {
+                alert('Payment failed: ' + (response.error || 'Unknown error.'));
+            }
         })
         .catch(err => {
             console.error("Error:", err);
-            alert("Payment failed. Please try again.");
+            alert("An error occurred during payment. Please try again.");
         });
-    });    
+    });
 });
-
-  

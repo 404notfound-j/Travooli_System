@@ -7,10 +7,7 @@
     <link rel="stylesheet" href="css/meal_popup.css">
 </head>
 <body>
-<div class="popup-bg">
-    <div class="popup">
-        <div class="popup-close" onclick="this.closest('.popup-bg').style.display='none'">
-            <img src="icon/Close_square_light.svg" alt="Close" width="24" height="24">
+<div class="popup"> <div class="popup-close"> <img src="icon/Close_square_light.svg" alt="Close" width="24" height="24">
         </div>
         <div class="popup-container">
             <div class="popup-title">Meal Add-on</div>
@@ -47,8 +44,5 @@
             </div>
         </div>
     </div>
-</div>
-
-<script src="js/meal_popup.js"></script>
 </body>
 </html>

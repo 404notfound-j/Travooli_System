@@ -449,3 +449,11 @@ hr {
 .proceed-btn:hover {
     background-color: #4f4cee;
 }
+
+.proceed-btn.disabled,
+.proceed-btn:disabled {
+  background-color: #4644a2 !important;
+  color: #afafaf !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}

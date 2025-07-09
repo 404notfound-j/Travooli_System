@@ -1,3 +1,15 @@
+<?php
+session_start();
+require_once 'connection.php'; // Ensure connection.php is included
+
+$isLoggedIn = isset($_SESSION['user_id']);
+$userId = $isLoggedIn ? $_SESSION['user_id'] : null; // Get user ID if logged in
+
+// --- DEBUG LINE: Check Session User ID in PHP before passing to JS ---
+error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? 'NOT SET') . ", userId variable: " . ($userId ?? 'NULL in PHP'));
+// --- END DEBUG ---
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,20 +22,10 @@
 <body>
     <header>        
         <?php include 'userHeader.php';?>
-        <?php
-          if (isset($_GET['depart'])) $_SESSION['selected_depart_flight_id'] = $_GET['depart'];
-          if (isset($_GET['return'])) $_SESSION['selected_return_flight_id'] = $_GET['return'];
-          if (isset($_GET['flightId'])) $_SESSION['selected_flight_id'] = $_GET['flightId'];
-          if (isset($_GET['classId'])) $_SESSION['selectedClass'] = $_GET['classId'];
-        ?>
-<input type="hidden" id="depart_flight_id" value="<?= $_SESSION['selected_depart_flight_id'] ?? $_SESSION['selected_flight_id'] ?? '' ?>">
-<input type="hidden" id="return_flight_id" value="<?= $_SESSION['selected_return_flight_id'] ?? '' ?>">
-<input type="hidden" id="seat_class_field" value="<?= $_SESSION['selectedClass'] ?? 'PE' ?>">
     </header>
     <main class="main-content">
         <div class="container">
             <div class="content-grid">
-                <!-- Left Column -->
                 <div class="left-column">
                     <h2 class="section-title">Payment method</h2>
                     
@@ -39,7 +41,7 @@
                                     <img src="icon/card.svg" alt="Credit Card" class="method-icon">
                                     <div class="method-name">Debit/Credit Card</div>
                                 </div>
-                                <div class="radio-button selected"></div>
+                                <div class="radio-button"></div>
                             </div>
                             
                             <div class="method-divider"></div>
@@ -84,9 +86,8 @@
                         </div>
                     </div>
 
-                    <!-- Credit Card Details -->
                     <div class="card-details-header">
-                        <h3 class="card-details-title">Credit card details</h3>
+                        <h3 class="card-details-title">Card details</h3>
                         <div class="save-card-toggle">
                             <div class="switch">
                                 <input type="checkbox" id="save-card" class="switch-input">
@@ -97,25 +98,24 @@
                     </div>
 
                     <div class="card-form">
-                        <input type="text" class="form-input" placeholder="Name">
-                        <input type="text" class="form-input" placeholder="Card Number">
-                        
+                        <input type="text" class="form-input card-input" placeholder="Name">
+                        <input type="text" class="form-input card-input" placeholder="Card Number">
+
                         <div class="form-row">
                             <div class="expiry-field">
-                                <input type="text" class="form-input" placeholder="Expiration Date">
+                                <input type="text" class="form-input card-input" placeholder="Expiration Date">
                                 <div class="field-hint">MM/YY</div>
                             </div>
                             <div class="cvv-field">
                                 <div class="cvv-input-wrapper">
-                                    <input type="text" class="form-input" placeholder="CVV">
-                                    <div class="cvv-icon">
-                                    </div>
+                                    <input type="text" class="form-input card-input" placeholder="CVV">
+                                    <div class="cvv-icon"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Cancellation Policy -->
+
                     <div class ="cancel-flight">
                         <h1>Cancellation Policy</h1>
                         <p>
@@ -129,7 +129,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Right Column -->
                 <div class="right-column">
                 <div class="price-card">
                     <h2>Price Details</h2>
@@ -148,7 +147,7 @@
                 </div>
                 <div class="price-item">
                     <span>Taxes & Fees</span>
-                    <span>RM 121</span>
+                    <span data-tax-display>RM 121</span>
                 </div>
                 <div class="price-item">
                     <span>Discount</span>
@@ -160,11 +159,14 @@
                     <span id="total">RM 0</span>
                 </div>
             </div>
-                    <button class="proceed-btn">Proceed to Payment</button>
+            <button class="proceed-btn" id="proceed-btn" disabled>Proceed to Payment</button>
                 </div>
             </div>
         </div>
     </main>
+    <script>
+        window.currentUserId = <?php echo json_encode($userId); ?>;
+    </script>
     <script src="js/payment.js"></script>
 </body>
 </html>

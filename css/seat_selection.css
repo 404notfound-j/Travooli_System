@@ -286,6 +286,14 @@ hr {
     background-color: #4f4cee;
 }
 
+.proceed-btn.disabled,
+.proceed-btn:disabled {
+  background-color: #4644a2;
+  color: #afafaf;
+  cursor: not-allowed;
+}
+
+
 @media (max-width: 768px) {
     .layout {
         flex-direction: column;

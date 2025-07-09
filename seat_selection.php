@@ -1,63 +1,5 @@
 <?php
-// seat_selection.php
-session_start();
 include 'connection.php';
-
-$flight_id = $_GET['flight_id'] ?? '';
-$booking_id = $_GET['booking_id'] ?? '';
-$class_id = $_GET['class_id'] ?? '';
-$user_id = $_SESSION['user_id'] ?? 'U0001'; // temporary fallback for testing
-
-// Handle fetch of occupied seats
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'get') {
-    $stmt = $conn->prepare("SELECT seat_no FROM flight_seats_t WHERE flight_id = ? AND is_booked = 1");
-    $stmt->bind_param("s", $flight_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $occupiedSeats = [];
-    while ($row = $result->fetch_assoc()) {
-        $occupiedSeats[] = $row['seat_no'];
-    }
-
-    echo json_encode($occupiedSeats);
-    exit;
-}
-
-// Handle saving selected seats and booking
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'save') {
-    $seats = explode(',', $_POST['seats']);
-    $total_price = floatval($_POST['total_price'] ?? 0);
-    $class_id = $_POST['class_id'] ?? '';
-
-    // Insert into FLIGHT_BOOKING_T
-    $stmt = $conn->prepare("INSERT IGNORE INTO FLIGHT_BOOKING_T (flight_booking_id, user_id, flight_id, booking_date, status) VALUES (?, ?, ?, NOW(), 'Pending')");
-    $stmt->bind_param("sss", $booking_id, $user_id, $flight_id);
-    $stmt->execute();
-
-    // Insert selected seats
-    foreach ($seats as $seat) {
-        $seat = trim($seat);
-        $stmt = $conn->prepare("INSERT INTO SEAT_BOOKING_T (booking_id, flight_id, seat_number) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $booking_id, $flight_id, $seat);
-        $stmt->execute();
-    }
-
-    echo json_encode(['status' => 'success']);
-    exit;
-}
-
-// Get class name(s)
-$flight_classes = [];
-if (!empty($flight_id)) {
-    $stmt = $conn->prepare("SELECT sct.class_name FROM flight_seat_cls_t fsc JOIN seat_class_t sct ON fsc.class_id = sct.class_id WHERE fsc.flight_id = ?");
-    $stmt->bind_param("s", $flight_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
-        $flight_classes[] = $row['class_name'];
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +24,10 @@ if (!empty($flight_id)) {
             Please proceed to the seat selection option during your booking process
         </p>
 
-        <h3 class="subtitle"><?php echo implode(', ', array_map('htmlspecialchars', $flight_classes)); ?> </h3>
+        <h3 class="subtitle">
+            <span id="class-name">Class</span>
+        </h3>
+
 
         <div class="layout">
             <div class="seat-map">
@@ -106,11 +51,16 @@ if (!empty($flight_id)) {
                                 echo "<div class='row-number'>$r</div>";
                             } else {
                                 $id = $c . $r;
-                                echo "<div class='seat available' id='$id'></div>";
+                                echo "<div class='seat available' id='$id' data-seat-number='$id'></div>";
                             }
                         }
                     }
                     ?>
+                </div>
+
+                <div id="seat-selection-status">
+                    <p><strong><span id="seat-count">Loading...</span></strong></p>
+                    <p>Selected Seats: <span id="seat-list">-</span></p>
                 </div>
 
                 <div class="legend">
@@ -150,16 +100,9 @@ if (!empty($flight_id)) {
                     <span id="total">RM 0</span>
                 </div>
             </div>
-            <a href="payment.php" class="proceed-btn">Proceed to Payment</a>
+            <button class="proceed-btn" id="proceed-btn" disabled>Proceed to Payment</button>
+            </div>
 
-            <button class="proceed-btn">Proceed to Payment</button>
-        </div>
-
-
-    <script>
-        const flightId = "<?php echo $flight_id; ?>";
-        const bookingId = "<?php echo $booking_id; ?>";
-    </script>
     <script src="js/seat_selection.js"></script>
 </body>
 </html>
