@@ -1,6 +1,10 @@
 /* Import Poppins font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;400&display=swap');
 
+body, .report-chart-summary, .summary-box, .airlines-boxes-container, .airline-box, .airline-box-top, .airline-box-middle, .airline-box-bottom, .airline-info {
+    background: #d1fae5 !important;
+}
+
 .page-title {
     color: #4379EE;
     font-size: 32px;
@@ -37,33 +41,6 @@
     border-bottom: 2px solid #4379EE;
 }
 
-.filters {
-    display: flex;
-    gap: 8px;
-}
-
-.filter-select {
-    width: 98px;
-    height: 38px;
-    font-size: 15px;
-    font-family: 'Poppins', sans-serif;
-    color: #91AADF;
-    border: 1px solid #E0E7EF;
-    border-radius: 6px;
-    padding: 0 12px;
-    background: #fff;
-    outline: none;
-    appearance: none;
-    font-weight: 400;
-}
-
-.filter-select option {
-    font-size: 15px;
-    font-family: 'Poppins', sans-serif;
-    color: #91AADF;
-    font-weight: 400;
-}
-
 .sub-title {
     font-size: 18px;
     color: #4379EE;
@@ -80,6 +57,8 @@
     margin-top: 24px;
     gap: 60px;
     box-sizing: border-box;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .bar-chart-canvas {
@@ -182,4 +161,15 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+}
+
+.chart-scroll-xy {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    height: 350px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }

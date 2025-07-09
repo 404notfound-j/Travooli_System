@@ -1,8 +1,10 @@
 <?php
+
 ob_start();
 ?>
 
 <?php
+include 'connection.php';
 $type = isset($_GET['type']) ? $_GET['type'] : 'flight';
 
 if ($type === 'hotel') {
@@ -11,114 +13,73 @@ if ($type === 'hotel') {
     $tabInactive = "Flight Sales";
     $tabActiveLink = "sales.php?type=hotel";
     $tabInactiveLink = "sales.php?type=flight";
-    $items = [
-        [
-            'name' => 'AAA Hotel',
-            'image' => 'images/grand-hotel-logo.png',
-            'tickets_sold' => 120,
-            'revenue' => 'RM40,000'
-        ],
-        [
-            'name' => 'BBB Hotel',
-            'image' => 'images/grand-hotel-logo.png',
-            'tickets_sold' => 120,
-            'revenue' => 'RM63,000'
-        ],
-        [
-            'name' => 'CCC Hotel',
-            'image' => 'images/grand-hotel-logo.png',
-            'tickets_sold' => 120,
-            'revenue' => 'RM58,000'
-        ],
-        [
-            'name' => 'DDD Hotel',
-            'image' => 'images/grand-hotel-logo.png',
-            'tickets_sold' => 120,
-            'revenue' => 'RM90,000'
-        ],
-        [
-            'name' => 'EEE Hotel',
-            'image' => 'images/grand-hotel-logo.png',
-            'tickets_sold' => 120,
-            'revenue' => 'RM74,000'
-        ],
-        [
-            'name' => 'FFF Hotel',
-            'image' => 'images/grand-hotel-logo.png',
-            'tickets_sold' => 120,
-            'revenue' => 'RM58,000'
-        ],
-        [
-            'name' => 'GGG Hotel',
-            'image' => 'images/grand-hotel-logo.png',
-            'tickets_sold' => 120,
-            'revenue' => 'RM95,000'
-        ],
-        [
-            'name' => 'HHH Hotel',
-            'image' => 'images/grand-hotel-logo.png',
-            'tickets_sold' => 120,
-            'revenue' => 'RM43,000'
-        ]
 
+    $items = [];
+    $sql = "
+        SELECT 
+            h.hotel_id, 
+            h.name, 
+            COUNT(DISTINCT b.h_book_id) AS tickets_sold, 
+            COALESCE(SUM(p.amount), 0) AS revenue
+        FROM hotel_t h
+        LEFT JOIN hotel_booking_t b ON h.hotel_id = b.hotel_id
+        LEFT JOIN hotel_payment_t p ON b.h_book_id = p.h_book_id AND p.status = 'Paid'
+        GROUP BY h.hotel_id, h.name
+    ";
+    $result = mysqli_query($connection, $sql);
 
-    ];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $items[] = [
+            'name' => $row['name'],
+            'image' => 'images/grand-hotel-logo.png', 
+            'tickets_sold' => (int)$row['tickets_sold'],
+            'revenue' => 'RM' . number_format($row['revenue'], 2)
+        ];
+    }
+
+    $totalTickets = 0;
+    $totalRevenue = 0;
+    foreach ($items as $item) {
+        $totalTickets += $item['tickets_sold'];
+        $totalRevenue += floatval(str_replace(['RM', ','], '', $item['revenue']));
+    }
 } else {
     $pageTitle = "Flight Sales";
     $tabActive = "Flight Sales";
     $tabInactive = "Hotel Sales";
     $tabActiveLink = "sales.php?type=flight";
     $tabInactiveLink = "sales.php?type=hotel";
-    $items = [
-        [ 
-            'name' => 'AAA Airlines',
-            'image' => 'images/AK.png',
-            'tickets_sold' => 205,
-            'revenue' => 'RM63,500'
-        ],
-        [ 
-            'name' => 'BBB Airlines',
-            'image' => 'images/AK.png',
-            'tickets_sold' => 205,
-            'revenue' => 'RM54,500'
-        ],
-        [ 
-            'name' => 'CCC Airlines',
-            'image' => 'images/AK.png',
-            'tickets_sold' => 205,
-            'revenue' => 'RM66,500'
-        ],
-        [ 
-            'name' => 'DDD Airlines',
-            'image' => 'images/AK.png',
-            'tickets_sold' => 205,
-            'revenue' => 'RM78,500'
-        ],
-        [ 
-            'name' => 'EEE Airlines',
-            'image' => 'images/AK.png',
-            'tickets_sold' => 205,
-            'revenue' => 'RM84,500'
-        ],
-        [ 
-            'name' => 'FFF Airlines',
-            'image' => 'images/AK.png',
-            'tickets_sold' => 205,
-            'revenue' => 'RM45,500'
-        ],
-        [ 
-            'name' => 'GGG Airlines',
-            'image' => 'images/AK.png',
-            'tickets_sold' => 205,
-            'revenue' => 'RM58,500'
-        ],
-        [ 
-            'name' => 'HHH Airlines',
-            'image' => 'images/AK.png',
-            'tickets_sold' => 205,
-            'revenue' => 'RM74,500'
-        ]
-    ];
+
+    $items = [];
+    $sql = "
+        SELECT 
+            a.airline_name AS name,
+            'images/AK.png' AS image,
+            COUNT(DISTINCT b.f_book_id) AS tickets_sold,
+            COALESCE(SUM(p.amount), 0) AS revenue
+        FROM airline_t a
+        LEFT JOIN flight_info_t f ON a.airline_id = f.airline_id
+        LEFT JOIN flight_booking_t b ON f.flight_id = b.flight_id AND b.status = 'confirmed'
+        LEFT JOIN flight_payment_t p ON b.f_book_id = p.f_book_id
+        GROUP BY a.airline_id, a.airline_name
+    ";
+    $result = mysqli_query($connection, $sql);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $items[] = [
+            'name' => $row['name'],
+            'image' => $row['image'],
+            'tickets_sold' => (int)$row['tickets_sold'],
+            'revenue' => 'RM' . number_format($row['revenue'], 2)
+        ];
+    }
+
+    $totalTickets = 0;
+    $totalRevenue = 0;
+    foreach ($items as $item) {
+        $totalTickets += $item['tickets_sold'];
+        $totalRevenue += floatval(str_replace(['RM', ','], '', $item['revenue']));
+    }
 }
 ?>
 
@@ -139,27 +100,19 @@ if ($type === 'hotel') {
             <a href="salesReport.php?type=flight" class="tab<?php echo ($type === 'flight') ? ' active' : ''; ?>">Flight Sales</a>
             <a href="salesReport.php?type=hotel" class="tab<?php echo ($type === 'hotel') ? ' active' : ''; ?>">Hotel Sales</a>
         </div>
-        <div class="filters">
-            <select id="filter-type" class="filter-select">
-                <option value="yearly">Yearly</option>
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
-            </select>
-            <select id="filter-value" class="filter-select">
-                <option>Jan 2025</option>
-            </select>
-        </div>
     </div>
 
     <h2 class="sub-title">Detailed Report</h2>
     <div class="report-chart-summary">
-        <canvas id="salesBarChart" width="600" height="260"></canvas>
+        <div class="chart-scroll-xy">
+            <canvas id="salesBarChart" width="650" height="350"></canvas>
+        </div>
         <div class="summary-box">
             <div class="summary-item">
-                <span>Total Ticket Sold</span> : <span class="summary-value" id="totalTickets">RM 103,950</span>
+                <span>Total Ticket Sold</span> : <span class="summary-value" id="totalTickets"><?php echo $totalTickets; ?></span>
             </div>
             <div class="summary-item">
-                <span>Total Revenue</span> : <span class="summary-value" id="totalRevenue">RM 103,950</span>
+                <span>Total Revenue</span> : <span class="summary-value" id="totalRevenue">RM <?php echo number_format($totalRevenue, 2); ?></span>
             </div>
         </div>
     </div>

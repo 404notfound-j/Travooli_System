@@ -19,4 +19,11 @@ $records = [
         'date' => '25 Jan 2025',
     ]
 ];
+
+$perPage = 10;
+$totalRecords = count($records);
+$totalPages = ceil($totalRecords / $perPage);
+$page = isset($_GET['page']) ? max(1, min($totalPages, intval($_GET['page']))) : 1;
+$start = ($page - 1) * $perPage;
+$recordsToShow = array_slice($records, $start, $perPage);
 ?>

@@ -26,7 +26,7 @@ const salesBarChart = new Chart(ctx, {
             x: {
                 ticks: {
                     color: '#2B3034',
-                    font: { family: 'Poppins', size: 13 },
+                    font: { family: 'Poppins', size: 10 },
                     maxRotation: 45,
                     minRotation: 45
                 },

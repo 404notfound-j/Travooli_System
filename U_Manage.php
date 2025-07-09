@@ -3,16 +3,16 @@ ob_start();
 ?>
 
 <?php
-// Example user data (simulate database)
+include 'connection.php';
+
+// Fetch users from user_detail_t
 $users = [];
-for ($i = 1; $i <= 50; $i++) {
-    $users[] = [
-        'username' => "user$i",
-        'first_name' => "First$i",
-        'last_name' => "Last$i",
-        'email' => "user$i@example.com",
-        'last_login' => "25 Jan 2025 - 08:30"
-    ];
+$query = "SELECT user_id, fst_name, lst_name, email_address FROM user_detail_t";
+$result = mysqli_query($connection, $query);
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $users[] = $row;
+    }
 }
 
 // Pagination logic
@@ -39,7 +39,7 @@ $usersToShow = array_slice($users, $start, $perPage);
 <table class="user-table">
     <thead>
         <tr>
-            <th>Username</th>
+            <th>User ID</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
@@ -50,11 +50,10 @@ $usersToShow = array_slice($users, $start, $perPage);
     <tbody>
         <?php foreach ($usersToShow as $user): ?>
         <tr>
-            <td><?= htmlspecialchars($user['username']) ?></td>
-            <td><?= htmlspecialchars($user['first_name']) ?></td>
-            <td><?= htmlspecialchars($user['last_name']) ?></td>
-            <td><a href="mailto:<?= htmlspecialchars($user['email']) ?>"><?= htmlspecialchars($user['email']) ?></a></td>
-            <td><?= htmlspecialchars($user['last_login']) ?></td>
+            <td><?= htmlspecialchars($user['user_id']) ?></td>
+            <td><?= htmlspecialchars($user['fst_name']) ?></td>
+            <td><?= htmlspecialchars($user['lst_name']) ?></td>
+            <td><a href="mailto:<?= htmlspecialchars($user['email_address']) ?>"><?= htmlspecialchars($user['email_address']) ?></a></td>
             <td>
                 <button class="modify-btn">Modify</button>
                 <button class="delete-btn">Delete</button>
