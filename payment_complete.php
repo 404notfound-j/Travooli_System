@@ -240,7 +240,7 @@ if (empty($flightDetailsDB)) {
     <section class="action-buttons">
       <div class="share-btn"><img src="icon/share.svg" alt="btn"></div>
       <button class="download-btn">Download</button>
-      <button class="home-btn" onclick="window.location.href='index.php'">Back to Homepage</button>
+      <button class="home-btn" onclick="window.location.href='U_dashboard.php'">Back to Homepage</button>
     </section>
 
     <section class="ratings">

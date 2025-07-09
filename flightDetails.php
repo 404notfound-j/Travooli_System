@@ -60,7 +60,7 @@ if (isset($_GET['return'])) {
     </div>
     <img src="" class="airline-picture" id="depart-airplane-image" >
     <div class="features-header"">
-      <h3 style="color: #5c63f2;">Basic Economy Features</h3>
+      <h3 style="color: #5c63f2;">1Basic Economy Features</h3>
       <div class="seat" id="depart-seat-classes">
       <span class="seat-option" data-class="EC">Economy</span>
         <span class="seat-option" data-class="PE">Premium Economy</span>
