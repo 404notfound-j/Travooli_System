@@ -1,3 +1,11 @@
+<!-- 
+Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
+Project Name: U_dashboard.php
+Description: To display the dashboard of the user
+Date first written: 10-May-2025
+Date last modified: 6-Jul-2025 
+ -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
