@@ -84,20 +84,20 @@ if (!empty($bookingIdToQuery)) {
             $selectedSeatsDisplay = explode(',', $row['selected_seat_numbers']);
 
             // --- Fetch all passengers for this booking ---
-            $passengersQuery = "SELECT passenger_id, fst_name, lst_name, gender, dob, country, class_id, baggage_id, meal_id
-                                FROM passenger_t WHERE flight_booking_id = ?";
-            $stmtPassengers = mysqli_prepare($connection, $passengersQuery);
-            if ($stmtPassengers) {
-                mysqli_stmt_bind_param($stmtPassengers, "s", $bookingIdToQuery);
-                mysqli_stmt_execute($stmtPassengers);
-                $resultPassengers = mysqli_stmt_get_result($stmtPassengers);
-                while($paxRow = mysqli_fetch_assoc($resultPassengers)) {
-                    $passengersForDisplay[] = $paxRow;
-                }
-                mysqli_stmt_close($stmtPassengers);
-            } else {
-                error_log("DB Query prep failed for passengers_t in payment_complete.php: " . mysqli_error($connection));
-            }
+            // $passengersQuery = "SELECT passenger_id, fst_name, lst_name, gender, dob, country, class_id, baggage_id, meal_id
+            //                     FROM passenger_t WHERE flight_booking_id = ?";
+            // $stmtPassengers = mysqli_prepare($connection, $passengersQuery);
+            // if ($stmtPassengers) {
+            //     mysqli_stmt_bind_param($stmtPassengers, "s", $bookingIdToQuery);
+            //     mysqli_stmt_execute($stmtPassengers);
+            //     $resultPassengers = mysqli_stmt_get_result($stmtPassengers);
+            //     while($paxRow = mysqli_fetch_assoc($resultPassengers)) {
+            //         $passengersForDisplay[] = $paxRow;
+            //     }
+            //     mysqli_stmt_close($stmtPassengers);
+            // } else {
+            //     error_log("DB Query prep failed for passengers_t in payment_complete.php: " . mysqli_error($connection));
+            // }
 
         } else {
             error_log("No booking found for ID: " . $bookingIdToQuery);
