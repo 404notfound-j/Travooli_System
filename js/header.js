@@ -1,3 +1,12 @@
+/* 
+Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
+Project Name: header.js
+Description: To style the user header
+Date first written: 10-May-2025
+Date last modified: 6-Jul-2025 
+ */
+
+
 // Navigation menu active state management and mobile menu functionality
 document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
