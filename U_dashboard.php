@@ -303,31 +303,31 @@
                 <a href=# class="card-link">
                     <div class="card">
                         <div class="card-image">
-                            <img src="background/penang.jpg" alt="Penang">
+                            <img src="background/marina-bay.png" alt="Marina Bay">
                             <div class="card-overlay">
-                                <h3>Penang</h3>
+                                <h3>Singapore</h3>
                                 <div class="overlay-icons">
                                     <div class="icon-item">
-                                    <i class="fas fa-umbrella-beach"></i>
-                                        <span>Batu Ferringhi Beach</span>
+                                        <i class="fas fa-leaf"></i>
+                                        <span>Gardens by the Bay</span>
                                     </div>
                                     <div class="icon-item">
                                         <i class="fas fa-utensils"></i>
                                         <span>Food Paradise</span>
                                     </div>
                                     <div class="icon-item">
-                                        <i class="fas fa-brush"></i>
-                                        <span>Heritage & Street Art</span>
+                                        <i class="fas fa-shopping-bag"></i>
+                                        <span>Shopping Haven</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-content">
                             <div class="card-header">
-                                <h4 class="card-title">Penang, <span class="highlight">Malaysia</span></h4>
-                                <span class="card-price">RM 100</span>
+                                <h4 class="card-title">Marina Bay, <span class="highlight">Singapore</span></h4>
+                                <span class="card-price">RM 400</span>
                             </div>
-                            <p class="card-description">Penang vibrant island of culture and cuisine.</p>
+                            <p class="card-description">Singapore's iconic waterfront hub of attractions and luxury.</p>
                         </div>
                     </div>
                 </a>
@@ -584,8 +584,10 @@
                 </div>
             </div>
         </div>
-    </section> 
+    </section>
+    
     <script src="js/script.js"></script>
+    
     <?php include 'u_footer_1.php'; ?>
     <?php include 'u_footer_2.php'; ?>
 </body>

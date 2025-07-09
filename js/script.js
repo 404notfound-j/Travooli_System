@@ -9,71 +9,62 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.getElementById('searchBtn')?.addEventListener('click', function () {
-    // Get airport codes from data attributes
     const fromInput = document.getElementById('fromAirport');
     const toInput = document.getElementById('toAirport');
     const fromCode = fromInput?.getAttribute('data-code');
     const toCode = toInput?.getAttribute('data-code');
     const fromText = fromInput?.value;
     const toText = toInput?.value;
-  
-    // Get dates
-    const departDate = document.getElementById('departDate')?.value; // Format: Mon, Jul 21
-    const returnDate = document.getElementById('returnDate')?.value;
-  
-    // Get passenger count
+
+    // --- CRUCIAL CHANGE: Get dates from data-selected, which should be YYYY-MM-DD ---
+    // If your date picker in script.js is properly setting data-selected attributes
+    // on the internal departDate and returnDate inputs, this is the correct way.
+    // Ensure updateDateFieldDisplay in script.js sets these.
+    const departDateISO = document.getElementById('departDate')?.dataset.selected; // Use data-selected
+    const returnDateISO = document.getElementById('returnDate')?.dataset.selected; // Use data-selected
+
+    // If script.js's date picker does NOT set data-selected yet,
+    // then you need to fix its updateDateFieldDisplay to set it,
+    // OR parse the date from its display value with more robust logic here:
+    // This is the fallback if data-selected isn't available, but less reliable:
+    // const departDateDisplay = document.getElementById('dateInput')?.value; // Get from main dateInput for display
+    // const departDateISO = parseDisplayDate(departDateDisplay); // Using the parseDisplayDate from script.js
+
     const adults = parseInt(document.getElementById('adultCount')?.textContent || '1', 10);
     const children = parseInt(document.getElementById('childCount')?.textContent || '0', 10);
 
-    // Get trip type
     const trip = document.getElementById('roundTrip')?.checked ? 'round' : 'one';
-  
-    // Get class (optional: from dropdown or default)
-    const classId = 'PE'; // Hardcoded for now; update if you have a selector
-  
-    // Validate required inputs
-    if (!fromCode || !toCode || !departDate) {
+    const classId = 'EC';
+
+    // Validation needs to check the ISO date now
+    if (!fromCode || !toCode || !departDateISO) {
       alert("Please complete all required fields before searching.");
       return;
     }
-  
-    function parseDisplayDate(str) {
-        if (!str) return '';
-        const today = new Date();
-        const currentYear = today.getFullYear();
-      
-        // e.g., "Mon, Jul 21"
-        const match = str.match(/^[A-Za-z]+,\s([A-Za-z]+)\s(\d{1,2})$/);
-        if (!match) return '';
-      
-        const [, monthName, day] = match;
-      
-        const monthIndex = new Date(`${monthName} 1, ${currentYear}`).getMonth(); // e.g., "Jul 1, 2025" → 6
-        const date = new Date(currentYear, monthIndex, parseInt(day, 10));
-        return date.toISOString().split('T')[0];
-      }
-      
-  
-    const departISO = parseDisplayDate(departDate);
-    const returnISO = returnDate ? parseDisplayDate(returnDate) : '';
-  
-    // Construct query string
-    const params = new URLSearchParams({
+
+    if (fromCode === toCode) {
+        alert("Departure and destination airports cannot be the same.");
+        return;
+    }
+
+    const searchData = {
       from: fromCode,
       to: toCode,
       fromText,
       toText,
-      departDate: departISO,
-      returnDate: returnISO,
+      departDate: departDateISO, // Save as ISO
+      returnDate: returnDateISO || '', // Save as ISO or empty string
       adults,
       children,
       trip,
       classId
-    });
-  
-    // Redirect to search results page
-    window.location.href = `flightBook.php?${params.toString()}`;
-  });
+    };
+
+    sessionStorage.setItem('flightSearch', JSON.stringify(searchData));
+
+    // Redirect to flightBook.php without query parameters
+    window.location.href = 'flightBook.php';
+});
   
 
 // Airport Dropdown Functionality
@@ -420,15 +411,21 @@ function selectDate(date) {
 function updateDateFieldDisplay() {
     const departDateInput = document.getElementById('departDate');
     const returnDateInput = document.getElementById('returnDate');
-    
+
     if (selectedDepartDate) {
         departDateInput.value = formatDisplayDate(selectedDepartDate);
+        departDateInput.dataset.selected = formatDateISO(selectedDepartDate); // <-- THIS LINE IS KEY
+    } else {
+        departDateInput.value = '';
+        departDateInput.dataset.selected = ''; // <-- Clear also
     }
-    
+
     if (selectedReturnDate) {
         returnDateInput.value = formatDisplayDate(selectedReturnDate);
+        returnDateInput.dataset.selected = formatDateISO(selectedReturnDate); // <-- THIS LINE IS KEY
     } else {
         returnDateInput.value = '';
+        returnDateInput.dataset.selected = ''; // <-- Clear also
     }
 }
 
