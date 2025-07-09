@@ -91,6 +91,108 @@
     opacity: 0.8;
 }
 
+/* Analytics Section - Cursor AI Style */
+.analytics-section {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-top: 32px;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.analytics-header h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #F9FAFB;
+    margin: 0;
+}
+
+.time-filter {
+    display: flex;
+    gap: 8px;
+    background: rgba(55, 65, 81, 0.5);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.filter-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9CA3AF;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.filter-btn:hover {
+    color: #F3F4F6;
+    background: rgba(75, 85, 99, 0.4);
+}
+
+.filter-btn.active {
+    color: #F9FAFB;
+    background: rgba(59, 130, 246, 0.8);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.analytics-stats {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #F9FAFB;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    background: rgba(17, 24, 39, 0.4);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgba(75, 85, 99, 0.2);
+}
+
+.chart-container canvas {
+    border-radius: 8px;
+}
+
 .dashboard-charts {
     background: white;
     padding: 24px;
@@ -180,5 +282,20 @@
     
     .dashboard-header h1 {
         font-size: 24px;
+    }
+    
+    .analytics-stats {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .analytics-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .time-filter {
+        align-self: flex-end;
     }
 }

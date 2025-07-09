@@ -35,6 +35,45 @@ $totalHotels = $hotelRow['total_hotels'];
 $revenueResult = mysqli_query($connection, "SELECT (SELECT COALESCE(SUM(amount), 0) FROM flight_payment_t WHERE payment_status = 'Paid') + (SELECT COALESCE(SUM(amount), 0) FROM hotel_payment_t WHERE status = 'Paid') as total_revenue");
 $revenueRow = mysqli_fetch_assoc($revenueResult);
 $totalRevenue = $revenueRow['total_revenue'];
+
+// Get analytics data for different time periods
+$analyticsData = [
+    'daily' => []
+];
+
+// Get last 30 days of daily data
+for ($i = 29; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $dateLabel = date('M d', strtotime("-$i days"));
+    
+    // Flight revenue for this date (using book_date)
+    $flightQuery = "SELECT COALESCE(SUM(fp.amount), 0) as flight_revenue 
+                    FROM flight_payment_t fp 
+                    JOIN flight_booking_t fb ON fp.f_book_id = fb.f_book_id 
+                    WHERE DATE(fb.book_date) = '$date' AND fp.payment_status = 'Paid'";
+    $flightResult = mysqli_query($connection, $flightQuery);
+    $flightRevenue = mysqli_fetch_assoc($flightResult)['flight_revenue'];
+    
+    // Hotel revenue for this date (using payment_date)
+    $hotelQuery = "SELECT COALESCE(SUM(hp.amount), 0) as hotel_revenue 
+                   FROM hotel_payment_t hp 
+                   WHERE DATE(hp.payment_date) = '$date' AND hp.status = 'Paid'";
+    $hotelResult = mysqli_query($connection, $hotelQuery);
+    $hotelRevenue = mysqli_fetch_assoc($hotelResult)['hotel_revenue'];
+    
+    $analyticsData['daily'][] = [
+        'date' => $date,
+        'label' => $dateLabel,
+        'flight_revenue' => (float)$flightRevenue,
+        'hotel_revenue' => (float)$hotelRevenue
+    ];
+}
+
+// Calculate totals for different periods
+$last7DaysData = array_slice($analyticsData['daily'], -7);
+$totalFlightRevenue = array_sum(array_column($last7DaysData, 'flight_revenue'));
+$totalHotelRevenue = array_sum(array_column($last7DaysData, 'hotel_revenue'));
+$totalWeekRevenue = $totalFlightRevenue + $totalHotelRevenue;
 ?>
 
 <div class="dashboard-container">
@@ -71,80 +110,42 @@ $totalRevenue = $revenueRow['total_revenue'];
             </div>
         </div>
         
-        <div class="dashboard-charts sales-details-section">
-            <div class="sales-chart-container">
-                <h2 class="sub-title">Sales Details</h2>
-                <canvas id="salesBarChart" width="600" height="260" class="bar-chart-canvas"></canvas>
-            </div>
-            <div class="summary-box">
-                <div class="summary-item">
-                    <span>Total Ticket Sold</span> : <span class="summary-value" id="totalTickets">RM 103,950</span>
-                </div>
-                <div class="summary-item">
-                    <span>Total Revenue</span> : <span class="summary-value" id="totalRevenue">RM 103,950</span>
+        <!-- Revenue Analytics Chart -->
+        <div class="analytics-section">
+            <div class="analytics-header">
+                <h2>Your Analytics</h2>
+                <div class="time-filter">
+                    <span class="filter-btn active">7d</span>
+                    <span class="filter-btn">30d</span>
+                    <span class="filter-btn" id="dateRange"><?php echo date('M d', strtotime('-6 days')) . ' - ' . date('M d'); ?></span>
                 </div>
             </div>
-        </div>
-
-        <!-- Second Sales Details Section (Reversed) -->
-        <div class="dashboard-charts sales-details-section sales-details-section--reverse">
-            <div class="summary-box">
-                <div class="summary-item">
-                    <span>Total Ticket Sold</span> : <span class="summary-value" id="totalTickets2">RM 88,000</span>
+            
+            <div class="analytics-stats">
+                <div class="stat-item">
+                    <div class="stat-value">RM <?php echo number_format($totalWeekRevenue, 0); ?></div>
+                    <div class="stat-label">Total Revenue (7 days)</div>
                 </div>
-                <div class="summary-item">
-                    <span>Total Revenue</span> : <span class="summary-value" id="totalRevenue2">RM 88,000</span>
+                <div class="stat-item">
+                    <div class="stat-value">RM <?php echo number_format($totalFlightRevenue, 0); ?></div>
+                    <div class="stat-label">Flight Revenue</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">RM <?php echo number_format($totalHotelRevenue, 0); ?></div>
+                    <div class="stat-label">Hotel Revenue</div>
                 </div>
             </div>
-            <div class="sales-chart-container">
-                <h2 class="sub-title">Sales Details (Right Chart)</h2>
-                <canvas id="salesBarChart2" width="600" height="260" class="bar-chart-canvas"></canvas>
+            
+            <div class="chart-container">
+                <canvas id="revenueChart" width="800" height="300"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-
-<?php
-// Example sales data for the chart (replace with real data as needed)
-$salesData = [
-    ['name' => 'January', 'revenue' => 'RM60000'],
-    ['name' => 'February', 'revenue' => 'RM35000'],
-    ['name' => 'March', 'revenue' => 'RM50000'],
-    ['name' => 'April', 'revenue' => 'RM42000'],
-    ['name' => 'May', 'revenue' => 'RM48000'],
-    ['name' => 'June', 'revenue' => 'RM30000'],
-    ['name' => 'July', 'revenue' => 'RM70000'],
-    ['name' => 'August', 'revenue' => 'RM55000'],
-    ['name' => 'September', 'revenue' => 'RM40000'],
-    ['name' => 'October', 'revenue' => 'RM80000'],
-    ['name' => 'November', 'revenue' => 'RM60000'],
-    ['name' => 'December', 'revenue' => 'RM65000'],
-];
-?>
 <script>
-window.salesData = <?php echo json_encode($salesData); ?>;
-</script>
-
-<?php
-// Example sales data for the second chart
-$salesData2 = [
-    ['name' => 'Jan', 'revenue' => 'RM20000'],
-    ['name' => 'Feb', 'revenue' => 'RM25000'],
-    ['name' => 'Mar', 'revenue' => 'RM30000'],
-    ['name' => 'Apr', 'revenue' => 'RM35000'],
-    ['name' => 'May', 'revenue' => 'RM40000'],
-    ['name' => 'Jun', 'revenue' => 'RM45000'],
-    ['name' => 'Jul', 'revenue' => 'RM50000'],
-    ['name' => 'Aug', 'revenue' => 'RM55000'],
-    ['name' => 'Sep', 'revenue' => 'RM60000'],
-    ['name' => 'Oct', 'revenue' => 'RM65000'],
-    ['name' => 'Nov', 'revenue' => 'RM70000'],
-    ['name' => 'Dec', 'revenue' => 'RM75000'],
-];
-?>
-<script>
-window.salesData2 = <?php echo json_encode($salesData2); ?>;
+// Pass analytics data to JavaScript
+window.analyticsData = <?php echo json_encode($analyticsData); ?>;
 </script>
 
 <?php
