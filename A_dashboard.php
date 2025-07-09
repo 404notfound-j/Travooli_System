@@ -46,11 +46,11 @@ for ($i = 29; $i >= 0; $i--) {
     $date = date('Y-m-d', strtotime("-$i days"));
     $dateLabel = date('M d', strtotime("-$i days"));
     
-    // Flight revenue for this date (using book_date)
+    // Flight revenue for this date (using booking_date)
     $flightQuery = "SELECT COALESCE(SUM(fp.amount), 0) as flight_revenue 
                     FROM flight_payment_t fp 
-                    JOIN flight_booking_t fb ON fp.f_book_id = fb.f_book_id 
-                    WHERE DATE(fb.book_date) = '$date' AND fp.payment_status = 'Paid'";
+                    JOIN flight_booking_t fb ON fp.f_book_id = fb.flight_booking_id 
+                    WHERE DATE(fb.booking_date) = '$date' AND fp.payment_status = 'Paid'";
     $flightResult = mysqli_query($connection, $flightQuery);
     $flightRevenue = mysqli_fetch_assoc($flightResult)['flight_revenue'];
     
