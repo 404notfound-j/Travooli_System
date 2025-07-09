@@ -39,7 +39,6 @@ $ticketBasePrice = $data['ticket'] ?? 0;
 $baggageFees = $data['baggage'] ?? 0;
 $mealFees = $data['meal'] ?? 0;
 $taxAmount = $data['taxPrice'] ?? 0;
-// $discountAmount = $data['discount'] ?? 0; // Removed as it's not in DB table
 
 $numPassenger = $data['num_passenger'] ?? 0;
 
@@ -64,10 +63,12 @@ if (empty($userId) || empty($flightId) || empty($bookingDate) || empty($totalAmo
 mysqli_autocommit($connection, false);
 
 try {
-    // 1. Generate a unique flight_booking_id in the format BKXXXXXXXXXX
-    $uniquePart = substr(md5(uniqid(rand(), true)), 0, 6);
+    // 1. Generate a unique flight_booking_id in the format BKmmddNNNNNN
     $datePart = date('md');
-    $flightBookingId = 'BK' . $datePart . $uniquePart;
+    $randomNumber = mt_rand(0, 999999);
+    $randomPart = str_pad($randomNumber, 6, '0', STR_PAD_LEFT);
+    $flightBookingId = 'BK' . $datePart . $randomPart;
+
 
     // 2. Insert into flight_booking_t
     $bookingQuery = "INSERT INTO flight_booking_t (flight_booking_id, user_id, flight_id, booking_date, status) VALUES (?, ?, ?, ?, ?)";
@@ -82,7 +83,7 @@ try {
     mysqli_stmt_close($stmtBooking);
 
 
-    // --- Insert into flight_booking_info_t (Corrected bind_param types) ---
+    // 3. Insert into flight_booking_info_t
     $bookingInfoQuery = "INSERT INTO flight_booking_info_t (
         flight_booking_id, total_amount_paid, ticket_base_price, baggage_fees, 
         meal_fees, tax_amount, num_passenger, selected_seat_numbers, class_id, flight_date
@@ -92,8 +93,9 @@ try {
     if (!$stmtInfo) {
         throw new Exception('Booking info query prepare failed: ' . mysqli_error($connection));
     }
+    // This line is now corrected to have 10 types to match the 10 variables
     mysqli_stmt_bind_param(
-        $stmtInfo, "sddddddisss", // CORRECTED TYPE STRING: 10 characters (s d d d d d i s s s)
+        $stmtInfo, "sdddddisss", // CORRECTED TYPE STRING
         $flightBookingId, $totalAmountPaid, $ticketBasePrice, $baggageFees,
         $mealFees, $taxAmount, $numPassenger, $selectedSeatNumbersString, $classId, $flightDate
     );
@@ -101,10 +103,9 @@ try {
         throw new Exception('Booking info insert failed: ' . mysqli_stmt_error($stmtInfo));
     }
     mysqli_stmt_close($stmtInfo);
-    // --- END NEW ---
 
 
-    // 3. Update flight_seats_t for each selected seat
+    // 4. Update flight_seats_t for each selected seat
     $seatUpdateQuery = "UPDATE flight_seats_t SET is_booked = 1, pass_id = ? WHERE flight_id = ? AND class_id = ? AND seat_no = ?";
     $stmtSeats = mysqli_prepare($connection, $seatUpdateQuery);
     if (!$stmtSeats) {
