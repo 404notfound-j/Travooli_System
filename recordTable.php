@@ -111,12 +111,6 @@
                 ?>
                 <a href="<?= $prevUrl ?>" class="arrow <?= $page == 1 ? 'disabled' : '' ?>">&lt;</a>
                 <?php
-                for ($i = 1; $i <= $totalPages; $i++) {
-                    $queryParams['page'] = $i;
-                    $url = '?' . http_build_query($queryParams);
-                    $activeClass = $i == $page ? 'active-page' : '';
-                    echo "<a href=\"$url\" class=\"arrow $activeClass\">$i</a>";
-                }
                 // Next
                 $queryParams['page'] = $page + 1;
                 $nextUrl = '?' . http_build_query($queryParams);

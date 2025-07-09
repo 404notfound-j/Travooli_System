@@ -43,7 +43,6 @@ $usersToShow = array_slice($users, $start, $perPage);
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
-            <th>Last Login</th>
             <th>Action</th>
         </tr>
     </thead>

@@ -1,10 +1,6 @@
 /* Import Poppins font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;400&display=swap');
 
-body, .report-chart-summary, .summary-box, .airlines-boxes-container, .airline-box, .airline-box-top, .airline-box-middle, .airline-box-bottom, .airline-info {
-    background: #d1fae5 !important;
-}
-
 .page-title {
     color: #4379EE;
     font-size: 32px;
@@ -164,12 +160,13 @@ body, .report-chart-summary, .summary-box, .airlines-boxes-container, .airline-b
 }
 
 .chart-scroll-xy {
-    max-width: 100%;
+    width: 650px;
     overflow-x: auto;
     overflow-y: auto;
-    height: 350px;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    margin-bottom: 24px;
+}
+
+#salesBarChart {
+    min-width: 650px;
+    display: block;
 }
