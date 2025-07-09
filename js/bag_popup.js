@@ -1,23 +1,24 @@
 // bag_popup.js
-
-// Global state variables for the currently open bag popup's selection
 let currentBagPopup_PricePerPiece = 0;
 let currentBagPopup_Quantity = 0;
 let currentBagPopup_WeightText = "0kg";
+let currentBagPopup_Id = null; // Store the ID (e.g., 'BG10', 'BG25', 'BG50')
 
-// Named functions for event handlers (defined outside setup function to be consistent for remove/add)
+
+// Named functions for event handlers
 function handleBagOptionClick() {
     document.querySelectorAll('.bag-option').forEach(opt => opt.classList.remove('selected'));
     this.classList.add('selected');
     currentBagPopup_PricePerPiece = parseFloat(this.dataset.price);
     currentBagPopup_WeightText = this.dataset.bag;
-    console.log('Bag option clicked:', this.dataset.bag, 'Price per piece:', currentBagPopup_PricePerPiece);
+    currentBagPopup_Id = this.dataset.bagId; // Use data-bag-id from HTML
+    console.log('Bag option clicked:', this.dataset.bag, 'Price per piece:', currentBagPopup_PricePerPiece, 'ID:', currentBagPopup_Id);
 }
 
 function handleQuantityDecrement() {
     let quantityDisplay = document.querySelector('.quantity-display');
     let currentQuantity = parseInt(quantityDisplay.textContent, 10);
-    if (currentQuantity > 1) {
+    if (currentQuantity > 0) {
         quantityDisplay.textContent = currentQuantity - 1;
         currentBagPopup_Quantity = currentQuantity - 1;
         console.log('Quantity decremented to:', currentBagPopup_Quantity);
@@ -43,14 +44,24 @@ function handleBagSaveClick() {
             return;
         }
         
-        // Calculate total price for this specific baggage add-on
         const finalCalculatedPrice = currentBagPopup_PricePerPiece * currentBagPopup_Quantity;
         
         addonValueSpan.textContent = `${currentBagPopup_Quantity} piece, ${currentBagPopup_WeightText}`;
-        addonValueSpan.dataset.price = finalCalculatedPrice.toFixed(2); // Store the calculated total price for this item
+        addonValueSpan.dataset.price = finalCalculatedPrice.toFixed(2);
         console.log('Updating main page baggage:', addonValueSpan.textContent, 'Price:', addonValueSpan.dataset.price);
 
-        // Call the global updatePrices function from popupAddFlight.js
+        // --- NEW: Update baggageId in allPassengersDetails ---
+        const passengerIndex = parseInt(sessionStorage.getItem('editingAddonPassengerIndex'));
+        const allPassengersDetails = JSON.parse(sessionStorage.getItem('allPassengersDetails') || '[]');
+        if (!isNaN(passengerIndex) && allPassengersDetails[passengerIndex]) {
+            allPassengersDetails[passengerIndex].baggageId = currentBagPopup_Id; // Store the ID
+            sessionStorage.setItem('allPassengersDetails', JSON.stringify(allPassengersDetails)); // Persist updated data
+            console.log('Passenger', passengerIndex, 'baggageId updated to:', currentBagPopup_Id);
+        } else {
+            console.warn("Could not find passenger in allPassengersDetails to update baggageId.");
+        }
+        sessionStorage.removeItem('editingAddonPassengerIndex'); // Clean up
+
         if (window.updatePrices && typeof window.updatePrices === 'function') {
             window.updatePrices();
             console.log('window.updatePrices called successfully.');
@@ -60,7 +71,6 @@ function handleBagSaveClick() {
     } else {
         console.warn('No active baggage edit button found. Cannot save.');
     }
-    // Programmatically click the close button
     const closeBtn = document.querySelector('.popup-close');
     if(closeBtn) closeBtn.click();
 }
@@ -68,17 +78,15 @@ function handleBagSaveClick() {
 function handleBagCloseClick() {
     let activeEditButton = document.querySelector('.edit-baggage-btn.active');
     if (activeEditButton) {
-        activeEditButton.classList.remove('active'); // Remove active class from the edit button when closing
+        activeEditButton.classList.remove('active');
         console.log('Active class removed from baggage edit button.');
     }
-    // Assuming popup-bg is the outer container with the hidden class
     this.closest('.popup-bg').classList.add('hidden');
-    document.body.classList.remove('blurred'); // Remove blur from body
+    document.body.classList.remove('blurred');
+    sessionStorage.removeItem('editingAddonPassengerIndex'); // Clean up on close
     console.log('Baggage popup closed.');
 }
 
-
-// --- Crucial function: Called by popupAddFlight.js when baggage popup is opened ---
 window.setupBagPopupEvents = function() {
     console.log('setupBagPopupEvents called.');
     const bagOptions = document.querySelectorAll('.bag-option');
@@ -89,86 +97,80 @@ window.setupBagPopupEvents = function() {
     // --- Initialization: Set popup state based on current passenger's selection ---
     let activeEditButton = document.querySelector('.edit-baggage-btn.active');
     
-    let initialQuantity = 0; // Default before parsing
+    let initialQuantity = 0;
     let initialWeightText = "0kg";
     let initialTotalPrice = 0;
+    let initialBagId = null;
 
     if (activeEditButton) {
-        let currentBagValueSpan = activeEditButton.closest('.addon-details').querySelector('.addon-value');
-        if (currentBagValueSpan) {
-            let currentBagText = currentBagValueSpan.textContent.trim();
-            initialTotalPrice = parseFloat(currentBagValueSpan.dataset.price) || 0;
+        const passengerIndex = parseInt(sessionStorage.getItem('editingAddonPassengerIndex'));
+        const allPassengersDetails = JSON.parse(sessionStorage.getItem('allPassengersDetails') || '[]');
+        const pax = allPassengersDetails[passengerIndex];
 
-            let parts = currentBagText.match(/(\d+)\s*piece(?:s)?,\s*(\d+)\s*(kg)/i);
-            if (parts && parts.length >= 4) {
-                initialQuantity = parseInt(parts[1], 10);
-                initialWeightText = `${parts[2]}${parts[3]}`;
-            } else {
-                initialQuantity = 0; // Fallback to 0 if parsing fails
-                initialWeightText = "10kg"; // Assume default for 0 price
+        if (pax && pax.baggageId) { // Check if baggageId is set in our data array
+            initialBagId = pax.baggageId;
+            // Find the bag option by its data-bag-id
+            const correspondingOption = Array.from(bagOptions).find(opt => opt.dataset.bagId === initialBagId);
+
+            if (correspondingOption) {
+                initialWeightText = correspondingOption.dataset.bag;
+                currentBagPopup_PricePerPiece = parseFloat(correspondingOption.dataset.price);
+                // Also get quantity from existing text on the main page to initialize popup quantity
+                let currentBagValueSpan = activeEditButton.closest('.addon-details').querySelector('.addon-value');
+                let currentBagText = currentBagValueSpan ? currentBagValueSpan.textContent.trim() : '0 piece, 0kg';
+                let parts = currentBagText.match(/(\d+)\s*piece(?:s)?/i);
+                initialQuantity = parseInt(parts ? parts[1] : '0', 10);
             }
+        } else { // Fallback to current DOM value if no specific ID in data, or default
+             let currentBagValueSpan = activeEditButton.closest('.addon-details').querySelector('.addon-value');
+             if (currentBagValueSpan) {
+                let currentBagText = currentBagValueSpan.textContent.trim();
+                initialTotalPrice = parseFloat(currentBagValueSpan.dataset.price) || 0;
+                let parts = currentBagText.match(/(\d+)\s*piece(?:s)?,\s*(\d+)\s*(kg)/i);
+                if (parts && parts.length >= 4) {
+                    initialQuantity = parseInt(parts[1], 10);
+                    initialWeightText = `${parts[2]}${parts[3]}`;
+                }
+             }
         }
     }
-
-    // Set popup quantity display - if initialQuantity is 0, default to 1, otherwise keep initial.
-    currentBagPopup_Quantity = (initialQuantity === 0 && initialTotalPrice === 0) ? 1 : initialQuantity; // NEW Default to 1 if no existing paid bag
+    
+    currentBagPopup_Quantity = (initialQuantity === 0 && initialTotalPrice === 0) ? 1 : initialQuantity;
     quantityDisplay.textContent = currentBagPopup_Quantity;
-    console.log('Initial baggage state:', {initialQuantity, initialWeightText, initialTotalPrice, effectiveQuantity: currentBagPopup_Quantity});
+    console.log('Initial baggage state:', {initialQuantity, initialWeightText, initialTotalPrice, initialBagId, effectiveQuantity: currentBagPopup_Quantity});
 
     let matchedOptionFound = false;
     bagOptions.forEach(option => {
         let optionWeight = option.dataset.bag;
         let optionPricePerPiece = parseFloat(option.dataset.price) || 0;
+        let optionId = option.dataset.bagId; // Get ID from data-bag-id
 
-        // If this is the "10kg Free" option
-        if (optionWeight === "10kg" && optionPricePerPiece === 0) {
-            // Select "10kg Free" if total price is 0 AND initial quantity was 0, or if it was explicitly 10kg free
-            if (initialTotalPrice === 0 && (initialQuantity === 0 || initialWeightText === "10kg")) {
-                option.classList.add('selected');
-                currentBagPopup_PricePerPiece = 0;
-                currentBagPopup_WeightText = "10kg";
-                matchedOptionFound = true;
-            } else {
-                option.classList.remove('selected');
-            }
+        // Match by weight and ID, or if quantity > 0 and price matches
+        if (optionWeight === initialWeightText && (optionId === initialBagId || (currentBagPopup_Quantity > 0 && (initialTotalPrice / currentBagPopup_Quantity).toFixed(2) === optionPricePerPiece.toFixed(2)))) {
+            option.classList.add('selected');
+            currentBagPopup_PricePerPiece = optionPricePerPiece;
+            currentBagPopup_WeightText = optionWeight;
+            currentBagPopup_Id = optionId;
+            matchedOptionFound = true;
         } else {
-            // For paid options: match by weight and ensure the price per piece aligns if quantity > 0
-            if (currentBagPopup_Quantity > 0 && optionWeight === initialWeightText && (initialTotalPrice / currentBagPopup_Quantity).toFixed(2) === optionPricePerPiece.toFixed(2)) {
-                 option.classList.add('selected');
-                 currentBagPopup_PricePerPiece = optionPricePerPiece;
-                 currentBagPopup_WeightText = optionWeight;
-                 matchedOptionFound = true;
-            } else {
-                option.classList.remove('selected');
-            }
+            option.classList.remove('selected');
         }
     });
 
-    // If no option was specifically matched (e.g., a new passenger, or first time selecting),
-    // ensure a default paid option (e.g., 25kg) is selected and quantity is 1 if it wasn't the free 10kg.
     if (!matchedOptionFound) {
         bagOptions.forEach(opt => opt.classList.remove('selected'));
-        const paidOption = document.querySelector('.bag-option[data-bag="25kg"]'); // Default to 25kg if nothing else matches
-        if (paidOption) {
-            paidOption.classList.add('selected');
-            currentBagPopup_PricePerPiece = parseFloat(paidOption.dataset.price);
-            currentBagPopup_WeightText = paidOption.dataset.bag;
-            // Quantity is already set to 1 or initial quantity above.
-        } else { // Fallback if no 25kg option
-            const free10kgOption = document.querySelector('.bag-option[data-bag="10kg"]');
-            if (free10kgOption) {
-                free10kgOption.classList.add('selected');
-                currentBagPopup_PricePerPiece = 0;
-                currentBagPopup_WeightText = "10kg";
-                currentBagPopup_Quantity = 0; // If 10kg free, quantity starts at 0 unless user adds it
-                quantityDisplay.textContent = 0;
-            }
+        const defaultOption = document.querySelector('.bag-option[data-bag="10kg"]');
+        if (defaultOption) {
+            defaultOption.classList.add('selected');
+            currentBagPopup_PricePerPiece = 0;
+            currentBagPopup_WeightText = "10kg";
+            currentBagPopup_Id = 'BG10'; // Default ID
+            currentBagPopup_Quantity = 0; // Quantity is 0 for 10kg free by default
+            quantityDisplay.textContent = 0;
         }
     }
-    console.log('Baggage popup initialized. Current state:', {currentBagPopup_Quantity, currentBagPopup_WeightText, currentBagPopup_PricePerPiece});
+    console.log('Baggage popup initialized. Current state:', {currentBagPopup_Quantity, currentBagPopup_WeightText, currentBagPopup_PricePerPiece, currentBagPopup_Id});
 
-
-    // --- Event Listeners for Popup Controls (re-attach every time popup is loaded) ---
     bagOptions.forEach(option => {
         option.removeEventListener('click', handleBagOptionClick);
         option.addEventListener('click', handleBagOptionClick);

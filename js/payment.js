@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const baggage = parseFloat(flightSearch.baggagePrice || 0);
     const meal = parseFloat(flightSearch.mealPrice || 0);
     const taxPrice = parseFloat(flightSearch.taxPrice || 0);
-    // const discount = parseFloat(flightSearch.discount || 0); // REMOVED: No longer need to retrieve discount
 
     const activeAdults = parseInt(flightSearch.activeAdults) || 1;
     const activeChildren = parseInt(flightSearch.children) || 0;
@@ -18,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const returnId = flightSearch.return || '';
     const classId = flightSearch.classId || '';
 
-    const flightDate = flightSearch.departDate || ''; // Get the departure date
+    const flightDate = flightSearch.departDate || '';
 
     const userId = window.currentUserId || null;
 
@@ -143,6 +142,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const today = new Date();
         const paymentDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
+        // Retrieve the full passenger details array from sessionStorage
+        const allPassengersDetails = JSON.parse(sessionStorage.getItem('allPassengersDetails') || '[]');
+
         const bookingData = {
             user_id: userId,
             flight_id: departId,
@@ -156,11 +158,14 @@ document.addEventListener('DOMContentLoaded', function () {
             baggage: baggage,
             meal: meal,
             taxPrice: taxPrice,
-            // REMOVED: discount: discount, // No longer send discount data
+            // discount is no longer sent
             activeAdults: activeAdults, 
             activeChildren: activeChildren, 
             num_passenger: numPassengers, 
-            flight_date: flightDate 
+            flight_date: flightDate,
+            
+            // NEW: Include all passenger details for insertion into passenger_t
+            passengers: allPassengersDetails 
         };
 
         console.log("DEBUG in payment.js: Sending bookingData:", bookingData);
@@ -177,6 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Payment successful and booking confirmed!');
                 sessionStorage.removeItem('flightSearch'); 
                 sessionStorage.removeItem('selectedSeats'); 
+                sessionStorage.removeItem('allPassengersDetails'); 
                 
                 sessionStorage.removeItem('lastBookingDetails'); 
                 sessionStorage.removeItem('lastSelectedSeats'); 

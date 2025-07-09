@@ -24,6 +24,7 @@
     $method_label = ($section === 'payment') ? 'Payment Method' : 'Refund Method';
     $status_label = ($section === 'payment') ? 'Status' : 'Refund Status';
     $date_label = ($section === 'payment') ? 'Payment Date' : 'Refund Date';
+
 ?>
 
 
@@ -60,8 +61,8 @@
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($records)): ?>
-                <?php foreach ($records as $row): ?>
+            <?php if (!empty($recordsToShow)): ?>
+                <?php foreach ($recordsToShow as $row): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['id']) ?></td>
                         <td><?php echo htmlspecialchars($row['booking_reference']); ?></td>
@@ -69,9 +70,23 @@
                         <td><?php echo htmlspecialchars($row['method']); ?></td>
                         <td><?php echo htmlspecialchars($row['amount']); ?></td>
                         <td>
-                            <span class="status-badge">
-                                <?php echo htmlspecialchars($row['status']); ?>
+                            <?php
+                                if ($row['status'] === 'Paid') {
+                                    $displayStatus = 'Completed';
+                                    $badgeClass = 'Completed';
+                                } elseif ($row['status'] === 'Refunded') {
+                                    $displayStatus = 'Cancelled';
+                                    $badgeClass = 'Cancelled';
+                                } else {
+                                    $displayStatus = htmlspecialchars($row['status']);
+                                    $badgeClass = preg_replace('/\s+/', '', $displayStatus);
+                                }
+                            ?>
+                            <span class="status-badge <?php echo $badgeClass; ?>">
+                                <?php echo $displayStatus; ?> 
                             </span>
+
+
                         </td>
                         <td><?php echo htmlspecialchars($row['date']); ?></td>
                     </tr>
@@ -81,6 +96,29 @@
             <?php endif; ?>
         </tbody>
     </table>
+
+    <div class="pagination-wrapper">
+        <div class="pagination">
+            <span>
+                Showing <?= $start + 1 ?>-<?= min($start + $perPage, $totalRecords) ?> of <?= $totalRecords ?>
+            </span>
+            <div class="pagination-arrows">
+                <?php
+                $queryParams = $_GET;
+                // Previous
+                $queryParams['page'] = $page - 1;
+                $prevUrl = '?' . http_build_query($queryParams);
+                ?>
+                <a href="<?= $prevUrl ?>" class="arrow <?= $page == 1 ? 'disabled' : '' ?>">&lt;</a>
+                <?php
+                // Next
+                $queryParams['page'] = $page + 1;
+                $nextUrl = '?' . http_build_query($queryParams);
+                ?>
+                <a href="<?= $nextUrl ?>" class="arrow <?= $page == $totalPages ? 'disabled' : '' ?>">&gt;</a>
+            </div>
+        </div>
+    </div>
 
     <?php
     // Capture the content and store it in a variable

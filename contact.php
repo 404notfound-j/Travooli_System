@@ -8,9 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<?php
-ob_start();
-?>
+
   <div class="contact-page">
     <div class="header-row">
       <h2>Contact</h2>
@@ -47,10 +45,7 @@ ob_start();
         </a>
      </div>
   </div>
-<?php
-$pageContent = ob_get_clean();
-include 'adminSidebar.php';
-?>
+
 
 </body>
 </html>

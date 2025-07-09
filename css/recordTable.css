@@ -72,11 +72,20 @@
     display: inline-block;
     padding: 4px 16px;
     border-radius: 8px;
-    background: #d1fae5;
-    color: #10b981;
     font-weight: 600;
     font-size: 0.96rem;
     letter-spacing: 0.5px;
+
+}
+
+.payment-table td .status-badge.Completed {
+    background: #d1fae5;
+    color: #10b981;
+}
+
+.payment-table td .status-badge.Cancelled {
+    background: #fee2e2;
+    color: #dc2626;
 }
 
 .payment-table tbody td {
@@ -88,3 +97,46 @@
 .payment-table tbody tr:last-child td {
     border-bottom: none;
 }
+
+.pagination-wrapper {
+    width: 95%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+}
+.pagination {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #202224;
+    width: 100%;
+    justify-content: space-between;
+}
+.pagination span {
+    margin-right: 16px;
+}
+.pagination-arrows {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+.arrow {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: #eaf0fb;
+    color: #4a6cf7;
+    text-decoration: none;
+    font-size: 1.2rem;
+    border: 1px solid #4a6cf7;
+    transition: background 0.2s;
+}
+.arrow:hover:not(.disabled) {
+    background: #4a6cf7;
+    color: #fff;
+}
+.arrow.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+}
+

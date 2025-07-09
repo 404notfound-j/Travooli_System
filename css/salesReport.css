@@ -37,33 +37,6 @@
     border-bottom: 2px solid #4379EE;
 }
 
-.filters {
-    display: flex;
-    gap: 8px;
-}
-
-.filter-select {
-    width: 98px;
-    height: 38px;
-    font-size: 15px;
-    font-family: 'Poppins', sans-serif;
-    color: #91AADF;
-    border: 1px solid #E0E7EF;
-    border-radius: 6px;
-    padding: 0 12px;
-    background: #fff;
-    outline: none;
-    appearance: none;
-    font-weight: 400;
-}
-
-.filter-select option {
-    font-size: 15px;
-    font-family: 'Poppins', sans-serif;
-    color: #91AADF;
-    font-weight: 400;
-}
-
 .sub-title {
     font-size: 18px;
     color: #4379EE;
@@ -80,6 +53,8 @@
     margin-top: 24px;
     gap: 60px;
     box-sizing: border-box;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .bar-chart-canvas {
@@ -182,4 +157,16 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+}
+
+.chart-scroll-xy {
+    width: 650px;
+    overflow-x: auto;
+    overflow-y: auto;
+    margin-bottom: 24px;
+}
+
+#salesBarChart {
+    min-width: 650px;
+    display: block;
 }
