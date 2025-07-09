@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (section === 'refund') return 'Refund';
                 return null;
             },  
-            'U_Manage.php': 'User Management'
+            'U_Manage.php': 'User Management',
+            'contact.php' :'Contact'
         };
         
         // Find and activate the matching nav item
