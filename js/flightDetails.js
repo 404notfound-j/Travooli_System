@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function highlightSeatClass(classCode, type = 'depart') {
-  document.querySelectorAll(`#${type}-seat-classes .seat-option`).forEach(option => {
+  document.querySelectorAll(#${type}-seat-classes .seat-option).forEach(option => {
     option.classList.toggle('highlighted', option.dataset.class === classCode);
   });
 }
@@ -80,7 +80,7 @@ function loadFlightDetails(flightId, type, classCode) {
   // Use the classCode passed to the function, which comes from searchData.seatClass
   const classParam = classCode;
 
-  fetch(`getFlightDetails.php?flightId=${flightId}&classId=${classParam}`)
+  fetch(getFlightDetails.php?flightId=${flightId}&classId=${classParam})
     .then(res => res.json())
     .then(flight => {
       if (flight.error) {
@@ -98,29 +98,29 @@ function loadFlightDetails(flightId, type, classCode) {
         if (el) el.textContent = text;
       };
 
-      updateText(`${type}-departure-time`, formattedDeparture);
-      updateText(`${type}-arrival-time`, formattedArrival);
-      updateText(`${type}-departure-airport-code`, flight.orig_airport_id);
-      updateText(`${type}-arrival-airport-code`, flight.dest_airport_id);
-      updateText(`${type}-flight-duration`, duration);
-      updateText(`${type}-airline-name`, flight.airline_name);
-      updateText(`${type}-aircraft-type`, flight.flight_id);
+      updateText(${type}-departure-time, formattedDeparture);
+      updateText(${type}-arrival-time, formattedArrival);
+      updateText(${type}-departure-airport-code, flight.orig_airport_id);
+      updateText(${type}-arrival-airport-code, flight.dest_airport_id);
+      updateText(${type}-flight-duration, duration);
+      updateText(${type}-airline-name, flight.airline_name);
+      updateText(${type}-aircraft-type, flight.flight_id);
 
       const price = parseFloat(flight.price);
-      updateText(`${type}-flight-price`, `RM ${price.toFixed(2)}`);
+      updateText(${type}-flight-price, RM ${price.toFixed(2)});
 
       // Retrieve searchData again to ensure it's the latest from sessionStorage before modification
       const searchData = JSON.parse(sessionStorage.getItem('flightSearch') || '{}');
 
       if (type === 'depart') {
         updateText("depart-flight-airline-plane", flight.airline_name || flight.airline_id);
-        updateText(`${type}-origin-airport-info`, `${flight.origin_airport_full || ''}, ${flight.origin_airport_address || ''}`);
+        updateText(${type}-origin-airport-info, ${flight.origin_airport_full || ''}, ${flight.origin_airport_address || ''});
         const airlineImage = document.getElementById("depart-airplane-image");
-        if (airlineImage) airlineImage.src = `images/${flight.airline_id}.jpg`;
+        if (airlineImage) airlineImage.src = images/${flight.airline_id}.jpg;
         const logoImage = document.getElementById("depart-airline-logo");
         if (logoImage) {
-          logoImage.src = `images/${flight.airline_id}.png`;
-          logoImage.alt = `${flight.airline_name} Logo`;
+          logoImage.src = images/${flight.airline_id}.png;
+          logoImage.alt = ${flight.airline_name} Logo;
         }
         window.departFlightPrice = price;
         // Store per-passenger price for the depart flight in sessionStorage
@@ -128,8 +128,8 @@ function loadFlightDetails(flightId, type, classCode) {
       } else {
         const logoImage = document.getElementById("return-airline-logo");
         if (logoImage) {
-          logoImage.src = `images/${flight.airline_id}.png`;
-          logoImage.alt = `${flight.airline_name} Logo`;
+          logoImage.src = images/${flight.airline_id}.png;
+          logoImage.alt = ${flight.airline_name} Logo;
         }
         window.returnFlightPrice = price;
         // Store per-passenger price for the return flight in sessionStorage
@@ -157,7 +157,7 @@ function updateTotalFlightPriceIfReady() {
 
   const ret = window.returnFlightPrice !== null ? window.returnFlightPrice : 0;
   const total = (window.departFlightPrice + ret) * passengerCount;
-  totalDisplay.textContent = `RM ${total.toFixed(2)}`;
+  totalDisplay.textContent = RM ${total.toFixed(2)};
 
   // This is the place where initial total flight price is stored for passengerCheck.php to read
   searchData.totalPrice = total; // Ensure total price is updated in session storage
@@ -169,7 +169,7 @@ function formatTimeTo12Hour(timeString) {
   let hour = parseInt(hourStr);
   const ampm = hour >= 12 ? 'pm' : 'am';
   hour = hour % 12 || 12;
-  return `${hour}:${minuteStr} ${ampm}`;
+  return ${hour}:${minuteStr} ${ampm};
 }
 
 function calculateDuration(dep, arr) {
@@ -184,7 +184,7 @@ function calculateDuration(dep, arr) {
 function formatDuration(minutes) {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  return `${hours}h ${mins}m`;
+  return ${hours}h ${mins}m;
 }
 
 const likeButton = document.querySelector('.like-button');
@@ -240,6 +240,6 @@ if (bookButton) {
     sessionStorage.setItem("flightSearch", JSON.stringify(flightSearch));
 
     // Redirect to booking page without URL parameters
-    window.location.href = `passengerCheck.php`;
+    window.location.href = passengerCheck.php;
   });
 }
