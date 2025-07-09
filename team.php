@@ -8,7 +8,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-
+<?php
+ob_start();
+?>
   <div class="team-section">
     <div class="team-header">
       <h2>Team</h2>
@@ -59,9 +61,9 @@
       </div>
     </div>
   </div>
-
-
-
-
+  <?php
+$pageContent = ob_get_clean();
+include 'adminSidebar.php';
+?>
 </body>
 </html>

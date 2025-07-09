@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return null;
             },  
             'U_Manage.php': 'User Management',
-            'contact.php' :'Contact'
+            'contact.php' :'Contact',
+            'team.php':'Team'
         };
         
         // Find and activate the matching nav item
