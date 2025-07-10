@@ -65,13 +65,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     {
                         label: 'Flight Revenue',
                         data: flightData,
-                        borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderColor: '#605DEC',
+                        backgroundColor: 'rgba(96, 93, 236, 0.1)',
                         borderWidth: 2,
                         fill: false,
                         tension: 0.4,
-                        pointBackgroundColor: '#3B82F6',
-                        pointBorderColor: '#3B82F6',
+                        pointBackgroundColor: '#605DEC',
+                        pointBorderColor: '#605DEC',
                         pointRadius: period === '30d' ? 2 : 4,
                         pointHoverRadius: period === '30d' ? 4 : 6
                     },
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         position: 'top',
                         align: 'end',
                         labels: {
-                            color: '#6B7280',
+                            color: '#1e293b',
                             font: {
                                 family: 'Poppins',
                                 size: 12,
@@ -115,10 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     },
                     tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                        titleColor: '#F9FAFB',
-                        bodyColor: '#F9FAFB',
-                        borderColor: '#374151',
+                        backgroundColor: '#fff',
+                        titleColor: '#1e293b',
+                        bodyColor: '#1e293b',
+                        borderColor: '#e2e8f0',
                         borderWidth: 1,
                         cornerRadius: 8,
                         displayColors: true,
@@ -138,11 +138,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     x: {
                         grid: {
                             display: true,
-                            color: 'rgba(107, 114, 128, 0.1)',
+                            color: 'rgba(226, 232, 240, 0.6)',
                             drawBorder: false
                         },
                         ticks: {
-                            color: '#6B7280',
+                            color: '#64748b',
                             font: {
                                 family: 'Poppins',
                                 size: period === '30d' ? 9 : 11,
@@ -160,11 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         beginAtZero: true,
                         grid: {
                             display: true,
-                            color: 'rgba(107, 114, 128, 0.1)',
+                            color: 'rgba(226, 232, 240, 0.6)',
                             drawBorder: false
                         },
                         ticks: {
-                            color: '#6B7280',
+                            color: '#64748b',
                             font: {
                                 family: 'Poppins',
                                 size: 11,

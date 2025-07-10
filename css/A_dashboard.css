@@ -93,12 +93,12 @@
 
 /* Analytics Section - Cursor AI Style */
 .analytics-section {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-    border-radius: 16px;
+    background: #fff;
+    border-radius: 14px;
     padding: 24px 28px;
     margin-top: 32px;
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    color: #1e293b;
+    box-shadow: 6px 6px 54px 0px rgba(0, 0, 0, 0.05);
 }
 
 .analytics-header {
@@ -112,24 +112,24 @@
     font-family: 'Poppins', sans-serif;
     font-size: 20px;
     font-weight: 600;
-    color: #F9FAFB;
+    color: #1e293b;
     margin: 0;
 }
 
 .time-filter {
     display: flex;
     gap: 8px;
-    background: rgba(55, 65, 81, 0.5);
+    background: #f1f5f9;
     padding: 4px;
     border-radius: 8px;
-    border: 1px solid rgba(75, 85, 99, 0.3);
+    border: 1px solid #e2e8f0;
 }
 
 .filter-btn {
     padding: 6px 12px;
     font-size: 12px;
     font-weight: 500;
-    color: #9CA3AF;
+    color: #64748b;
     background: transparent;
     border: none;
     border-radius: 6px;
@@ -138,15 +138,30 @@
     font-family: 'Poppins', sans-serif;
 }
 
+.filter-btn-static {
+    color: #fff;
+    background: #605DEC;
+    box-shadow: 0 2px 4px rgba(96, 93, 236, 0.3);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    cursor: default;
+    border: none;
+    margin-left: 4px;
+    pointer-events: none;
+}
+
 .filter-btn:hover {
-    color: #F3F4F6;
-    background: rgba(75, 85, 99, 0.4);
+    color: #1e293b;
+    background: #e2e8f0;
 }
 
 .filter-btn.active {
-    color: #F9FAFB;
-    background: rgba(59, 130, 246, 0.8);
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    color: #fff;
+    background: #605DEC;
+    box-shadow: 0 2px 4px rgba(96, 93, 236, 0.3);
 }
 
 .analytics-stats {
@@ -154,7 +169,7 @@
     gap: 40px;
     margin-bottom: 32px;
     padding-bottom: 24px;
-    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .stat-item {
@@ -167,7 +182,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: 24px;
     font-weight: 700;
-    color: #F9FAFB;
+    color: #605DEC;
     line-height: 1.2;
 }
 
@@ -175,7 +190,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
     font-weight: 500;
-    color: #9CA3AF;
+    color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -183,10 +198,10 @@
 .chart-container {
     position: relative;
     height: 300px;
-    background: rgba(17, 24, 39, 0.4);
+    background: #f8fafc;
     border-radius: 12px;
     padding: 16px;
-    border: 1px solid rgba(75, 85, 99, 0.2);
+    border: 1px solid #e2e8f0;
 }
 
 .chart-container canvas {
