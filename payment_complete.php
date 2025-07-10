@@ -160,7 +160,6 @@ if (empty($flightDetailsDB)) {
     <?php include 'userHeader.php'; ?>
   </header>
   <main class="container">
-    <h1 class="title">You have <?= count($passengersForDisplay) ?> boarding passes, <?= $userName ?>!</h1>
     <p class="reference">Booking Reference: <span><?= $flightDetailsDB[0]['flight_booking_id'] ?></span></p>
     <p class="description">
       Thank you for booking your travel with <span>Travooli</span>!<br>
