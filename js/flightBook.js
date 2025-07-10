@@ -717,20 +717,22 @@ document.addEventListener('DOMContentLoaded', function () {
       };
 
       if (searchInfo.trip === 'round') {
-          const returnSearch = {
-              from: searchInfo.to,
-              to: searchInfo.from,
-              date: searchInfo.returnDate,
-              seatClass: searchInfo.seatClass || 'EC', // Ensure a default
-              airlines: searchInfo.airlines || '',
-              timeFrom: searchInfo.timeFrom || '06:00', // Use '06:00' as per filter, not '00:00'
-              timeTo: searchInfo.timeTo || '23:59',
-              sortBy: searchInfo.sortBy || ''
-          };
+        const returnSearch = {
+            from: searchInfo.to,
+            to: searchInfo.from,
+            date: searchInfo.returnDate, // This is the date parameter being sent
+            seatClass: searchInfo.seatClass || 'EC',
+            airlines: searchInfo.airlines || '',
+            timeFrom: searchInfo.timeFrom || '06:00',
+            timeTo: searchInfo.timeTo || '23:59',
+            sortBy: searchInfo.sortBy || ''
+        };
 
-          Promise.all([
-              new Promise(resolve => fetchFlights(searchParams, resolve)),
-              new Promise(resolve => fetchFlights(returnSearch, resolve))
+        console.log("DEBUG: Return Flight Search Params:", returnSearch); // ADD THIS LINE
+
+        Promise.all([
+            new Promise(resolve => fetchFlights(searchParams, resolve)),
+            new Promise(resolve => fetchFlights(returnSearch, resolve))
           ]).then(([departData, returnData]) => {
               const pairedData = departData.map((depart, i) => ({
                   depart,

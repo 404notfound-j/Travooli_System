@@ -13,15 +13,15 @@
             <div class="popup-title">Meal Add-on</div>
             
             <div class="meal-options">
-                <div class="meal-option selected" data-meal="no-meal" data-price="0">
+                <div class="meal-option selected" data-meal="no-meal" data-price="0" data-meal-id="M01"> 
                     <div class="meal-name">No meal</div>
                     <div class="meal-price free">Free</div>
                 </div>
-                <div class="meal-option" data-meal="single-meal" data-price="15">
+                <div class="meal-option" data-meal="single-meal" data-price="15" data-meal-id="ML01"> 
                     <div class="meal-name">Single meal</div>
                     <div class="meal-price">RM 15</div>
                 </div>
-                <div class="meal-option" data-meal="multi-meal" data-price="30">
+                <div class="meal-option" data-meal="multi-meal" data-price="30" data-meal-id="ML02"> 
                     <div class="meal-name">Multi-meal</div>
                     <div class="meal-price">RM 30</div>
                 </div>

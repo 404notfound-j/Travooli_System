@@ -1,138 +1,103 @@
 <?php
-// insertFlightPayment.php
-session_start();
-require_once 'connection.php'; // Include your database connection file
+header('Content-Type: application/json');
+require_once __DIR__ . '/connection.php'; // Uses $connection from connection.php
 
-header('Content-Type: application/json'); // Set header to return JSON
+// ✅ Generate unique 4-digit passenger ID
+function generateUniquePassengerId($connection) {
+    do {
+        $randomId = 'P' . str_pad(mt_rand(1000, 9999), 4, '0', STR_PAD_LEFT);
+        $check = $connection->prepare("SELECT pass_id FROM passenger_t WHERE pass_id = ?");
+        $check->bind_param("s", $randomId);
+        $check->execute();
+        $result = $check->get_result();
+    } while ($result->num_rows > 0);
 
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 0); // Do not display errors to the user, but log them
-
-// Ensure request method is POST and content type is JSON
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'error' => 'Invalid request method.']);
-    exit();
+    return $randomId;
 }
-
-$input = file_get_contents('php://input');
-$data = json_decode($input, true); // Decode JSON as associative array
-
-if (json_last_error() !== JSON_ERROR_NONE) {
-    error_log("JSON Decode Error: " . json_last_error_msg() . " Input: " . $input);
-    echo json_encode(['success' => false, 'error' => 'Invalid JSON received: ' . json_last_error_msg()]);
-    exit();
-}
-
-// Extract data from the received JSON
-$userId = $data['user_id'] ?? null;
-$flightId = $data['flight_id'] ?? null;
-$bookingDate = $data['booking_date'] ?? null;
-$status = $data['status'] ?? 'Confirmed';
-
-// --- Extract additional data for flight_booking_info_t ---
-$classId = $data['class_id'] ?? null;
-$selectedSeats = $data['selected_seats'] ?? [];
-$totalAmountPaid = $data['total_amount'] ?? 0;
-
-$ticketBasePrice = $data['ticket'] ?? 0;
-$baggageFees = $data['baggage'] ?? 0;
-$mealFees = $data['meal'] ?? 0;
-$taxAmount = $data['taxPrice'] ?? 0;
-
-$numPassenger = $data['num_passenger'] ?? 0;
-
-$flightDate = $data['flight_date'] ?? null;
-
-$selectedSeatNumbersString = implode(',', $selectedSeats);
-
-// --- DEBUG LINE: Check received data in PHP ---
-error_log("DEBUG in insertFlightPayment.php: Received data: " . print_r($data, true));
-error_log("DEBUG: Data for info table: TotalPaid=" . $totalAmountPaid . ", Ticket=" . $ticketBasePrice . ", NumPass=" . $numPassenger . ", Seats=" . $selectedSeatNumbersString . ", FlightDate=" . $flightDate);
-// --- END DEBUG ---
-
-
-// Basic validation for core booking data
-if (empty($userId) || empty($flightId) || empty($bookingDate) || empty($totalAmountPaid) || empty($classId) || empty($selectedSeats) || empty($numPassenger) || empty($flightDate)) {
-    error_log("ERROR in insertFlightPayment.php: Missing required booking data. Received: " . print_r($data, true));
-    echo json_encode(['success' => false, 'error' => 'Missing required booking data.']);
-    exit();
-}
-
-// Start transaction for atomicity
-mysqli_autocommit($connection, false);
 
 try {
-    // 1. Generate a unique flight_booking_id in the format BKmmddNNNNNN
-    $datePart = date('md');
-    $randomNumber = mt_rand(0, 999999);
-    $randomPart = str_pad($randomNumber, 6, '0', STR_PAD_LEFT);
-    $flightBookingId = 'BK' . $datePart . $randomPart;
+    $data = json_decode(file_get_contents("php://input"), true);
 
-
-    // 2. Insert into flight_booking_t
-    $bookingQuery = "INSERT INTO flight_booking_t (flight_booking_id, user_id, flight_id, booking_date, status) VALUES (?, ?, ?, ?, ?)";
-    $stmtBooking = mysqli_prepare($connection, $bookingQuery);
-    if (!$stmtBooking) {
-        throw new Exception('Booking query prepare failed: ' . mysqli_error($connection));
-    }
-    mysqli_stmt_bind_param($stmtBooking, "sssss", $flightBookingId, $userId, $flightId, $bookingDate, $status);
-    if (!mysqli_stmt_execute($stmtBooking)) {
-        throw new Exception('Booking insert failed: ' . mysqli_stmt_error($stmtBooking));
-    }
-    mysqli_stmt_close($stmtBooking);
-
-
-    // 3. Insert into flight_booking_info_t
-    $bookingInfoQuery = "INSERT INTO flight_booking_info_t (
-        flight_booking_id, total_amount_paid, ticket_base_price, baggage_fees, 
-        meal_fees, tax_amount, num_passenger, selected_seat_numbers, class_id, flight_date
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    $stmtInfo = mysqli_prepare($connection, $bookingInfoQuery);
-    if (!$stmtInfo) {
-        throw new Exception('Booking info query prepare failed: ' . mysqli_error($connection));
-    }
-    // This line is now corrected to have 10 types to match the 10 variables
-    mysqli_stmt_bind_param(
-        $stmtInfo, "sdddddisss", // CORRECTED TYPE STRING
-        $flightBookingId, $totalAmountPaid, $ticketBasePrice, $baggageFees,
-        $mealFees, $taxAmount, $numPassenger, $selectedSeatNumbersString, $classId, $flightDate
-    );
-    if (!mysqli_stmt_execute($stmtInfo)) {
-        throw new Exception('Booking info insert failed: ' . mysqli_stmt_error($stmtInfo));
-    }
-    mysqli_stmt_close($stmtInfo);
-
-
-    // 4. Update flight_seats_t for each selected seat
-    $seatUpdateQuery = "UPDATE flight_seats_t SET is_booked = 1, pass_id = ? WHERE flight_id = ? AND class_id = ? AND seat_no = ?";
-    $stmtSeats = mysqli_prepare($connection, $seatUpdateQuery);
-    if (!$stmtSeats) {
-        throw new Exception('Seat update query prepare failed: ' . mysqli_error($connection));
+    if (
+        !$data || !isset(
+            $data['user_id'], $data['flight_id'], $data['booking_date'], $data['status'],
+            $data['class_id'], $data['selected_seats'], $data['total_amount'],
+            $data['passengers'], $data['ticket'], $data['baggage'],
+            $data['meal'], $data['num_passenger']
+        )
+    ) {
+        throw new Exception("Missing required booking data.");
     }
 
-    foreach ($selectedSeats as $seatNo) {
-        mysqli_stmt_bind_param($stmtSeats, "ssss", $userId, $flightId, $classId, $seatNo);
-        if (!mysqli_stmt_execute($stmtSeats)) {
-            throw new Exception('Failed to update seat ' . $seatNo . ': ' . mysqli_stmt_error($stmtSeats));
+    $f_book_id = 'BK' . time();
+    $booking_info_id = 'BI' . time();
+
+    $connection->begin_transaction();
+
+    // ➤ Insert into flight_booking_t
+    $stmt1 = $connection->prepare("
+        INSERT INTO flight_booking_t (f_book_id, user_id, flight_id, book_date, status)
+        VALUES (?, ?, ?, ?, ?)
+    ");
+    $stmt1->bind_param("sssss", $f_book_id, $data['user_id'], $data['flight_id'], $data['booking_date'], $data['status']);
+    $stmt1->execute();
+
+    // ➤ Insert into flight_booking_info_t
+    $stmt2 = $connection->prepare("
+        INSERT INTO flight_booking_info_t (booking_info_id, f_book_id, passenger_count, baggage_total, meal_total, base_fare_total, total_amount)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt2->bind_param("ssidddd", $booking_info_id, $f_book_id, $data['num_passenger'], $data['baggage'], $data['meal'], $data['ticket'], $data['total_amount']);
+    $stmt2->execute();
+
+    // ➤ Insert each passenger
+    foreach ($data['passengers'] as $index => $pax) {
+        $pass_id = generateUniquePassengerId($connection);
+
+        // ➤ Insert into passenger_t
+        $stmt3 = $connection->prepare("
+            INSERT INTO passenger_t (pass_id, fst_name, lst_name, gender, dob, country, pass_category)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt3->bind_param("sssssss", $pass_id, $pax['first_name'], $pax['last_name'], $pax['gender'], $pax['dob'], $pax['country'], $pax['type']);
+        $stmt3->execute();
+
+        // ➤ Safe baggage and meal fallback
+        $validBaggageIds = ['BG01', 'BG02', 'BG03'];
+        $baggage_id = in_array($pax['baggage_id'], $validBaggageIds) ? $pax['baggage_id'] : 'BG01';
+        $meal_id = $pax['meal_id'] ?? 'M01';
+
+        // ➤ Insert into passenger_service_t
+        $stmt4 = $connection->prepare("
+            INSERT INTO passenger_service_t (pass_id, f_book_id, class_id, baggage_id, meal_id)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $stmt4->bind_param("sssss", $pass_id, $f_book_id, $data['class_id'], $baggage_id, $meal_id);
+        $stmt4->execute();
+
+        // ➤ Update seat booking in flight_seats_t
+        $selectedSeat = $data['selected_seats'][$index];
+        $stmtSeatUpdate = $connection->prepare("
+            UPDATE flight_seats_t
+            SET is_booked = 1, pass_id = ?
+            WHERE flight_id = ? AND seat_no = ?
+        ");
+        $stmtSeatUpdate->bind_param("sss", $pass_id, $data['flight_id'], $selectedSeat);
+        $stmtSeatUpdate->execute();
+
+        if ($stmtSeatUpdate->affected_rows === 0) {
+            error_log("⚠️ Seat update failed for seat_no = $selectedSeat (flight_id = {$data['flight_id']})");
         }
-        if (mysqli_stmt_affected_rows($stmtSeats) === 0) {
-            throw new Exception('Seat ' . $seatNo . ' was not updated (possibly already booked or does not exist for this flight/class).');
-        }
     }
-    mysqli_stmt_close($stmtSeats);
 
-    // If all operations succeeded, commit the transaction
-    mysqli_commit($connection);
-    echo json_encode(['success' => true, 'message' => 'Booking confirmed and seats updated. Booking ID: ' . $flightBookingId, 'bookingId' => $flightBookingId]);
+    $connection->commit();
+    echo json_encode(['success' => true, 'bookingId' => $f_book_id]);
 
 } catch (Exception $e) {
-    // If any operation failed, rollback the transaction
-    mysqli_rollback($connection);
-    error_log("Booking Transaction Failed: " . $e->getMessage());
+    if (isset($connection)) {
+        $connection->rollback();
+    }
+    error_log("❌ Booking Error: " . $e->getMessage());
     echo json_encode(['success' => false, 'error' => 'Booking failed: ' . $e->getMessage()]);
-} finally {
-    mysqli_autocommit($connection, true); // Restore autocommit mode
-    mysqli_close($connection); // Close the database connection
 }
+?>

@@ -50,7 +50,7 @@ $passengersForDisplay = []; // Array to hold passenger_t records
 // --- Main DB Query to get ALL booking and flight info ---
 if (!empty($bookingIdToQuery)) {
     $query = "SELECT
-                fb.flight_booking_id, fb.user_id, fb.flight_id, fb.booking_date, fb.status AS booking_status,
+                fb.f_book_id, fb.user_id, fb.flight_id, fb.booking_date, fb.status AS booking_status,
                 ft.departure_time, ft.arrival_time, ft.orig_airport_id, ft.dest_airport_id,
                 a.airline_name, a.airline_id,
                 fbi.total_amount_paid, fbi.ticket_base_price, fbi.baggage_fees,
@@ -60,8 +60,8 @@ if (!empty($bookingIdToQuery)) {
               FROM flight_booking_t fb
               JOIN flight_info_t ft ON fb.flight_id = ft.flight_id
               JOIN airline_t a ON ft.airline_id = a.airline_id
-              JOIN flight_booking_info_t fbi ON fb.flight_booking_id = fbi.flight_booking_id
-              WHERE fb.flight_booking_id = ?";
+              JOIN flight_booking_info_t fbi ON fb.f_book_id = fbi.f_book_id
+              WHERE fb.f_book_id = ?";
     
     $stmt = mysqli_prepare($connection, $query);
     if ($stmt) {
@@ -83,21 +83,6 @@ if (!empty($bookingIdToQuery)) {
 
             $selectedSeatsDisplay = explode(',', $row['selected_seat_numbers']);
 
-            // --- Fetch all passengers for this booking ---
-            // $passengersQuery = "SELECT passenger_id, fst_name, lst_name, gender, dob, country, class_id, baggage_id, meal_id
-            //                     FROM passenger_t WHERE flight_booking_id = ?";
-            // $stmtPassengers = mysqli_prepare($connection, $passengersQuery);
-            // if ($stmtPassengers) {
-            //     mysqli_stmt_bind_param($stmtPassengers, "s", $bookingIdToQuery);
-            //     mysqli_stmt_execute($stmtPassengers);
-            //     $resultPassengers = mysqli_stmt_get_result($stmtPassengers);
-            //     while($paxRow = mysqli_fetch_assoc($resultPassengers)) {
-            //         $passengersForDisplay[] = $paxRow;
-            //     }
-            //     mysqli_stmt_close($stmtPassengers);
-            // } else {
-            //     error_log("DB Query prep failed for passengers_t in payment_complete.php: " . mysqli_error($connection));
-            // }
 
         } else {
             error_log("No booking found for ID: " . $bookingIdToQuery);

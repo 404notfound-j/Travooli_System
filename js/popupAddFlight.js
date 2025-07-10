@@ -293,7 +293,54 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     return true;
   }
-  // --- END VALIDATION FUNCTION ---
+
+  function recordPassengerDataToSession() {
+    const passengerItems = document.querySelectorAll('#passenger-list .passenger-item');
+    const allPassengerData = [];
+  
+    passengerItems.forEach(item => {
+      const checkbox = item.querySelector('.passenger-select-checkbox');
+      if (!checkbox || !checkbox.checked) return;
+  
+      const nameText = item.querySelector('.passenger-name').textContent.trim();
+      const [firstName, ...lastNameParts] = nameText.split(' ');
+      const lastName = lastNameParts.join(' ');
+  
+      const typeText = item.querySelector('.passenger-type').textContent.trim().split(" / ");
+      const type = typeText[0];
+      const gender = typeText[1];
+      const country = typeText[2];
+      const dob = item.getAttribute('data-dob');
+  
+      const index = item.dataset.passengerIndex;
+      const paxAddons = document.querySelectorAll(`.passenger-addon-item[data-passenger-index="${index}"]`);
+  
+      let mealId = "M01"; // default
+      let baggageId = "BG10"; // default
+  
+      // Try to extract from sessionStorage if available
+      const paxDetailsArray = JSON.parse(sessionStorage.getItem('allPassengersDetails') || '[]');
+      if (paxDetailsArray[index]) {
+        mealId = paxDetailsArray[index].mealId || mealId;
+        baggageId = paxDetailsArray[index].baggageId || baggageId;
+      }
+  
+      allPassengerData.push({
+        first_name: firstName,
+        last_name: lastName,
+        gender: gender,
+        country: country,
+        dob: dob,
+        type: type,
+        meal_id: mealId,
+        baggage_id: baggageId
+      });
+    });
+  
+    sessionStorage.setItem('passenger_details', JSON.stringify(allPassengerData));
+    console.log('Passenger details recorded to sessionStorage:', allPassengerData);
+  }
+  
 
 
   // --- Event delegation for passenger checkbox changes ---
@@ -338,6 +385,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (validateAllPassengerInfo()) {
         window.updatePrices();
+        recordPassengerDataToSession();
         window.location.href = 'seat_selection.php';
       }
     });

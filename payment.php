@@ -28,6 +28,7 @@ error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? '
             <div class="content-grid">
                 <div class="left-column">
                     <h2 class="section-title">Payment method</h2>
+                    <input type="hidden" name="passengers" id="passengersField">
                     
                     <p class="section-description">
                         Select a payment method below. Tripma processes your payment
