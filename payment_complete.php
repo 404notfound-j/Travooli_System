@@ -160,10 +160,12 @@ if (empty($flightDetailsDB)) {
     <?php include 'userHeader.php'; ?>
   </header>
   <main class="container">
+    <h1 class="title">Have a good trip, <?= $userName ?>!</h1>
     <p class="reference">Booking Reference: <span><?= $flightDetailsDB[0]['flight_booking_id'] ?></span></p>
     <p class="description">
-      Thank you for booking your travel with <span>Travooli</span>!<br>
-      Below is a summary of your trip.
+        Thank you for booking your travel with <span>Travooli</span>!<br>
+        Below is a summary of your trip.
+        A copy of your booking confirmation has been sent to your email address. You can always revisit this information in the My Trips section of our app. Safe travels!
     </p>
 
     <?php foreach ($passengersForDisplay as $index => $passenger): ?>
@@ -258,11 +260,11 @@ if (empty($flightDetailsDB)) {
       </div>
     </section>
 
-    <section class="cancel-flight">
-      <h1>Cancellation Policy</h1>
-      <p>This flight has a flexible cancellation policy. You may be eligible for a refund if cancelled at least 24 hours before departure.</p>
-      <p>All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee.</p>
-      <button class="cancel-flight-btn" onclick="showCancelConfirmation()">Cancel Flight</button>
+    <section class="cancel-flight"> 
+      <h1>Cancellation Policy</h1> 
+      <p>This flight has a flexible cancellation policy. You may be eligible for a refund if cancelled at least 24 hours before departure.</p> 
+      <p>All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee.</p> 
+      <button class="cancel-flight-btn" onclick="showCancelConfirmation()">Cancel Flight</button> 
     </section>
   </main>
   <script src="js/flight_Complete.js"></script>
