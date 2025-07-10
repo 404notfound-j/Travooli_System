@@ -234,7 +234,7 @@ if (empty($flightDetailsDB)) {
           <div class="price-item"><span>Flight Price</span><span>RM <?= number_format($ticketPrice, 2) ?></span></div>
           <div class="price-item"><span>Baggage Fees</span><span>RM <?= number_format($baggagePrice, 2) ?></span></div>
           <div class="price-item"><span>Meal Add-on</span><span>RM <?= number_format($mealPrice, 2) ?></span></div>
-          <div class="price-item"><span>Taxes and Fees</span><span>RM <?= number_format($taxPrice, 2) ?></span></div>
+          <div class="price-item"><span>Taxes and Fees</span><span>RM <?= number_format(($ticketPrice+$baggagePrice+$mealPrice) *0.06, 2)?></span></div>
           <div class="price-total"><span>Amount Paid</span><span>RM <?= number_format($finalTotalPrice, 2) ?></span></div>
         </div>
       </div>
