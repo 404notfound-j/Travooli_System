@@ -13,8 +13,7 @@ ob_start();
 ?>
   <div class="contact-page">
     <div class="header-row">
-      <h2>Contact</h2>
-      <button class="add-btn">Add New Contact</button>
+      <h2>Contacts</h2>
     </div>
 
     <div class="card-container">

@@ -14,7 +14,6 @@ ob_start();
   <div class="team-section">
     <div class="team-header">
       <h2>Team</h2>
-      <button class="add-team-btn">Add Team Member</button>
     </div>
 
     <div class="team-container">

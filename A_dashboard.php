@@ -117,7 +117,7 @@ $totalWeekRevenue = $totalFlightRevenue + $totalHotelRevenue;
                 <div class="time-filter">
                     <span class="filter-btn active">7d</span>
                     <span class="filter-btn">30d</span>
-                    <span class="filter-btn" id="dateRange"><?php echo date('M d', strtotime('-6 days')) . ' - ' . date('M d'); ?></span>
+                    <span class="filter-btn-static" id="dateRange"><?php echo date('M d', strtotime('-6 days')) . ' - ' . date('M d'); ?></span>
                 </div>
             </div>
             
