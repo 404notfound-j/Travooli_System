@@ -87,6 +87,18 @@ if (!empty($bookingIdToQuery)) {
         while ($row = mysqli_fetch_assoc($resultPassengers)) {
             $passengersForDisplay[] = $row;
         }
+
+        $seen = [];
+        $uniquePassengers = [];
+
+        foreach ($passengersForDisplay as $p) {
+            if (!in_array($p['pass_id'], $seen)) {
+                $seen[] = $p['pass_id'];
+                $uniquePassengers[] = $p;
+            }
+        }
+        $passengersForDisplay = $uniquePassengers;
+
         mysqli_stmt_close($stmtPassengers);
     }
 }
