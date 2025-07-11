@@ -19,33 +19,32 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$isAdmin = false;
 $userId = $_SESSION['user_id'];
+$isAdmin = false;
+$editUserId = $userId; // Default: user can only edit their own profile
 
-// Check if user_id exists in admin_detail_t
+// Check if logged-in user is admin
 $adminCheckQuery = "SELECT 1 FROM admin_detail_t WHERE admin_id = ?";
-$stmt = mysqli_prepare($connection, $adminCheckQuery);
-mysqli_stmt_bind_param($stmt, "s", $userId);
-mysqli_stmt_execute($stmt);
-mysqli_stmt_store_result($stmt);
-
-if (mysqli_stmt_num_rows($stmt) > 0) {
-    $isAdmin = true;
-}
-mysqli_stmt_close($stmt);
-
-// By default, user edits their own profile
-$targetUserId = $_SESSION['user_id'];
-
-// If admin and ?user_id= is set, allow editing another user
-if ($isAdmin && isset($_GET['user_id']) && !empty($_GET['user_id'])) {
-    $targetUserId = $_GET['user_id'];
+$adminCheckStmt = mysqli_prepare($connection, $adminCheckQuery);
+if ($adminCheckStmt) {
+    mysqli_stmt_bind_param($adminCheckStmt, "s", $userId);
+    mysqli_stmt_execute($adminCheckStmt);
+    mysqli_stmt_store_result($adminCheckStmt);
+    if (mysqli_stmt_num_rows($adminCheckStmt) > 0) {
+        $isAdmin = true;
+    }
+    mysqli_stmt_close($adminCheckStmt);
 }
 
-// Prevent normal users from accessing other profiles
-if (!$isAdmin && isset($_GET['user_id'])) {
-    header("Location: profile.php");
-    exit();
+// If admin and both ?admin_id and ?user_id are set, and admin_id matches session, allow editing that user's profile
+$hideHeader = false;
+if (
+    $isAdmin &&
+    isset($_GET['admin_id']) && $_GET['admin_id'] === $userId &&
+    isset($_GET['user_id']) && !empty($_GET['user_id'])
+) {
+    $editUserId = $_GET['user_id'];
+    $hideHeader = true; // Hide header when admin is editing another user's profile
 }
 
 $message = '';
@@ -138,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $escapedPhone = mysqli_real_escape_string($connection, $phone);
             $escapedCountry = mysqli_real_escape_string($connection, $country);
             $escapedGender = mysqli_real_escape_string($connection, $gender);
-            $escapedUserId = mysqli_real_escape_string($connection, $targetUserId);
+            $escapedUserId = mysqli_real_escape_string($connection, $editUserId);
             
             $updateQuery = "UPDATE user_detail_t SET fst_name = '$escapedFirstName', lst_name = '$escapedLastName', phone_no = '$escapedPhone', country = '$escapedCountry', gender = '$escapedGender', profile_pic = '$escapedImageData' WHERE user_id = '$escapedUserId'";
             
@@ -150,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt = mysqli_prepare($connection, $updateQuery);
             
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "ssssss", $firstName, $lastName, $phone, $country, $gender, $targetUserId);
+                mysqli_stmt_bind_param($stmt, "ssssss", $firstName, $lastName, $phone, $country, $gender, $editUserId);
             }
         }
         
@@ -160,6 +159,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $message = "Profile updated successfully!";
                 $messageType = "success";
                 $_SESSION['profile_complete'] = true;
+                if ($isAdminEditing) {
+                    header("Location: profile.php?admin_id=" . urlencode($_POST['admin_id']) . "&user_id=" . urlencode($_POST['user_id']) . "&return=" . urlencode($_POST['return']));
+                    exit();
+                }
             } else {
                 $message = "Error updating profile. Please try again.";
                 $messageType = "error";
@@ -175,6 +178,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 $messageType = "success";
                 $_SESSION['profile_complete'] = true;
+                if ($isAdminEditing) {
+                    header("Location: profile.php?admin_id=" . urlencode($_POST['admin_id']) . "&user_id=" . urlencode($_POST['user_id']) . "&return=" . urlencode($_POST['return']));
+                    exit();
+                }
             } else {
                 $message = "Error updating profile. Please try again.";
                 $messageType = "error";
@@ -191,14 +198,19 @@ $query = "SELECT user_id, fst_name, lst_name, email_address, phone_no, country, 
 $stmt = mysqli_prepare($connection, $query);
 
 if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "s", $targetUserId);
+    mysqli_stmt_bind_param($stmt, "s", $editUserId);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     
     if ($result && mysqli_num_rows($result) > 0) {
         $userData = mysqli_fetch_assoc($result);
     } else {
-        header("Location: signIn.php");
+        // Debug output
+        echo "<div style='color:red;text-align:center;margin:2em;'>";
+        echo "DEBUG: No user found for user_id = <b>" . htmlspecialchars($editUserId) . "</b><br>";
+        echo "Are you sure this user exists in user_detail_t?<br>";
+        echo "<a href='javascript:history.back()'>Go Back</a>";
+        echo "</div>";
         exit();
     }
     
@@ -208,8 +220,18 @@ if ($stmt) {
 // Check if profile is complete (has phone number)
 $profileComplete = !empty($userData['phone_no']);
 $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomplete';
+
+$isEmbed = isset($_GET['embed']) && $_GET['embed'] == '1';
+$isContentOnly = isset($_GET['content_only']) && $_GET['content_only'] == '1';
+
+$isAdminEditing = (
+    $isAdmin &&
+    isset($_GET['admin_id']) && $_GET['admin_id'] === $userId &&
+    isset($_GET['user_id']) && !empty($_GET['user_id'])
+);
 ?>
 
+<?php if (!$isContentOnly): ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -222,10 +244,15 @@ $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomp
 </head>
 <body>
 
-<?php include 'userHeader.php'; ?>
+<?php if (!$hideHeader) include 'userHeader.php'; ?>
 
 <div class="signin-bg">
+    <main class="profile-main">
+<?php else: ?>
+<div class="signin-bg">
 <main class="profile-main">
+<?php endif; ?>
+
     <div class="profile-container <?= $profileContainerClass ?>">
         <div class="profile-header">
             <div class="profile-avatar clickable-avatar" onclick="triggerFileUpload()" title="Click to change profile picture">
@@ -245,16 +272,8 @@ $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomp
                 </div>
             </div>
             <div class="profile-title">
-                <h1>
-                    <?php
-                    if ($isAdmin && isset($_GET['user_id']) && !empty($_GET['user_id'])) {
-                        echo htmlspecialchars($userData['fst_name'] . ' ' . $userData['lst_name']);
-                    } else {
-                        echo 'My Profile';
-                    }
-                    ?>
-                </h1>
-                <p>Manage your personal information</p>
+                <h1><?= $isAdminEditing ? 'Edit Profile' : 'My Profile' ?></h1>
+                <p><?= $isAdminEditing ? 'Edit user information' : 'Manage your personal information' ?></p>
                 <?php if ($message): ?>
                     <div id="profile-message" class="profile-message" data-type="<?= $messageType ?>" style="display: none;">
                         <?= htmlspecialchars($message) ?>
@@ -271,9 +290,13 @@ $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomp
             </div>
         </div>
 
-        <form class="profile-form" method="POST" action="" enctype="multipart/form-data">
+        <form class="profile-form" method="POST" action="?admin_id=<?= urlencode($_GET['admin_id'] ?? '') ?>&user_id=<?= urlencode($_GET['user_id'] ?? '') ?>&return=<?= urlencode($_GET['return'] ?? '') ?>" enctype="multipart/form-data">
             <!-- Hidden file input for profile picture -->
             <input type="file" id="profile_pic" name="profile_pic" accept="image/*" style="display: none;">
+            
+            <input type="hidden" name="admin_id" value="<?= htmlspecialchars($_GET['admin_id'] ?? '') ?>">
+            <input type="hidden" name="user_id" value="<?= htmlspecialchars($_GET['user_id'] ?? '') ?>">
+            <input type="hidden" name="return" value="<?= htmlspecialchars($_GET['return'] ?? '') ?>">
             
             <div class="form-section">
                 <h2>Personal Information</h2>
@@ -326,7 +349,13 @@ $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomp
 
             <div class="form-actions">
                 <?php if ($profileComplete): ?>
-                    <button type="button" class="btn-secondary" onclick="window.history.back()">Back</button>
+                    <?php if ($isAdminEditing): ?>
+                        <button type="button" class="btn-secondary" onclick="window.location.href='<?= isset($_GET['return']) ? htmlspecialchars($_GET['return']) : 'U_Manage.php' ?>'">Back to User Management</button>
+                    <?php elseif (isset($_GET['return']) && !empty($_GET['return'])): ?>
+                        <button type="button" class="btn-secondary" onclick="window.location.href='<?= htmlspecialchars($_GET['return']) ?>'">Back</button>
+                    <?php else: ?>
+                        <button type="button" class="btn-secondary" onclick="window.history.back()">Back</button>
+                    <?php endif; ?>
                 <?php endif; ?>
                 <button type="submit" class="btn-primary">
                     <?= $profileComplete ? 'Update Profile' : 'Complete Profile' ?>
@@ -334,6 +363,8 @@ $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomp
             </div>
         </form>
     </div>
+
+<?php if (!$isContentOnly): ?>
 </main>
 </div>
 
@@ -395,3 +426,4 @@ setTimeout(() => {
 
 </body>
 </html>
+<?php endif; ?>

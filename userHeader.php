@@ -31,22 +31,36 @@ $userData = null;
 
 if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
-    
-    // Fetch user data from database including profile picture
+    $isLoggedIn = false;
+
+    // Try user_detail_t
     $query = "SELECT user_id, fst_name, lst_name, email_address, phone_no, country, profile_pic FROM user_detail_t WHERE user_id = ?";
     $stmt = mysqli_prepare($connection, $query);
-    
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "s", $userId);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
-        
         if ($result && mysqli_num_rows($result) > 0) {
             $userData = mysqli_fetch_assoc($result);
             $isLoggedIn = true;
         }
-        
         mysqli_stmt_close($stmt);
+    }
+
+    // If not found, try admin_detail_t
+    if (!$isLoggedIn) {
+        $query = "SELECT admin_id as user_id, fst_name, lst_name, email_address, phone_no, country, profile_pic FROM admin_detail_t WHERE admin_id = ?";
+        $stmt = mysqli_prepare($connection, $query);
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "s", $userId);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            if ($result && mysqli_num_rows($result) > 0) {
+                $userData = mysqli_fetch_assoc($result);
+                $isLoggedIn = true;
+            }
+            mysqli_stmt_close($stmt);
+        }
     }
 }
 ?>
