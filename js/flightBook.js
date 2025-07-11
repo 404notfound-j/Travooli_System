@@ -1061,3 +1061,33 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
 });
+
+// Airline Reviews Tab Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const tabButtons = document.querySelectorAll('.tab-button');
+  
+  if (tabButtons.length > 0) {
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons and panes
+        document.querySelectorAll('.tab-button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+          pane.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        // Show corresponding tab pane
+        const tabId = this.getAttribute('data-tab');
+        const tabPane = document.getElementById(tabId);
+        if (tabPane) {
+          tabPane.classList.add('active');
+        }
+      });
+    });
+  }
+});

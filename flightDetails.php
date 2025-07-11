@@ -14,6 +14,33 @@ if (isset($_GET['depart'])) {
 if (isset($_GET['return'])) {
     $_SESSION['selected_return_flight_id'] = $_GET['return'];
 }
+
+include 'connection.php';
+
+// Get airline ID from the flight
+$airline_id = null;
+$flight_id = isset($_SESSION['selected_flight_id']) ? $_SESSION['selected_flight_id'] : 
+            (isset($_SESSION['selected_depart_flight_id']) ? $_SESSION['selected_depart_flight_id'] : null);
+
+if ($flight_id) {
+    $sql = "SELECT airline_id FROM flight_info_t WHERE flight_id = '$flight_id'";
+    $result = mysqli_query($connection, $sql);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $airline_id = $row['airline_id'];
+    }
+}
+
+// We'll use JavaScript to get the airline_id from sessionStorage
+// The hardcoded value is removed
+
+// Calculate average rating for this airline
+$avg_rating = 0;
+$total_reviews = 0;
+$rating_text = "No reviews yet";
+
+// We'll set the airline_id via JavaScript, so we'll calculate ratings after that
+// The PHP code will be executed after the airline_id is set by JavaScript
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,6 +50,7 @@ if (isset($_GET['return'])) {
   <title>Flight Details</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/flightDetails.css">
+  <link rel="stylesheet" href="css/feedback.css">
   
   <!-- ✅ Inject login status for JS -->
   <script>
@@ -44,8 +72,10 @@ if (isset($_GET['return'])) {
       </p>
         <div style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
         <div class="rating-info">
-            <span class="rating-score">4.2</span>
-            <span class="rating-text">Very Good 54 reviews</span> 
+            <span class="rating-score" id="avg-rating">0</span>
+            <span class="rating-text" id="rating-text">
+                No reviews yet
+            </span> 
         </div>
     </div>
       </div>
@@ -175,10 +205,39 @@ if (isset($_GET['return'])) {
     </div>
   </div>
 </div>
-    <?php include 'feedback.php'; ?>
+
+    <section class="feedback-section" id="feedback-section">
+        <div class="feedback-container">
+            <!-- Reviews Header -->
+            <div class="reviews-header">
+                <h2 class="reviews-title">Reviews</h2>
+                <div class="rating-display">
+                    <span class="rating-score" id="feedback-avg-rating">0</span>
+                    <div class="rating-details">
+                        <div class="rating-stars" id="feedback-rating-stars">
+                            <!-- Stars will be added by JavaScript -->
+                        </div>
+                        <span class="rating-label" id="feedback-rating-label">No reviews yet</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reviews-divider"></div>
+            
+            <div id="feedback-form-container">
+                <!-- Feedback form will be added by JavaScript if user can leave feedback -->
+            </div>
+            
+            <!-- Reviews List -->
+            <div class="reviews-list" id="reviews-list">
+                <!-- Reviews will be loaded by JavaScript -->
+                <p id="no-reviews-message">Loading reviews...</p>
+            </div>
+        </div>
+    </section>
 
 <script src="js/flightDetails.js"></script>
-
+<script src="js/airlineReviews.js"></script>
 </body>
 </html>
 

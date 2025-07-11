@@ -1,5 +1,5 @@
 <?php
-// This file handles saving reviews submitted from hotelPaymentComplete.php and payment_complete.php
+// This file handles saving reviews submitted from hotelPaymentComplete.php
 session_start();
 include 'connection.php';
 

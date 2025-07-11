@@ -1560,3 +1560,153 @@ input:focus ~ .input-border {
   min-width: 24px;
   text-align: center;
 }
+
+/* Airline Reviews Section */
+.airline-reviews-section {
+  padding: 40px 0;
+  background-color: #f9f9f9;
+}
+
+.airline-reviews-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.airline-tabs {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.tab-header {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+
+.tab-button {
+  padding: 15px 25px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+}
+
+.tab-button:hover {
+  background-color: #f5f5f5;
+}
+
+.tab-button.active {
+  color: #5c63f2;
+  border-bottom: 2px solid #5c63f2;
+  background-color: #f9f9ff;
+}
+
+.tab-content {
+  padding: 20px;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.airline-rating-summary {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.rating-display {
+  display: flex;
+  align-items: center;
+}
+
+.rating-score {
+  font-size: 36px;
+  font-weight: 700;
+  color: #5c63f2;
+  margin-right: 15px;
+}
+
+.rating-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.rating-stars {
+  color: #ffb400;
+  margin-bottom: 5px;
+}
+
+.rating-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.reviews-list {
+  padding: 10px 0;
+}
+
+.review-item {
+  margin-bottom: 20px;
+}
+
+.review-content {
+  display: flex;
+  gap: 15px;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.review-text {
+  flex: 1;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.user-name {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.separator {
+  margin: 0 8px;
+  color: #ccc;
+}
+
+.review-rating {
+  color: #ffb400;
+}
+
+.review-comment {
+  color: #555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.review-divider {
+  height: 1px;
+  background-color: #eee;
+  margin: 20px 0;
+}

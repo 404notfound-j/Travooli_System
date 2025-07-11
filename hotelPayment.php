@@ -3,6 +3,68 @@
 session_start();
 include 'connection.php';
 
+// AJAX Credit Card Validation Endpoint
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    if (isset($_POST['action']) && $_POST['action'] == 'validate_card') {
+        $response = ['valid' => false, 'errors' => []];
+        
+        // Validate card name
+        if (empty($_POST['card_name'])) {
+            $response['errors']['card_name'] = 'Please enter the name on card';
+        }
+        
+        // Validate card number
+        if (empty($_POST['card_number'])) {
+            $response['errors']['card_number'] = 'Please enter card number';
+        } else {
+            $cardNumber = preg_replace('/\s+/', '', $_POST['card_number']);
+            if (!preg_match('/^\d+$/', $cardNumber) || strlen($cardNumber) != 16) {
+                $response['errors']['card_number'] = 'Card number must be 16 digits';
+            }
+        }
+        
+        // Validate expiry date
+        if (empty($_POST['card_expiry'])) {
+            $response['errors']['card_expiry'] = 'Please enter expiration date';
+        } else {
+            $expiry = $_POST['card_expiry'];
+            if (!preg_match('/^(0[1-9]|1[0-2])\/([0-9]{2})$/', $expiry, $matches)) {
+                $response['errors']['card_expiry'] = 'Invalid expiration date format (MM/YY)';
+            } else {
+                $month = $matches[1];
+                $year = $matches[2];
+                
+                // Check if card is expired
+                $currentYear = date('y');
+                $currentMonth = date('m');
+                
+                if (($year < $currentYear) || ($year == $currentYear && $month < $currentMonth)) {
+                    $response['errors']['card_expiry'] = 'Card has expired';
+                }
+            }
+        }
+        
+        // Validate CVV
+        if (empty($_POST['card_cvv'])) {
+            $response['errors']['card_cvv'] = 'Please enter CVV';
+        } else {
+            $cvv = $_POST['card_cvv'];
+            if (!preg_match('/^[0-9]{3,4}$/', $cvv)) {
+                $response['errors']['card_cvv'] = 'CVV must be 3-4 digits';
+            }
+        }
+        
+        // If no errors, set valid to true
+        if (empty($response['errors'])) {
+            $response['valid'] = true;
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+}
+
 // Get parameters from URL
 $customer_id = isset($_GET['customer_id']) ? $_GET['customer_id'] : '';
 $hotel_id = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : '';
@@ -45,7 +107,104 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tax = isset($_GET['tax']) ? $_GET['tax'] : '';
     $total = isset($_GET['total']) ? $_GET['total'] : '';
     
-    if (!empty($payment_method)) {
+    // Validate payment method
+    if (empty($payment_method)) {
+        $error_message = "Please select a payment method.";
+    } 
+    // For credit card payment, validate card details
+    else if ($payment_method === 'Credit Card') {
+        // Only validate card details if credit card is selected
+        $card_name = isset($_POST['card_name']) ? $_POST['card_name'] : '';
+        $card_number = isset($_POST['card_number']) ? $_POST['card_number'] : '';
+        $card_expiry = isset($_POST['card_expiry']) ? $_POST['card_expiry'] : '';
+        $card_cvv = isset($_POST['card_cvv']) ? $_POST['card_cvv'] : '';
+        
+        if (empty($card_name) || empty($card_number) || empty($card_expiry) || empty($card_cvv)) {
+            $error_message = "Please fill in all credit card details.";
+        } else {
+            // Proceed with payment processing
+            try {
+                // Start transaction
+                mysqli_begin_transaction($connection, MYSQLI_TRANS_START_READ_WRITE);
+                
+                // Get the logged-in user's ID from the session
+                $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'U001'; // Default to U001 if not logged in
+                
+                // --- Generate booking ID safely (lock table row) ---
+                $booking_id_query = "SELECT MAX(SUBSTRING(h_book_id, 3)) as max_id FROM hotel_booking_t FOR UPDATE";
+                $result = mysqli_query($connection, $booking_id_query);
+                $row = mysqli_fetch_assoc($result);
+                $max_id = isset($row['max_id']) ? (int)$row['max_id'] : 0;
+                $next_booking_id = str_pad($max_id + 1, 4, '0', STR_PAD_LEFT);
+                $h_book_id = "BK" . $next_booking_id;
+                
+                // Debug: Output booking info before insert
+                error_log("Booking Insert: h_book_id=$h_book_id, user_id=$user_id, customer_id=$customer_id, hotel_id=$hotel_id, r_type_id=$r_type_id, checkin=$checkin, checkout=$checkout, room_count=$room_count, adult=$adult, child=$child");
+                
+                // --- Use prepared statement for booking insert ---
+                $stmt = mysqli_prepare($connection, "INSERT INTO hotel_booking_t (h_book_id, user_id, customer_id, hotel_id, r_type_id, check_in_date, check_out_date, status, room_count, adult_count, child_count) VALUES (?, ?, ?, ?, ?, ?, ?, 'Confirmed', ?, ?, ?)");
+                if (!$stmt) throw new Exception('Prepare booking insert failed: ' . mysqli_error($connection));
+                mysqli_stmt_bind_param($stmt, 'ssssssssii', $h_book_id, $user_id, $customer_id, $hotel_id, $r_type_id, $checkin, $checkout, $room_count, $adult, $child);
+                if (!mysqli_stmt_execute($stmt)) {
+                    error_log('Booking insert error: ' . mysqli_stmt_error($stmt));
+                    throw new Exception('Booking insert error: ' . mysqli_stmt_error($stmt));
+                }
+                mysqli_stmt_close($stmt);
+                
+                // --- Generate payment ID safely (lock table row) ---
+                $payment_id_query = "SELECT MAX(SUBSTRING(h_payment_id, 3)) as max_id FROM hotel_payment_t FOR UPDATE";
+                $result = mysqli_query($connection, $payment_id_query);
+                $row = mysqli_fetch_assoc($result);
+                $max_payment_id = isset($row['max_id']) ? (int)$row['max_id'] : 0;
+                $next_payment_id = str_pad($max_payment_id + 1, 4, '0', STR_PAD_LEFT);
+                $h_payment_id = "HP" . $next_payment_id;
+                
+                // Get current date for payment date
+                $payment_date = date('Y-m-d');
+                
+                // --- Use prepared statement for payment insert ---
+                $stmt2 = mysqli_prepare($connection, "INSERT INTO hotel_payment_t (h_payment_id, h_book_id, payment_date, amount, method, status) VALUES (?, ?, ?, ?, ?, 'Paid')");
+                if (!$stmt2) throw new Exception('Prepare payment insert failed: ' . mysqli_error($connection));
+                mysqli_stmt_bind_param($stmt2, 'sssss', $h_payment_id, $h_book_id, $payment_date, $total, $payment_method);
+                if (!mysqli_stmt_execute($stmt2)) {
+                    error_log('Payment insert error: ' . mysqli_stmt_error($stmt2));
+                    throw new Exception('Payment insert error: ' . mysqli_stmt_error($stmt2));
+                }
+                mysqli_stmt_close($stmt2);
+                
+                // Commit the changes
+                mysqli_commit($connection);
+                
+                // Store booking ID in session for hotelPaymentComplete.php
+                $_SESSION['last_booking_id'] = $h_book_id;
+                
+                $payment_success = true;
+                
+                if ($payment_success) {
+                    // Clear any previous booking sessions to ensure fresh data
+                    unset($_SESSION['booking_ids']);
+                    
+                    // Debug log before redirect
+                    error_log("Payment successful, redirecting to hotelPaymentComplete.php with booking ID: $h_book_id");
+                    
+                    // Ensure no output has been sent before redirect
+                    if (headers_sent($file, $line)) {
+                        error_log("Headers already sent in $file:$line - cannot redirect");
+                    } else {
+                        header("Location: hotelPaymentComplete.php");
+                        exit();
+                    }
+                }
+                
+            } catch (Exception $e) {
+                // Rollback transaction on error
+                mysqli_rollback($connection);
+                $error_message = "Error processing payment: " . $e->getMessage();
+            }
+        }
+    }
+    // For other payment methods (non-credit card), proceed directly
+    else {
         try {
             // Start transaction
             mysqli_begin_transaction($connection, MYSQLI_TRANS_START_READ_WRITE);
@@ -62,7 +221,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $h_book_id = "BK" . $next_booking_id;
             
             // Debug: Output booking info before insert
-            error_log("Booking Insert: h_book_id=$h_book_id, user_id=$user_id, customer_id=$customer_id, hotel_id=$hotel_id, r_type_id=$r_type_id, checkin=$checkin, checkout=$checkout, room_count=$room_count, adult=$adult, child=$child");
+            error_log("Direct Payment Booking Insert: h_book_id=$h_book_id, user_id=$user_id, payment_method=$payment_method");
             
             // --- Use prepared statement for booking insert ---
             $stmt = mysqli_prepare($connection, "INSERT INTO hotel_booking_t (h_book_id, user_id, customer_id, hotel_id, r_type_id, check_in_date, check_out_date, status, room_count, adult_count, child_count) VALUES (?, ?, ?, ?, ?, ?, ?, 'Confirmed', ?, ?, ?)");
@@ -107,10 +266,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Clear any previous booking sessions to ensure fresh data
                 unset($_SESSION['booking_ids']);
                 
-                header("Location: hotelPaymentComplete.php");
-                exit();
+                // Debug log before redirect
+                error_log("Direct payment successful, redirecting to hotelPaymentComplete.php with booking ID: $h_book_id");
+                
+                // Ensure no output has been sent before redirect
+                if (headers_sent($file, $line)) {
+                    error_log("Headers already sent in $file:$line - cannot redirect");
+                } else {
+                    header("Location: hotelPaymentComplete.php");
+                    exit();
+                }
             }
-            
         } catch (Exception $e) {
             // Rollback transaction on error
             mysqli_rollback($connection);
@@ -166,7 +332,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-                        <form method="post" action="">
+                        <form method="post" action="" id="payment-form">
                             <div class="payment-methods-card">
                                 <div class="payment-methods">
                                     <div class="payment-method">
@@ -232,17 +398,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
 
                             <div class="card-form">
-                                <input type="text" class="form-input" placeholder="Name">
-                                <input type="text" class="form-input" placeholder="Card Number">
+                                <input type="text" class="form-input" placeholder="Name" id="card-name" name="card_name" required>
+                                <input type="text" class="form-input" placeholder="Card Number" id="card-number" name="card_number" maxlength="19" required>
                                 
                                 <div class="form-row">
                                     <div class="expiry-field">
-                                        <input type="text" class="form-input" placeholder="Expiration Date">
+                                        <input type="text" class="form-input" placeholder="Expiration Date" id="card-expiry" name="card_expiry" maxlength="5" required>
                                         <div class="field-hint">MM/YY</div>
                                     </div>
                                     <div class="cvv-field">
                                         <div class="cvv-input-wrapper">
-                                            <input type="text" class="form-input" placeholder="CVV">
+                                            <input type="text" class="form-input" placeholder="CVV" id="card-cvv" name="card_cvv" maxlength="4" required>
                                             <div class="cvv-icon">
                                             </div>
                                         </div>
@@ -294,10 +460,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <span>RM<?php echo number_format($total, 2); ?></span>
                             </div>
                         </div>
-                        <button type="submit" class="proceed-btn">Proceed to Payment</button>
+                        <button type="submit" class="proceed-btn" id="payment-submit-btn">Proceed to Payment</button>
+                        <input type="hidden" name="submit_fallback" value="1">
                     </div>
                 </form>
-                </div>
+                <!-- Fallback link in case JavaScript fails -->
+                <script>
+                    // This will only be visible if JavaScript fails completely
+                    if (typeof window.addEventListener !== 'function') {
+                        document.write('<div style="text-align:center; margin-top:20px;"><a href="hotelPaymentComplete.php" class="proceed-btn" style="display:inline-block; text-decoration:none;">Continue to Payment Complete</a></div>');
+                    }
+                </script>
             <?php endif; ?>
         </div>
     </main>
