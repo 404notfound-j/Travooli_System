@@ -13,7 +13,7 @@ $query="
     frt.status,
     frt.refund_date
     FROM flight_refund_t frt
-    JOIN flight_booking_t fbt ON frt.f_book_id = fbt.flight_booking_id
+    JOIN flight_booking_t fbt ON frt.f_book_id = fbt.f_book_id
     JOIN user_detail_t ud ON fbt.user_id = ud.user_id
 ";
 

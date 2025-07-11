@@ -75,7 +75,7 @@
                                     $displayStatus = 'Completed';
                                     $badgeClass = 'Completed';
                                 } elseif ($row['status'] === 'Refunded') {
-                                    $displayStatus = 'Cancelled';
+                                    $displayStatus = 'Refunded';
                                     $badgeClass = 'Cancelled';
                                 } else {
                                     $displayStatus = htmlspecialchars($row['status']);

@@ -100,12 +100,12 @@ if ($type === 'hotel') {
         SELECT 
             a.airline_name AS name,
             'images/AK.png' AS image,
-            COUNT(DISTINCT b.flight_booking_id) AS tickets_sold,
+            COUNT(DISTINCT b.f_book_id) AS tickets_sold,
             COALESCE(SUM(p.amount), 0) AS revenue
         FROM airline_t a
         LEFT JOIN flight_info_t f ON a.airline_id = f.airline_id
         LEFT JOIN flight_booking_t b ON f.flight_id = b.flight_id AND b.status = 'confirmed'
-        LEFT JOIN flight_payment_t p ON b.flight_booking_id = p.f_book_id
+        LEFT JOIN flight_payment_t p ON b.f_book_id = p.f_book_id
         GROUP BY a.airline_id, a.airline_name
     ";
     $result = mysqli_query($connection, $sql);

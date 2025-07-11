@@ -1,88 +1,32 @@
-<!-- 
-Programmer Name: Mr.Chua Siong Zheng, Group Leader & Project Manager
-Project Name: profile.php
-Description: To display the profile of the user
-Date first written: 10-May-2025
-Date last modified: 6-Jul-2025 
- -->
-
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
+// adminEditUser.php: Admin can edit any user's profile by user_id from GET
 include 'connection.php';
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: signIn.php");
-    exit();
+// Get user_id from GET
+if (!isset($_GET['user_id']) || empty($_GET['user_id'])) {
+    die('User ID not specified.');
 }
-
-$isAdmin = false;
-$userId = $_SESSION['user_id'];
-
-// Check if user_id exists in admin_detail_t
-$adminCheckQuery = "SELECT 1 FROM admin_detail_t WHERE admin_id = ?";
-$stmt = mysqli_prepare($connection, $adminCheckQuery);
-mysqli_stmt_bind_param($stmt, "s", $userId);
-mysqli_stmt_execute($stmt);
-mysqli_stmt_store_result($stmt);
-
-if (mysqli_stmt_num_rows($stmt) > 0) {
-    $isAdmin = true;
-}
-mysqli_stmt_close($stmt);
-
-// By default, user edits their own profile
-$targetUserId = $_SESSION['user_id'];
-
-// If admin and ?user_id= is set, allow editing another user
-if ($isAdmin && isset($_GET['user_id']) && !empty($_GET['user_id'])) {
-    $targetUserId = $_GET['user_id'];
-}
-
-// Prevent normal users from accessing other profiles
-if (!$isAdmin && isset($_GET['user_id'])) {
-    header("Location: profile.php");
-    exit();
-}
-
+$userId = $_GET['user_id'];
 $message = '';
 $messageType = '';
-$isNewUser = false;
-
-// Check if this is a new user (first time visiting profile)
-if (!isset($_SESSION['profile_visited'])) {
-    $isNewUser = true;
-    $_SESSION['profile_visited'] = true;
-}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $firstName = trim($_POST['fst_name']);
     $lastName = trim($_POST['lst_name']);
-    $email = trim($_POST['email_address']);
     $phone = trim($_POST['phone_no']);
     $country = trim($_POST['country']);
     $gender = trim($_POST['gender']);
-    
-    // Handle profile picture upload
     $profilePicData = null;
-    
+
     if (isset($_FILES['profile_pic'])) {
         $uploadedFile = $_FILES['profile_pic'];
-        
         if ($uploadedFile['error'] == UPLOAD_ERR_OK) {
-            // Validate file type
             $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             $fileType = $uploadedFile['type'];
-            
             if (in_array($fileType, $allowedTypes)) {
-                // Validate file size (max 5MB)
-                $maxSize = 5 * 1024 * 1024; // 5MB
+                $maxSize = 5 * 1024 * 1024;
                 if ($uploadedFile['size'] <= $maxSize) {
-                    // Read file content
                     $profilePicData = file_get_contents($uploadedFile['tmp_name']);
                 } else {
                     $message = "Profile picture must be smaller than 5MB.";
@@ -92,22 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $message = "Only JPEG, PNG, and GIF images are allowed. Got: " . $fileType;
                 $messageType = "error";
             }
-        } else {
-            $uploadError = $uploadedFile['error'];
-            $errorMessages = [
-                UPLOAD_ERR_INI_SIZE => 'File too large (php.ini limit)',
-                UPLOAD_ERR_FORM_SIZE => 'File too large (form limit)',
-                UPLOAD_ERR_PARTIAL => 'File partially uploaded',
-                UPLOAD_ERR_NO_FILE => 'No file uploaded',
-                UPLOAD_ERR_NO_TMP_DIR => 'No temporary directory',
-                UPLOAD_ERR_CANT_WRITE => 'Cannot write to disk',
-                UPLOAD_ERR_EXTENSION => 'Upload stopped by extension'
-            ];
-            $message = "Upload failed: " . ($errorMessages[$uploadError] ?? "Unknown error ($uploadError)");
-            $messageType = "error";
         }
     }
-    
+
     // Validate input
     if (empty($firstName) || empty($lastName)) {
         $message = "First name and last name are required.";
@@ -119,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $message = "Last name can only contain letters (no numbers, symbols, or spaces).";
         $messageType = "error";
     } elseif (empty($phone)) {
-        $message = "Please provide your phone number to complete your profile.";
+        $message = "Please provide a phone number.";
         $messageType = "error";
     } elseif (!preg_match('/^[0-9]+$/', $phone)) {
         $message = "Phone number can only contain numbers (no letters, symbols, or spaces).";
@@ -128,53 +59,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $message = "Phone number must be between 8-15 digits.";
         $messageType = "error";
     } else {
-        // Update user data with or without profile picture
         if ($profilePicData !== null) {
-            // Update with profile picture - use direct query with proper escaping
-            // Escape the binary data
             $escapedImageData = mysqli_real_escape_string($connection, $profilePicData);
             $escapedFirstName = mysqli_real_escape_string($connection, $firstName);
             $escapedLastName = mysqli_real_escape_string($connection, $lastName);
             $escapedPhone = mysqli_real_escape_string($connection, $phone);
             $escapedCountry = mysqli_real_escape_string($connection, $country);
             $escapedGender = mysqli_real_escape_string($connection, $gender);
-            $escapedUserId = mysqli_real_escape_string($connection, $targetUserId);
-            
+            $escapedUserId = mysqli_real_escape_string($connection, $userId);
             $updateQuery = "UPDATE user_detail_t SET fst_name = '$escapedFirstName', lst_name = '$escapedLastName', phone_no = '$escapedPhone', country = '$escapedCountry', gender = '$escapedGender', profile_pic = '$escapedImageData' WHERE user_id = '$escapedUserId'";
-            
             $result = mysqli_query($connection, $updateQuery);
-            $stmt = null; // Set to null so the execution logic below works
+            $stmt = null;
         } else {
-            // Update without profile picture
             $updateQuery = "UPDATE user_detail_t SET fst_name = ?, lst_name = ?, phone_no = ?, country = ?, gender = ? WHERE user_id = ?";
             $stmt = mysqli_prepare($connection, $updateQuery);
-            
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "ssssss", $firstName, $lastName, $phone, $country, $gender, $targetUserId);
+                mysqli_stmt_bind_param($stmt, "ssssss", $firstName, $lastName, $phone, $country, $gender, $userId);
             }
         }
-        
         if ($stmt !== null) {
-            // Handle prepared statement
             if (mysqli_stmt_execute($stmt)) {
                 $message = "Profile updated successfully!";
                 $messageType = "success";
-                $_SESSION['profile_complete'] = true;
             } else {
                 $message = "Error updating profile. Please try again.";
                 $messageType = "error";
             }
             mysqli_stmt_close($stmt);
         } else if (isset($result)) {
-            // Handle direct query result
             if ($result) {
-                if ($profilePicData !== null) {
-                    $message = "Profile and profile picture updated successfully!";
-                } else {
-                    $message = "Profile updated successfully!";
-                }
+                $message = "Profile and profile picture updated successfully!";
                 $messageType = "success";
-                $_SESSION['profile_complete'] = true;
             } else {
                 $message = "Error updating profile. Please try again.";
                 $messageType = "error";
@@ -186,47 +101,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Fetch current user data including profile picture
+// Fetch user data
 $query = "SELECT user_id, fst_name, lst_name, email_address, phone_no, country, gender, profile_pic FROM user_detail_t WHERE user_id = ?";
 $stmt = mysqli_prepare($connection, $query);
-
 if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "s", $targetUserId);
+    mysqli_stmt_bind_param($stmt, "s", $userId);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    
     if ($result && mysqli_num_rows($result) > 0) {
         $userData = mysqli_fetch_assoc($result);
     } else {
-        header("Location: signIn.php");
-        exit();
+        die('User not found.');
     }
-    
     mysqli_stmt_close($stmt);
+} else {
+    die('Database error.');
 }
 
-// Check if profile is complete (has phone number)
-$profileComplete = !empty($userData['phone_no']);
-$profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomplete';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - Travooli</title>
-    <link rel="stylesheet" href="css/userHeader.css">
+    <title>Edit User Profile (Admin) - Travooli</title>
     <link rel="stylesheet" href="css/profile.css">
     <link rel="stylesheet" href="css/sign.css">
 </head>
 <body>
-
-<?php include 'userHeader.php'; ?>
-
 <div class="signin-bg">
 <main class="profile-main">
-    <div class="profile-container <?= $profileContainerClass ?>">
+    <div class="profile-container profile-admin-edit">
         <div class="profile-header">
             <div class="profile-avatar clickable-avatar" onclick="triggerFileUpload()" title="Click to change profile picture">
                 <?php if (!empty($userData['profile_pic'])): ?>
@@ -245,39 +150,19 @@ $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomp
                 </div>
             </div>
             <div class="profile-title">
-                <h1>
-                    <?php
-                    if ($isAdmin && isset($_GET['user_id']) && !empty($_GET['user_id'])) {
-                        echo htmlspecialchars($userData['fst_name'] . ' ' . $userData['lst_name']);
-                    } else {
-                        echo 'My Profile';
-                    }
-                    ?>
-                </h1>
-                <p>Manage your personal information</p>
+                <h1>Edit User Profile (Admin)</h1>
+                <p>Manage user information for user ID: <?= htmlspecialchars($userId) ?></p>
                 <?php if ($message): ?>
-                    <div id="profile-message" class="profile-message" data-type="<?= $messageType ?>" style="display: none;">
+                    <div id="profile-message" class="profile-message" data-type="<?= $messageType ?>">
                         <?= htmlspecialchars($message) ?>
                     </div>
                 <?php endif; ?>
-                
-                <?php if ($isNewUser): ?>
-                    <div id="welcome-message" class="welcome-message" style="display: none;">
-                        Welcome to Travooli! Please complete your profile information below.
-                    </div>
-                <?php endif; ?>
-                
-
             </div>
         </div>
-
         <form class="profile-form" method="POST" action="" enctype="multipart/form-data">
-            <!-- Hidden file input for profile picture -->
             <input type="file" id="profile_pic" name="profile_pic" accept="image/*" style="display: none;">
-            
             <div class="form-section">
                 <h2>Personal Information</h2>
-                
                 <div class="form-row">
                     <div class="form-group">
                         <label for="fst_name">First Name *</label>
@@ -296,14 +181,12 @@ $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomp
                         </select>
                     </div>
                 </div>
-
                 <div class="form-row full-width">
                     <div class="form-group readonly">
                         <label for="email_address">Email Address</label>
                         <input type="email" id="email_address" name="email_address" value="<?= htmlspecialchars($userData['email_address']) ?>" readonly>
                     </div>
                 </div>
-
                 <div class="form-row two-columns">
                     <div class="form-group required">
                         <label for="phone_no">Phone Number *</label>
@@ -323,75 +206,42 @@ $profileContainerClass = $profileComplete ? 'profile-complete' : 'profile-incomp
                     </div>
                 </div>
             </div>
-
             <div class="form-actions">
-                <?php if ($profileComplete): ?>
-                    <button type="button" class="btn-secondary" onclick="window.history.back()">Back</button>
-                <?php endif; ?>
-                <button type="submit" class="btn-primary">
-                    <?= $profileComplete ? 'Update Profile' : 'Complete Profile' ?>
-                </button>
+                <a href="U_Manage.php" class="btn-secondary">Back</a>
+                <button type="submit" class="btn-primary">Update User Profile</button>
             </div>
         </form>
     </div>
 </main>
 </div>
-
-<!-- Slide Message Animation Script -->
-<script src="js/sign.js"></script>
-<script src="js/profile.js"></script>
-
 <script>
-// Profile Picture Upload Functions
 function triggerFileUpload() {
     document.getElementById('profile_pic').click();
 }
-
-// Handle file selection and auto-submit
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('profile_pic');
     const form = document.querySelector('.profile-form');
-    
     fileInput.addEventListener('change', function(e) {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            
-            // Validate file type
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             if (!allowedTypes.includes(file.type.toLowerCase())) {
-                showErrorMessage('Only JPEG, PNG, and GIF images are allowed.');
-                e.target.value = ''; // Clear the input
+                alert('Only JPEG, PNG, and GIF images are allowed.');
+                e.target.value = '';
                 return;
             }
-            
-            // Validate file size (5MB = 5 * 1024 * 1024 bytes)
             const maxSize = 5 * 1024 * 1024;
             if (file.size > maxSize) {
-                showErrorMessage('Profile picture must be smaller than 5MB.');
-                e.target.value = ''; // Clear the input
+                alert('Profile picture must be smaller than 5MB.');
+                e.target.value = '';
                 return;
             }
-            
-            // Show loading message and submit form
-            showSuccessMessage('Uploading profile picture...');
-            
-            // Auto-submit the form after a brief delay to show the message
             setTimeout(() => {
                 form.submit();
             }, 500);
         }
     });
 });
-
-<?php if ($isNewUser): ?>
-// Show welcome message for new users
-setTimeout(() => {
-    showSuccessMessage('Welcome to Travooli! Please complete your profile information below.');
-}, 500);
-<?php endif; ?>
 </script>
-
-<?php include 'u_footer_2.php'; ?>
-
 </body>
-</html>
+</html> 
