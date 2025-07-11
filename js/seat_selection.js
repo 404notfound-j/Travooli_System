@@ -23,18 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Update Price Details card with .toFixed(2)
   document.getElementById('flight-price').textContent = `RM ${ticketPrice.toFixed(2)}`;
-  document.querySelector('.baggage-price').textContent = `RM ${baggagePrice.toFixed(2)}`;
-  document.querySelector('.meal-price').textContent = `RM ${mealPrice.toFixed(2)}`;
+  document.getElementById('baggage-price').textContent = `RM ${baggagePrice.toFixed(2)}`;
+  document.getElementById('meal-price').textContent = `RM ${mealPrice.toFixed(2)}`;
+  document.getElementById('tax-amount').textContent = `RM ${taxPrice.toFixed(2)}`;
   document.getElementById('total').textContent = `RM ${totalPrice.toFixed(2)}`;
   
-  // Update Taxes & Fees dynamically. Requires a small HTML adjustment below.
-  const taxesFeesEl = document.querySelector('.price-item span[data-tax-display]');
-  if (taxesFeesEl) {
-      taxesFeesEl.textContent = `RM ${taxPrice.toFixed(2)}`;
-  } else {
-      const defaultTaxesEl = document.querySelector('.price-item:nth-child(4) span:nth-child(2)');
-      if(defaultTaxesEl) defaultTaxesEl.textContent = `RM ${taxPrice.toFixed(2)}`;
-  }
 
   // Update Ticket Count Label
   const ticketCountLabel = document.getElementById('ticket-count-label');

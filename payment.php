@@ -36,7 +36,7 @@ error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? '
                     </p>
 
                     <div class="payment-methods-card">
-                        <div class="payment-methods">
+                        <div class="payment-methods" data-method="Card">
                             <div class="payment-method selected">
                                 <div class="method-content">
                                     <img src="icon/card.svg" alt="Credit Card" class="method-icon">
@@ -47,7 +47,7 @@ error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? '
                             
                             <div class="method-divider"></div>
                             
-                            <div class="payment-method">
+                            <div class="payment-method" data-method="Google Pay">
                                 <div class="method-content">
                                     <img src="icon/google.svg" alt="Google Pay" class="method-icon">
                                     <div class="method-name">Google Pay</div>
@@ -57,7 +57,7 @@ error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? '
                             
                             <div class="method-divider"></div>
                             
-                            <div class="payment-method">
+                            <div class="payment-method" data-method="Apple Pay">
                                 <div class="method-content">
                                     <img src="icon/apple.svg" alt="Apple Pay" class="method-icon">
                                     <div class="method-name">Apple Pay</div>
@@ -67,7 +67,7 @@ error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? '
                             
                             <div class="method-divider"></div>
                             
-                            <div class="payment-method">
+                            <div class="payment-method" data-method="Paypal">
                                 <div class="method-content">
                                     <img src="icon/paypal.svg" alt="PayPal" class="method-icon">
                                     <div class="method-name">Paypal</div>
@@ -77,7 +77,7 @@ error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? '
                             
                             <div class="method-divider"></div>
                             
-                            <div class="payment-method">
+                            <div class="payment-method" data-method="Amazon Pay">
                                 <div class="method-content">
                                     <img src="icon/amazonpay.svg" alt="Amazon Pay" class="method-icon">
                                     <div class="method-name">Amazon Pay</div>

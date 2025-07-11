@@ -13,12 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const activeAdults = parseInt(lastFlightDetails.activeAdults) || 0; 
   const activeChildren = parseInt(lastFlightDetails.activeChildren) || 0; 
 
-  // --- Populate Price Breakdown ---
-  document.getElementById('pb-flight-price').textContent = `RM ${ticket.toFixed(2)}`;
-  document.getElementById('pb-baggage-price').textContent = `RM ${baggage.toFixed(2)}`;
-  document.getElementById('pb-meal-price').textContent = `RM ${meal.toFixed(2)}`;
-  document.getElementById('pb-tax-price').textContent = `RM ${taxPrice.toFixed(2)}`;
-  document.getElementById('pb-total-paid').textContent = `RM ${finalTotalPrice.toFixed(2)}`;
 
   // --- Populate Seat Numbers on Boarding Pass ---
   // The seat ID on the HTML is "final-seat-list-0" for the first boarding pass (index 0 in PHP loop)

@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once __DIR__ . '/connection.php'; // Uses $connection from connection.php
+require_once __DIR__ . '/connection.php';
 
 // ✅ Generate unique 4-digit passenger ID
 function generateUniquePassengerId($connection) {
@@ -13,6 +13,43 @@ function generateUniquePassengerId($connection) {
     } while ($result->num_rows > 0);
 
     return $randomId;
+}
+
+function insertFlightPayment(mysqli $connection, string $f_book_id, float $amount, string $payment_method, string $payment_status): ?string {
+    // Generate unique payment ID: PAY + 6-digit random number
+    do {
+        $randomDigits = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $paymentId = 'PAY' . $randomDigits;
+
+        // Ensure payment ID is unique
+        $checkQuery = "SELECT 1 FROM flight_payment_t WHERE f_payment_id = ?";
+        $stmtCheck = $connection->prepare($checkQuery);
+        $stmtCheck->bind_param("s", $paymentId);
+        $stmtCheck->execute();
+        $stmtCheck->store_result();
+        $exists = $stmtCheck->num_rows > 0;
+        $stmtCheck->close();
+    } while ($exists);
+
+    // Prepare insert query
+    $insertQuery = "INSERT INTO flight_payment_t (f_payment_id, f_book_id, payment_date, amount, payment_method, payment_status)
+                    VALUES (?, ?, NOW(), ?, ?, ?)";
+    $stmtInsert = $connection->prepare($insertQuery);
+    if (!$stmtInsert) {
+        error_log("Failed to prepare insertFlightPayment: " . $connection->error);
+        return null;
+    }
+
+    $stmtInsert->bind_param("ssdss", $paymentId, $f_book_id, $amount, $payment_method, $payment_status);
+
+    if ($stmtInsert->execute()) {
+        $stmtInsert->close();
+        return $paymentId; // Return the new ID
+    } else {
+        error_log("Failed to insert payment: " . $stmtInsert->error);
+        $stmtInsert->close();
+        return null;
+    }
 }
 
 try {
@@ -35,18 +72,14 @@ try {
     $connection->begin_transaction();
 
     // ➤ Insert into flight_booking_t
-    $stmt1 = $connection->prepare("
-        INSERT INTO flight_booking_t (f_book_id, user_id, flight_id, book_date, status)
-        VALUES (?, ?, ?, ?, ?)
-    ");
+    $stmt1 = $connection->prepare("INSERT INTO flight_booking_t (f_book_id, user_id, flight_id, book_date, status)
+                                   VALUES (?, ?, ?, ?, ?)");
     $stmt1->bind_param("sssss", $f_book_id, $data['user_id'], $data['flight_id'], $data['booking_date'], $data['status']);
     $stmt1->execute();
 
     // ➤ Insert into flight_booking_info_t
-    $stmt2 = $connection->prepare("
-        INSERT INTO flight_booking_info_t (booking_info_id, f_book_id, passenger_count, baggage_total, meal_total, base_fare_total, total_amount)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
+    $stmt2 = $connection->prepare("INSERT INTO flight_booking_info_t (booking_info_id, f_book_id, passenger_count, baggage_total, meal_total, base_fare_total, total_amount)
+                                   VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt2->bind_param("ssidddd", $booking_info_id, $f_book_id, $data['num_passenger'], $data['baggage'], $data['meal'], $data['ticket'], $data['total_amount']);
     $stmt2->execute();
 
@@ -55,10 +88,8 @@ try {
         $pass_id = generateUniquePassengerId($connection);
 
         // ➤ Insert into passenger_t
-        $stmt3 = $connection->prepare("
-            INSERT INTO passenger_t (pass_id, fst_name, lst_name, gender, dob, country, pass_category)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ");
+        $stmt3 = $connection->prepare("INSERT INTO passenger_t (pass_id, fst_name, lst_name, gender, dob, country, pass_category)
+                                       VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt3->bind_param("sssssss", $pass_id, $pax['first_name'], $pax['last_name'], $pax['gender'], $pax['dob'], $pax['country'], $pax['type']);
         $stmt3->execute();
 
@@ -68,20 +99,15 @@ try {
         $meal_id = $pax['meal_id'] ?? 'M01';
 
         // ➤ Insert into passenger_service_t
-        $stmt4 = $connection->prepare("
-            INSERT INTO passenger_service_t (pass_id, f_book_id, class_id, baggage_id, meal_id)
-            VALUES (?, ?, ?, ?, ?)
-        ");
+        $stmt4 = $connection->prepare("INSERT INTO passenger_service_t (pass_id, f_book_id, class_id, baggage_id, meal_id)
+                                       VALUES (?, ?, ?, ?, ?)");
         $stmt4->bind_param("sssss", $pass_id, $f_book_id, $data['class_id'], $baggage_id, $meal_id);
         $stmt4->execute();
 
         // ➤ Update seat booking in flight_seats_t
         $selectedSeat = $data['selected_seats'][$index];
-        $stmtSeatUpdate = $connection->prepare("
-            UPDATE flight_seats_t
-            SET is_booked = 1, pass_id = ?
-            WHERE flight_id = ? AND seat_no = ?
-        ");
+        $stmtSeatUpdate = $connection->prepare("UPDATE flight_seats_t SET is_booked = 1, pass_id = ?
+                                                WHERE flight_id = ? AND seat_no = ?");
         $stmtSeatUpdate->bind_param("sss", $pass_id, $data['flight_id'], $selectedSeat);
         $stmtSeatUpdate->execute();
 
@@ -90,8 +116,17 @@ try {
         }
     }
 
+    // ➤ Insert flight payment
+    $payment_method = $data['payment_method'] ?? 'unknown';
+    $payment_status = 'paid';
+    $payment_id = insertFlightPayment($connection, $f_book_id, $data['total_amount'], $payment_method, $payment_status);
+
+    if (!$payment_id) {
+        throw new Exception("Failed to insert payment record.");
+    }
+
     $connection->commit();
-    echo json_encode(['success' => true, 'bookingId' => $f_book_id]);
+    echo json_encode(['success' => true, 'bookingId' => $f_book_id, 'paymentId' => $payment_id]);
 
 } catch (Exception $e) {
     if (isset($connection)) {

@@ -80,15 +80,15 @@ include 'connection.php';
                 </div>
                 <div class="price-item">
                     <span>Baggage Fees</span>
-                    <span class="baggage-price">RM 0</span>
+                    <span id="baggage-price">RM 0</span>
                 </div>
                 <div class="price-item">
-                    <span>Multi-meal</span>
-                    <span class="meal-price">RM 0</span>
+                    <span>Meal Add-on</span>
+                    <span id="meal-price">RM 0</span>
                 </div>
                 <div class="price-item">
                     <span>Taxes & Fees</span>
-                    <span>RM 121</span>
+                    <span id="tax-amount">RM 0</span>
                 </div>
                 <div class="price-item">
                     <span>Discount</span>

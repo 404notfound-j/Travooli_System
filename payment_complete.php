@@ -188,7 +188,7 @@ if (empty($flightDetailsDB)) {
         </div>
         <div class="boarding-pass">
           <div class="passenger-info">
-            <img src="<?= $userProfilePhotoSrc ?>" alt="User Profile Photo" class="avatar">
+            <img src="icon/avatar.svg" alt="Passenger" class="avatar">
             <div>
               <h3><?= htmlspecialchars($passenger['fst_name']) ?> <?= htmlspecialchars($passenger['lst_name']) ?></h3>
               <p>Boarding Pass <?= $flightDetailsDB[0]['flight_booking_id'] ?></p>
@@ -263,7 +263,8 @@ if (empty($flightDetailsDB)) {
     <section class="cancel-flight"> 
       <h1>Cancellation Policy</h1> 
       <p>This flight has a flexible cancellation policy. You may be eligible for a refund if cancelled at least 24 hours before departure.</p> 
-      <p>All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee.</p> 
+      <p>All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. 
+      However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.</p> 
       <button class="cancel-flight-btn" onclick="showCancelConfirmation()">Cancel Flight</button> 
     </section>
   </main>

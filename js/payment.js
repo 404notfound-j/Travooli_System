@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectedSeats = JSON.parse(sessionStorage.getItem('selectedSeats') || '[]');
     
     const departId = flightSearch.depart || flightSearch.selectedFlight || '';
-    const returnId = flightSearch.return || '';
     const classId = flightSearch.classId || '';
     const flightDate = flightSearch.departDate || '';
 
@@ -49,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (ticketLabel) ticketLabel.textContent = label;
 
     // Payment method and card form setup
-    const paymentMethods = document.querySelectorAll('.payment-method');
+    const selectedMethod = document.querySelector('.payment-method.selected')?.dataset.method || 'unknown';
     const radioButtons = document.querySelectorAll('.radio-button');
     const proceedBtn = document.querySelector('.proceed-btn');
     const cardFields = document.querySelectorAll('.card-input');
@@ -74,6 +73,9 @@ document.addEventListener('DOMContentLoaded', function () {
         proceedBtn.disabled = !checkCardValidity();
         proceedBtn.classList.toggle('disabled', proceedBtn.disabled);
     }
+
+    const paymentMethods = document.querySelectorAll('.payment-method');
+
 
     paymentMethods.forEach((method) => {
         method.addEventListener('click', function () {
@@ -122,11 +124,13 @@ document.addEventListener('DOMContentLoaded', function () {
     updateProceedButtonState();
 
     proceedBtn?.addEventListener('click', function () {
-        const selectedMethod = document.querySelector('.payment-method.selected .method-name')?.textContent.trim();
+        const selectedMethod = document.querySelector('.payment-method.selected')?.dataset.method || 'unknown';
         if (!selectedMethod) {
             alert("Please select a payment method.");
             return;
         }
+        console.log("✅ Final selected payment method:", selectedMethod);
+
 
         if (selectedMethod === "Debit/Credit Card" && !checkCardValidity()) {
             alert("Please complete all card details.");
@@ -152,7 +156,8 @@ document.addEventListener('DOMContentLoaded', function () {
             activeChildren: activeChildren,
             num_passenger: numPassengers,
             flight_date: flightDate,
-            passengers: passengerDetails
+            passengers: passengerDetails,
+            payment_method: selectedMethod
         };
 
         console.log("📦 Sending bookingData:", bookingData);
