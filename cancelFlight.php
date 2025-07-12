@@ -12,6 +12,41 @@ $debug['post_data'] = $data;
 $debug['get_data'] = $_GET;
 $debug['session_data'] = $_SESSION;
 
+$seatInfoQuery = "SELECT flight_id, seat_class, total_passengers FROM flight_booking_t WHERE f_book_id = ?";
+$stmt = mysqli_prepare($connection, $seatInfoQuery);
+mysqli_stmt_bind_param($stmt, "s", $f_book_id);
+mysqli_stmt_execute($stmt);
+$seatInfoResult = mysqli_stmt_get_result($stmt);
+$seatInfo = mysqli_fetch_assoc($seatInfoResult);
+mysqli_stmt_close($stmt);
+
+if ($seatInfo) {
+    $flightId = $seatInfo['flight_id'];
+    $seatClass = $seatInfo['seat_class'];
+    $seatsToRestore = $seatInfo['total_passengers'];
+
+    // 4a. Update seat availability in flight_seats_cls_t
+    $updateSeatsCls = "UPDATE flight_seats_cls_t 
+                       SET available_seats = available_seats + ? 
+                       WHERE flight_id = ? AND seat_class = ?";
+    $stmt = mysqli_prepare($connection, $updateSeatsCls);
+    mysqli_stmt_bind_param($stmt, "iss", $seatsToRestore, $flightId, $seatClass);
+    $updateSeatsClsSuccess = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+    // 4b. Free the specific seats in flight_seats_t (if you assign specific seats by booking)
+    $updateSeatsT = "UPDATE flight_seats_t 
+                     SET is_booked = 0, f_book_id = NULL 
+                     WHERE f_book_id = ?";
+    $stmt = mysqli_prepare($connection, $updateSeatsT);
+    mysqli_stmt_bind_param($stmt, "s", $f_book_id);
+    $updateSeatsTSuccess = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+} else {
+    $updateSeatsClsSuccess = false;
+    $updateSeatsTSuccess = false;
+}
+
 // Check if booking ID is in POST data
 if (isset($data['booking_id']) && !empty($data['booking_id'])) {
     $bookingId = $data['booking_id'];
@@ -111,7 +146,9 @@ echo json_encode([
     'operations' => [
         'insert_refund' => $insertSuccess,
         'update_booking' => $updateBookingSuccess,
-        'update_payment' => $updatePaymentSuccess
+        'update_payment' => $updatePaymentSuccess,
+        'update_seat_class' => $updateSeatsClsSuccess,
+        'update_individual_seats' => $updateSeatsTSuccess
     ]
 ]);
 ?>

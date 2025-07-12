@@ -4,7 +4,15 @@ require_once __DIR__ . '/connection.php';
 
 function generateUniquePassengerId($connection) {
     do {
-        $randomId = 'P' . str_pad(mt_rand(1000, 9999), 4, '0', STR_PAD_LEFT);
+        $digits = '0123456789';
+        $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        $randomId = 'P' .
+                    $digits[mt_rand(0, 9)] .
+                    $letters[mt_rand(0, 25)] .
+                    $digits[mt_rand(0, 9)] .
+                    $letters[mt_rand(0, 25)];
+
         $check = $connection->prepare("SELECT pass_id FROM passenger_t WHERE pass_id = ?");
         $check->bind_param("s", $randomId);
         $check->execute();
@@ -15,7 +23,6 @@ function generateUniquePassengerId($connection) {
 }
 
 function insertFlightPayment(mysqli $connection, string $f_book_id, float $amount, string $payment_method, string $payment_status): ?string {
-    // Generate unique payment ID: PAY + 6-digit random number
     do {
         $randomDigits = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
         $paymentId = 'PAY' . $randomDigits;
