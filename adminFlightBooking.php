@@ -383,6 +383,7 @@ $pageContent = ob_get_clean();
 // Add custom scripts needed for this page
 $customScripts = '<script src="js/adminFlightBooking.js"></script>';
 
+
 // Include sidebar with custom scripts
 include 'adminSidebar.php';
 ?>

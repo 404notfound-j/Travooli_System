@@ -8,6 +8,17 @@ window.openCancelHotelModal = function() {
     }
 };
 
+// Function for smooth scroll down
+window.scrollDownToSection = function(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+};
+
 // Function to close cancel hotel modal
 function closeModal() {
     const modal = document.getElementById('cancelHotelModal');

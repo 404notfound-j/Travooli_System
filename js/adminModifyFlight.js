@@ -134,62 +134,110 @@ document.addEventListener('DOMContentLoaded', function() {
     const classSelects = document.querySelectorAll('.class-select');
     const mealSelects = document.querySelectorAll('.meal-select');
     
-    // Price mapping for different seat classes
-    const classPrices = {
-        'Economy': 0,
-        'Premium Economy': 150,
-        'Business': 500,
-        'First': 1000
-    };
+    // Store class prices from database
+    const classPriceMap = {};
     
-    // Price mapping for different meal types
-    const mealPrices = {
-        'N/A': 0,
-        'Single meal': 15,
-        'Multi-meal': 30
-    };
+    // Function to fetch class price from server
+    async function fetchClassPrice(classId, flightId) {
+        try {
+            const response = await fetch(`getClassPrice.php?class_id=${classId}&flight_id=${flightId}`);
+            const data = await response.json();
+            if (data.success && data.price) {
+                return parseFloat(data.price);
+            }
+            return 0;
+        } catch (error) {
+            console.error('Error fetching class price:', error);
+            return 0;
+        }
+    }
+
+    // Function to fetch meal price from server
+    async function fetchMealPrice(mealType) {
+        try {
+            const response = await fetch(`getMealPrice.php?meal_type=${encodeURIComponent(mealType)}`);
+            const data = await response.json();
+            if (data.success && data.price) {
+                return parseFloat(data.price);
+            }
+            return 0;
+        } catch (error) {
+            console.error('Error fetching meal price:', error);
+            return 0;
+        }
+    }
+
+    // Store meal prices from database
+    const mealPriceMap = {};
+    
+    // Initialize meal prices - will be replaced with fetched values
+    mealPriceMap['N/A'] = 0;
+    mealPriceMap['Single meal'] = 20;
+    mealPriceMap['Multi-meal'] = 50;
     
     // Function to recalculate fares when selections change
-    function recalculateFares() {
-        let additionalAmount = 0;
+    async function recalculateFares() {
+        let newTotalAmount = 0;
         let hasChanges = false;
         
-        // Check class changes
-        classSelects.forEach(select => {
-            const originalClass = select.getAttribute('data-original');
-            const currentClass = select.value;
+        // Process each passenger row
+        for (let i = 0; i < classSelects.length; i++) {
+            const classSelect = classSelects[i];
+            const mealSelect = mealSelects[i];
             
-            if (originalClass !== currentClass) {
-                hasChanges = true;
-                // Calculate price difference
-                additionalAmount += classPrices[currentClass] - classPrices[originalClass];
-            }
-        });
-        
-        // Check meal changes
-        mealSelects.forEach(select => {
-            const originalMeal = select.getAttribute('data-original');
-            const currentMeal = select.value;
+            // Get current class ID and check if it changed
+            const currentClassId = classSelect.value;
+            const originalClassId = classSelect.getAttribute('data-original-id');
+            const classChanged = currentClassId !== originalClassId;
             
-            if (originalMeal !== currentMeal) {
+            // Get current meal type and check if it changed
+            const currentMeal = mealSelect.value;
+            const originalMeal = mealSelect.getAttribute('data-original');
+            const mealChanged = currentMeal !== originalMeal;
+            
+            // If either class or meal changed, mark as changed
+            if (classChanged || mealChanged) {
                 hasChanges = true;
-                // Calculate price difference
-                additionalAmount += mealPrices[currentMeal] - mealPrices[originalMeal];
             }
-        });
+            
+            // Get row and seat information for flight ID
+            const row = classSelect.closest('tr');
+            const seatCell = row.querySelector('td:nth-child(3)');
+            const seatText = seatCell.textContent.trim();
+            const flightIdMatch = seatText.match(/\(([^)]+)\)/);
+            const flightId = flightIdMatch ? flightIdMatch[1] : '';
+            
+            // Get class price
+            let classPrice = 0;
+            if (flightId) {
+                // If we don't have the price cached, fetch it
+                if (!classPriceMap[currentClassId]) {
+                    classPriceMap[currentClassId] = await fetchClassPrice(currentClassId, flightId);
+                }
+                classPrice = classPriceMap[currentClassId] || 0;
+            }
+            
+            // Get meal price
+            let mealPrice = mealPriceMap[currentMeal] || 0;
+            if (!mealPriceMap[currentMeal] && currentMeal) {
+                mealPrice = await fetchMealPrice(currentMeal);
+                mealPriceMap[currentMeal] = mealPrice;
+            }
+            
+            // Add to new total amount
+            newTotalAmount += classPrice + mealPrice;
+        }
         
-        // Get original total and modification fee
-        const originalTotal = parseFloat(document.getElementById('original-total').value);
+        // Get modification fee
         const modificationFee = parseFloat(document.getElementById('modification-fee').value);
         
-        // Calculate new totals
-        const newTotal = additionalAmount; // Show only the price difference
-        const additionalCharges = hasChanges ? modificationFee : 0; // Show only the RM50 fee
-        const finalTotal = originalTotal + additionalAmount + (hasChanges ? modificationFee : 0);
+        // Calculate final totals
+        const additionalCharges = hasChanges ? modificationFee : 0; // Apply RM50 fee only if changes were made
+        const finalTotal = newTotalAmount + additionalCharges; // Final total is new total + additional charges
         
         // Update the display
-        document.getElementById('current-total').textContent = formatCurrency(originalTotal);
-        document.getElementById('new-total').textContent = formatCurrency(newTotal);
+        document.getElementById('current-total').textContent = formatCurrency(parseFloat(document.getElementById('original-total').value));
+        document.getElementById('new-total').textContent = formatCurrency(newTotalAmount);
         document.getElementById('additional-charges').textContent = formatCurrency(additionalCharges);
         document.getElementById('final-total').textContent = formatCurrency(finalTotal);
     }
@@ -201,11 +249,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add event listeners to selects
     classSelects.forEach(select => {
-        select.addEventListener('change', recalculateFares);
+        select.addEventListener('change', () => recalculateFares());
     });
     
     mealSelects.forEach(select => {
-        select.addEventListener('change', recalculateFares);
+        select.addEventListener('change', () => recalculateFares());
     });
     
     // Handle discard button
@@ -222,6 +270,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveBtn = document.querySelector('.save-btn');
     if (saveBtn) {
         saveBtn.addEventListener('click', function() {
+            // Check if any changes were made
+            let hasChanges = false;
+            classSelects.forEach(select => {
+                if (select.value !== select.getAttribute('data-original-id')) {
+                    hasChanges = true;
+                }
+            });
+            
+            mealSelects.forEach(select => {
+                if (select.value !== select.getAttribute('data-original')) {
+                    hasChanges = true;
+                }
+            });
+            
+            // If no changes were made, alert the user
+            if (!hasChanges) {
+                alert('No changes detected. Please make changes before saving.');
+                return;
+            }
+            
+            // Confirm with the user before saving
+            if (!confirm('Are you sure you want to save these changes? This will update the booking details and may affect the fare.')) {
+                return;
+            }
+            
             // Collect all changes
             const changes = collectChanges();
             
@@ -229,8 +302,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const originalTotal = parseFloat(document.getElementById('original-total').value);
             const finalTotal = parseFloat(document.getElementById('final-total').textContent.replace(/,/g, ''));
             
+            // The actual new amount to save is the original amount plus the calculated changes
+            const actualNewAmount = originalTotal + finalTotal;
+            
             changes.original_amount = originalTotal;
-            changes.new_amount = finalTotal;
+            changes.new_amount = actualNewAmount;
             
             // Send changes to server using AJAX
             fetch('updateFlightBooking.php', {
@@ -270,9 +346,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to collect all changes made to the booking
     function collectChanges() {
         const changes = {
-        booking_id: bookingId,
+            booking_id: bookingId,
             passengers: []
         };
+        
+        // Get totals for payment update
+        const newTotal = parseFloat(document.getElementById('new-total').textContent.replace(/,/g, ''));
+        const additionalCharges = parseFloat(document.getElementById('additional-charges').textContent.replace(/,/g, ''));
+        const finalTotal = parseFloat(document.getElementById('final-total').textContent.replace(/,/g, ''));
+        
+        changes.new_amount = newTotal;
+        changes.additional_charges = additionalCharges;
+        changes.final_total = finalTotal;
         
         // Collect passenger data
         const passengerRows = document.querySelectorAll('.traveler-table tbody tr');
@@ -284,14 +369,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const mealSelect = row.querySelector('td:nth-child(5) select');
             const amountCell = row.querySelector('td:nth-child(6)');
             
+            // Extract flight ID from seat number
+            const seatText = seatCell ? seatCell.textContent.trim() : '';
+            const flightIdMatch = seatText.match(/\(([^)]+)\)/);
+            const flightId = flightIdMatch ? flightIdMatch[1] : '';
+            
             changes.passengers.push({
                 name: nameCell ? nameCell.textContent.trim() : '',
                 age_group: ageGroupSelect ? ageGroupSelect.value : '',
                 seat_no: seatCell ? seatCell.textContent.trim() : '',
-                class: classSelect ? classSelect.value : '',
+                class_id: classSelect ? classSelect.value : '',
+                flight_id: flightId,
                 meal_type: mealSelect ? mealSelect.value : '',
-                amount: amountCell ? amountCell.textContent.trim().replace('RM ', '') : '',
-                original_class: classSelect ? classSelect.getAttribute('data-original') : '',
+                amount: amountCell ? amountCell.textContent.trim().replace('RM ', '').replace(',', '') : '',
+                original_class_id: classSelect ? classSelect.getAttribute('data-original-id') : '',
                 original_meal: mealSelect ? mealSelect.getAttribute('data-original') : ''
             });
         });

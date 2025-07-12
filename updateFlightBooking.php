@@ -5,133 +5,213 @@ session_start();
 // Database connection
 include 'connection.php';
 
-// Set response header to JSON
+// Set content type to JSON
 header('Content-Type: application/json');
 
-// Get JSON data from request body
-$data = json_decode(file_get_contents('php://input'), true);
-
-// Initialize response
-$response = [
-    'success' => false,
-    'message' => 'Invalid request data'
-];
-
-// Check if we have valid data
-if (isset($data['booking_id']) && !empty($data['booking_id'])) {
-    $bookingId = $data['booking_id'];
-    $passengers = $data['passengers'] ?? [];
-    $newAmount = isset($data['new_amount']) ? floatval($data['new_amount']) : 0;
-    
-    // Start transaction
-    mysqli_begin_transaction($connection);
-    
-    try {
-        // Update passenger details
-        foreach ($passengers as $index => $passenger) {
-            // Extract passenger name
-            $nameParts = explode(' ', $passenger['name'], 2);
-            $firstName = $nameParts[0] ?? '';
-            $lastName = $nameParts[1] ?? '';
-            
-            // Get passenger ID for this booking and index
-            $sql = "SELECT p.pass_id 
-                    FROM passenger_t p 
-                    JOIN passenger_service_t ps ON p.pass_id = ps.pass_id 
-                    WHERE ps.f_book_id = ? 
-                    LIMIT ?, 1";
-            
-            $stmt = mysqli_prepare($connection, $sql);
-            mysqli_stmt_bind_param($stmt, "si", $bookingId, $index);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            
-            if ($row = mysqli_fetch_assoc($result)) {
-                $passId = $row['pass_id'];
-                
-                // Update passenger name and category
-                if (!empty($firstName)) {
-                    // Get the age group (Adult/Child)
-                    $passCategory = !empty($passenger['age_group']) ? $passenger['age_group'] : 'Adult';
-                    
-                    $updateSql = "UPDATE passenger_t SET fst_name = ?, lst_name = ?, pass_category = ? WHERE pass_id = ?";
-                    $updateStmt = mysqli_prepare($connection, $updateSql);
-                    mysqli_stmt_bind_param($updateStmt, "ssss", $firstName, $lastName, $passCategory, $passId);
-                    mysqli_stmt_execute($updateStmt);
-                    mysqli_stmt_close($updateStmt);
-                }
-                
-                // Check if class or meal has changed
-                $classChanged = $passenger['class'] !== $passenger['original_class'];
-                $mealChanged = $passenger['meal_type'] !== $passenger['original_meal'];
-                
-                // Update passenger service (class and meal)
-                $updateServiceSql = "UPDATE passenger_service_t ps 
-                                     LEFT JOIN seat_class_t sc ON sc.class_name = ? 
-                                     LEFT JOIN meal_option_t mo ON mo.opt_name = ? 
-                                     SET ps.class_id = sc.class_id, ps.meal_id = mo.meal_id 
-                                     WHERE ps.pass_id = ? AND ps.f_book_id = ?";
-                
-                $updateServiceStmt = mysqli_prepare($connection, $updateServiceSql);
-                mysqli_stmt_bind_param($updateServiceStmt, "ssss", $passenger['class'], $passenger['meal_type'], $passId, $bookingId);
-                mysqli_stmt_execute($updateServiceStmt);
-                mysqli_stmt_close($updateServiceStmt);
-            }
-            
-            mysqli_stmt_close($stmt);
-        }
-        
-        // Update payment amount if it changed
-        if ($newAmount > 0) {
-            // Check if payment record exists
-            $checkPaymentSql = "SELECT * FROM flight_payment_t WHERE f_book_id = ?";
-            $checkPaymentStmt = mysqli_prepare($connection, $checkPaymentSql);
-            mysqli_stmt_bind_param($checkPaymentStmt, "s", $bookingId);
-            mysqli_stmt_execute($checkPaymentStmt);
-            $paymentResult = mysqli_stmt_get_result($checkPaymentStmt);
-            
-            if (mysqli_num_rows($paymentResult) > 0) {
-                // Update existing payment record
-                $updatePaymentSql = "UPDATE flight_payment_t SET amount = ? WHERE f_book_id = ?";
-                $updatePaymentStmt = mysqli_prepare($connection, $updatePaymentSql);
-                mysqli_stmt_bind_param($updatePaymentStmt, "ds", $newAmount, $bookingId);
-                mysqli_stmt_execute($updatePaymentStmt);
-                mysqli_stmt_close($updatePaymentStmt);
-            } else {
-                // Create new payment record
-                $paymentId = 'PY' . time();
-                $paymentMethod = 'Card'; // Default payment method
-                $paymentStatus = 'Paid'; // Default status
-                
-                $insertPaymentSql = "INSERT INTO flight_payment_t (payment_id, f_book_id, amount, payment_method, payment_status) 
-                                     VALUES (?, ?, ?, ?, ?)";
-                $insertPaymentStmt = mysqli_prepare($connection, $insertPaymentSql);
-                mysqli_stmt_bind_param($insertPaymentStmt, "ssdss", $paymentId, $bookingId, $newAmount, $paymentMethod, $paymentStatus);
-                mysqli_stmt_execute($insertPaymentStmt);
-                mysqli_stmt_close($insertPaymentStmt);
-            }
-            
-            mysqli_stmt_close($checkPaymentStmt);
-        }
-        
-        // Commit transaction
-        mysqli_commit($connection);
-        
-        $response = [
-            'success' => true,
-            'message' => 'Flight booking updated successfully'
-        ];
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        mysqli_rollback($connection);
-        
-        $response = [
-            'success' => false,
-            'message' => 'Error updating flight booking: ' . $e->getMessage()
-        ];
-    }
+// Check if the request is a POST request
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    exit;
 }
 
-// Return response
-echo json_encode($response);
-?> 
+// Get the JSON data from the request
+$json_data = file_get_contents('php://input');
+$data = json_decode($json_data, true);
+
+// Validate input data
+if (!$data || !isset($data['booking_id']) || !isset($data['passengers'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid input data']);
+    exit;
+}
+
+// Get booking ID
+$booking_id = $data['booking_id'];
+
+// Initialize response
+$response = ['success' => true, 'message' => 'Changes saved successfully'];
+
+// Begin transaction
+mysqli_begin_transaction($connection);
+
+try {
+    // Update payment amount if changed
+    if (isset($data['final_total']) && $data['final_total'] > 0) {
+        // Get the final total amount (new total + additional charges)
+        $final_total = $data['final_total'];
+        
+        $update_payment_sql = "UPDATE flight_payment_t 
+                              SET amount = ? 
+                              WHERE f_book_id = ?";
+        
+        $payment_stmt = mysqli_prepare($connection, $update_payment_sql);
+        if (!$payment_stmt) {
+            throw new Exception("Error preparing payment update statement: " . mysqli_error($connection));
+        }
+        
+        mysqli_stmt_bind_param($payment_stmt, "ds", $final_total, $booking_id);
+        
+        if (!mysqli_stmt_execute($payment_stmt)) {
+            throw new Exception("Error updating payment: " . mysqli_stmt_error($payment_stmt));
+        }
+        
+        mysqli_stmt_close($payment_stmt);
+    }
+    
+    // Process passenger updates
+    foreach ($data['passengers'] as $index => $passenger) {
+        // Skip if no changes to class or meal
+        if ($passenger['class_id'] == $passenger['original_class_id'] && 
+            $passenger['meal_type'] == $passenger['original_meal']) {
+            continue;
+        }
+        
+        // Get passenger ID - In a real implementation, you would need to get this more reliably
+        // For now, we'll get the passenger ID based on the booking ID and row index
+        $passenger_sql = "SELECT p.pass_id 
+                         FROM passenger_t p 
+                         JOIN passenger_service_t ps ON p.pass_id = ps.pass_id 
+                         WHERE ps.f_book_id = ? 
+                         ORDER BY p.pass_id 
+                         LIMIT ?, 1";
+        
+        $pass_stmt = mysqli_prepare($connection, $passenger_sql);
+        if (!$pass_stmt) {
+            throw new Exception("Error preparing passenger query: " . mysqli_error($connection));
+        }
+        
+        $offset = $index;
+        mysqli_stmt_bind_param($pass_stmt, "si", $booking_id, $offset);
+        
+        if (!mysqli_stmt_execute($pass_stmt)) {
+            throw new Exception("Error fetching passenger ID: " . mysqli_stmt_error($pass_stmt));
+        }
+        
+        $pass_result = mysqli_stmt_get_result($pass_stmt);
+        $pass_row = mysqli_fetch_assoc($pass_result);
+        
+        if (!$pass_row) {
+            throw new Exception("Passenger not found at index $index");
+        }
+        
+        $pass_id = $pass_row['pass_id'];
+        mysqli_stmt_close($pass_stmt);
+        
+        // Get seat class ID directly from the request
+        $class_id = null;
+        if ($passenger['class_id'] != $passenger['original_class_id']) {
+            $class_id = $passenger['class_id'];
+            
+            // Validate that the class ID exists
+            $class_sql = "SELECT class_id FROM seat_class_t WHERE class_id = ?";
+            $class_stmt = mysqli_prepare($connection, $class_sql);
+            
+            if (!$class_stmt) {
+                throw new Exception("Error preparing class query: " . mysqli_error($connection));
+            }
+            
+            mysqli_stmt_bind_param($class_stmt, "s", $class_id);
+            
+            if (!mysqli_stmt_execute($class_stmt)) {
+                throw new Exception("Error fetching class ID: " . mysqli_stmt_error($class_stmt));
+            }
+            
+            $class_result = mysqli_stmt_get_result($class_stmt);
+            if (!mysqli_fetch_assoc($class_result)) {
+                throw new Exception("Invalid seat class ID: " . $class_id);
+            }
+            
+            mysqli_stmt_close($class_stmt);
+        }
+        
+        // Get meal ID from the meal type
+        $meal_id = null;
+        if ($passenger['meal_type'] != $passenger['original_meal']) {
+            // Map meal types directly to meal IDs based on the image
+            switch ($passenger['meal_type']) {
+                case 'Multi-meal':
+                    $meal_id = 'M001';
+                    break;
+                case 'Single meal':
+                    $meal_id = 'M002';
+                    break;
+                case 'N/A':
+                    $meal_id = 'M003';
+                    break;
+                default:
+                    // If not a standard meal, try to get from database
+                    $meal_sql = "SELECT meal_id FROM meal_option_t WHERE opt_name = ?";
+                    $meal_stmt = mysqli_prepare($connection, $meal_sql);
+                    
+                    if (!$meal_stmt) {
+                        throw new Exception("Error preparing meal query: " . mysqli_error($connection));
+                    }
+                    
+                    mysqli_stmt_bind_param($meal_stmt, "s", $passenger['meal_type']);
+                    
+                    if (!mysqli_stmt_execute($meal_stmt)) {
+                        throw new Exception("Error fetching meal ID: " . mysqli_stmt_error($meal_stmt));
+                    }
+                    
+                    $meal_result = mysqli_stmt_get_result($meal_stmt);
+                    $meal_row = mysqli_fetch_assoc($meal_result);
+                    
+                    if (!$meal_row) {
+                        throw new Exception("Meal option not found: " . $passenger['meal_type']);
+                    } else {
+                        $meal_id = $meal_row['meal_id'];
+                    }
+                    
+                    mysqli_stmt_close($meal_stmt);
+            }
+        }
+        
+        // Update passenger_service_t table with new class and/or meal
+        $updates = [];
+        $params = [];
+        $types = "";
+        
+        if ($class_id !== null) {
+            $updates[] = "class_id = ?";
+            $params[] = $class_id;
+            $types .= "s";
+        }
+        
+        if ($meal_id !== null) {
+            $updates[] = "meal_id = ?";
+            $params[] = $meal_id;
+            $types .= "s";  // Changed from 'i' to 's' since meal_id is a string like 'M001'
+        }
+        
+        if (!empty($updates)) {
+            $update_service_sql = "UPDATE passenger_service_t 
+                                  SET " . implode(", ", $updates) . " 
+                                  WHERE pass_id = ? AND f_book_id = ?";
+            
+            $service_stmt = mysqli_prepare($connection, $update_service_sql);
+            if (!$service_stmt) {
+                throw new Exception("Error preparing service update: " . mysqli_error($connection));
+            }
+            
+            $params[] = $pass_id;
+            $params[] = $booking_id;
+            $types .= "is";
+            
+            mysqli_stmt_bind_param($service_stmt, $types, ...$params);
+            
+            if (!mysqli_stmt_execute($service_stmt)) {
+                throw new Exception("Error updating passenger service: " . mysqli_stmt_error($service_stmt));
+            }
+            
+            mysqli_stmt_close($service_stmt);
+        }
+    }
+    
+    // Commit the transaction
+    mysqli_commit($connection);
+    echo json_encode($response);
+    
+} catch (Exception $e) {
+    // Roll back the transaction on error
+    mysqli_rollback($connection);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+} 

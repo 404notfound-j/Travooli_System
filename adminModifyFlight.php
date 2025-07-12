@@ -143,7 +143,8 @@ if (!empty($bookingId)) {
         // Get passenger details for this booking
         $passenger_sql = "SELECT p.*, ps.class_id, sc.class_name, mo.opt_name as meal_type, 
                                 fs.seat_no, fs.flight_id, 
-                                (fp.amount / fbi.passenger_count) as amount
+                                (fp.amount / fbi.passenger_count) as amount,
+                                fsc.price as class_price
                          FROM passenger_t p
                          JOIN passenger_service_t ps ON p.pass_id = ps.pass_id
                          LEFT JOIN seat_class_t sc ON ps.class_id = sc.class_id
@@ -151,6 +152,7 @@ if (!empty($bookingId)) {
                          LEFT JOIN flight_seats_t fs ON ps.pass_id = fs.pass_id
                          LEFT JOIN flight_payment_t fp ON ps.f_book_id = fp.f_book_id
                          LEFT JOIN flight_booking_info_t fbi ON ps.f_book_id = fbi.f_book_id
+                         LEFT JOIN flight_seat_cls_t fsc ON fsc.class_id = ps.class_id AND fsc.flight_id = fs.flight_id
                          WHERE ps.f_book_id = ?";
         
         $passenger_stmt = mysqli_prepare($connection, $passenger_sql);
@@ -182,6 +184,8 @@ if (!empty($bookingId)) {
                             'age_group' => $passenger['pass_category'] . (!empty($age) ? ' (' . $age . ')' : ''),
                             'seat_no' => '',
                             'class' => $passenger['class_name'] ?? 'Economy',
+                            'class_id' => $passenger['class_id'] ?? 'EC',
+                            'class_price' => $passenger['class_price'] ?? 0,
                             'meal_type' => $passenger['meal_type'] ?? 'Standard',
                             'amount' => number_format(($passenger['amount'] ?? 0), 2)
                         ];
@@ -368,11 +372,13 @@ ob_start();
                             </td>
                             <td>
                                 <div class="dropdown-select">
-                                    <select class="class-select" data-original="<?php echo htmlspecialchars($passenger['class']); ?>">
-                                        <option <?php if($passenger['class'] == 'Business') echo 'selected'; ?>>Business</option>
-                                        <option <?php if($passenger['class'] == 'Premium Economy') echo 'selected'; ?>>Premium Economy</option>
-                                        <option <?php if($passenger['class'] == 'First') echo 'selected'; ?>>First</option>
-                                        <option <?php if($passenger['class'] == 'Economy') echo 'selected'; ?>>Economy</option>
+                                    <select class="class-select" data-original="<?php echo htmlspecialchars($passenger['class']); ?>" 
+                                            data-original-id="<?php echo htmlspecialchars($passenger['class_id']); ?>"
+                                            data-original-price="<?php echo htmlspecialchars($passenger['class_price']); ?>">
+                                        <option value="BC" <?php if($passenger['class'] == 'Business Class') echo 'selected'; ?>>Business Class</option>
+                                        <option value="PE" <?php if($passenger['class'] == 'Premium Economy Class') echo 'selected'; ?>>Premium Economy Class</option>
+                                        <option value="FC" <?php if($passenger['class'] == 'First Class') echo 'selected'; ?>>First Class</option>
+                                        <option value="EC" <?php if($passenger['class'] == 'Economy Class') echo 'selected'; ?>>Economy Class</option>
                                     </select>
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
@@ -446,7 +452,7 @@ ob_start();
                                             $routes[] = trim($segment);
                                         }
                                     }
-                                    
+                                        
                                     $i = 0; // Counter for routes
                                     while ($flight = mysqli_fetch_assoc($flight_result)) {
                                         // Use route from the booking summary if available

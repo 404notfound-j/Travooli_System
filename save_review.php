@@ -20,6 +20,18 @@ try {
     // Start transaction
     mysqli_begin_transaction($connection);
     
+    // Check if customer has already submitted a review for this hotel
+    $check_query = "SELECT COUNT(*) AS review_count FROM hotel_feedback_t 
+                    WHERE customer_id = '$customer_id' AND hotel_id = '$hotel_id'";
+    $check_result = mysqli_query($connection, $check_query);
+    $check_row = mysqli_fetch_assoc($check_result);
+    
+    if ($check_row['review_count'] > 0) {
+        echo json_encode(['success' => false, 'message' => 'You have already submitted a review for this hotel']);
+        mysqli_rollback($connection);
+        exit;
+    }
+    
     // Generate feedback ID
     $feedback_id_query = "SELECT MAX(SUBSTRING(h_feedback_id, 3)) as max_id FROM hotel_feedback_t";
     $result = mysqli_query($connection, $feedback_id_query);

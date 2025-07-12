@@ -27,6 +27,28 @@
             padding-left: 0;
             letter-spacing: 0.5px;
         }
+        /* Ensure scrolling works properly */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        body {
+            display: flex;
+        }
+        
+        .main-content {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto !important;
+            padding-bottom: 50px;
+        }
+        
+        .admin-main-content {
+            padding-bottom: 100px;
+        }
     </style>
 </head>
 <body>
