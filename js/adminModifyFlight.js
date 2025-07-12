@@ -183,9 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const modificationFee = parseFloat(document.getElementById('modification-fee').value);
         
         // Calculate new totals
-        const newTotal = originalTotal + additionalAmount;
-        const finalTotal = hasChanges ? newTotal + modificationFee : newTotal;
-        const additionalCharges = hasChanges ? additionalAmount + modificationFee : additionalAmount;
+        const newTotal = additionalAmount; // Show only the price difference
+        const additionalCharges = hasChanges ? modificationFee : 0; // Show only the RM50 fee
+        const finalTotal = originalTotal + additionalAmount + (hasChanges ? modificationFee : 0);
         
         // Update the display
         document.getElementById('current-total').textContent = formatCurrency(originalTotal);

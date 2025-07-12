@@ -519,7 +519,7 @@ ob_start();
                 </div>
                 <div class="fare-row">
                     <div class="fare-label">New Total Amount</div>
-                    <div class="fare-value">: RM<span id="new-total"><?php echo htmlspecialchars($totalAmount); ?></span></div>
+                    <div class="fare-value">: RM<span id="new-total">0.00</span></div>
                 </div>
                 <div class="fare-row">
                     <div class="fare-label">Additional Charge(s)</div>
@@ -527,7 +527,7 @@ ob_start();
                 </div>
                 <div class="fare-divider"></div>
                 <div class="fare-row total">
-                    <div class="fare-label">Total</div>
+                    <div class="fare-label">Final Total</div>
                     <div class="fare-total-value">: RM<span id="final-total"><?php echo htmlspecialchars($totalAmount); ?></span></div>
                 </div>
                 <!-- Hidden inputs for price information -->
