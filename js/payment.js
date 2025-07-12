@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const taxPrice = parseFloat(flightSearch.taxPrice || 0);
 
     const activeAdults = parseInt(flightSearch.activeAdults) || 1;
-    const activeChildren = parseInt(flightSearch.children) || 0;
+    const activeChildren = parseInt(flightSearch.activeChildren) || 0;
     const numPassengers = activeAdults + activeChildren;
 
     const selectedSeats = JSON.parse(sessionStorage.getItem('selectedSeats') || '[]');
@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const departId = flightSearch.depart || flightSearch.selectedFlight || '';
     const classId = flightSearch.classId || '';
     const flightDate = flightSearch.departDate || '';
+    const trip = flightSearch.trip || '';
+    const tripType = trip === 'one' ? 'one way' : trip;
+
 
     const userId = window.currentUserId || null;
     if (!userId || userId === 'null') {
@@ -143,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const bookingData = {
             user_id: userId,
             flight_id: departId,
+            trip_type: tripType,
             booking_date: paymentDate,
             status: 'confirmed',
             class_id: classId,
@@ -158,6 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
             flight_date: flightDate,
             passengers: passengerDetails,
             payment_method: selectedMethod
+            
         };
 
         console.log("📦 Sending bookingData:", bookingData);

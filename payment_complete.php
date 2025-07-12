@@ -19,17 +19,6 @@ if (empty($bookingIdToQuery) && isset($_SESSION['user_id'])) {
     }
 }
 
-// Store the booking ID in session for future use
-if (!empty($bookingIdToQuery)) {
-    $_SESSION['booking_id'] = $bookingIdToQuery;
-    if (!isset($_SESSION['booking_ids']) || !is_array($_SESSION['booking_ids'])) {
-        $_SESSION['booking_ids'] = [];
-    }
-    if (!in_array($bookingIdToQuery, $_SESSION['booking_ids'])) {
-        $_SESSION['booking_ids'][] = $bookingIdToQuery;
-    }
-}
-
 $ticketPrice = $baggagePrice = $mealPrice = $taxPrice = $finalTotalPrice = 0;
 $numPassenger = 0;
 $selectedSeatsDisplay = [];
@@ -54,8 +43,7 @@ if (!empty($bookingIdToQuery)) {
                 fbi.base_fare_total AS ticket_base_price,
                 fbi.baggage_total AS baggage_fees,
                 fbi.meal_total AS meal_fees,
-                fbi.passenger_count AS num_passenger,
-                fbi.created_at AS flight_date
+                fbi.passenger_count AS num_passenger
               FROM flight_booking_t fb
               JOIN flight_info_t fi ON fb.flight_id = fi.flight_id
               JOIN airline_t a ON fi.airline_id = a.airline_id
@@ -213,7 +201,7 @@ if (empty($flightDetailsDB)) {
           <div class="flight-details">
             <div class="detail">
               <div class="icon"><img src="icon/calendar1.svg" alt="Calendar"></div>
-              <div><p>Date</p><span><?= date("Y-m-d", strtotime($flightDetailsDB[0]['flight_date'])) ?></span></div>
+              <div><p>Date</p><span></span></div>
             </div>
             <div class="detail">
               <div class="icon"><img src="icon/timmer.svg" alt="Clock"></div>
@@ -262,21 +250,12 @@ if (empty($flightDetailsDB)) {
     <section class="ratings">
       <p>Your feedback matters to us. Let us know how we can improve your experience.</p>
       <div class="stars">
-        <i class="fas fa-star" id="star-1" data-rating="1"></i>
-        <i class="fas fa-star" id="star-2" data-rating="2"></i>
-        <i class="fas fa-star" id="star-3" data-rating="3"></i>
-        <i class="fas fa-star" id="star-4" data-rating="4"></i>
-        <i class="fas fa-star" id="star-5" data-rating="5"></i>
+        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
       </div>
       <textarea placeholder="Share your thoughts..."></textarea>
       <div class="rating-buttons">
         <button class="cancel-btn">Cancel</button>
-        <button class="submit-btn" 
-          data-booking-id="<?= $flightDetailsDB[0]['flight_booking_id'] ?>"
-          data-flight-id="<?= $flightDetailsDB[0]['flight_id'] ?>"
-          data-airline-id="<?= $flightDetailsDB[0]['airline_id'] ?>">
-          Submit
-        </button>
+        <button class="submit-btn">Submit</button>
       </div>
     </section>
 
@@ -285,9 +264,7 @@ if (empty($flightDetailsDB)) {
       <p>This flight has a flexible cancellation policy. You may be eligible for a refund if cancelled at least 24 hours before departure.</p> 
       <p>All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. 
       However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.</p> 
-      <button class="cancel-flight-btn" 
-        data-booking-id="<?= $flightDetailsDB[0]['flight_booking_id'] ?>"
-        onclick="showCancelConfirmation()">Cancel Flight</button> 
+      <button class="cancel-flight-btn" onclick="showCancelConfirmation()">Cancel Flight</button> 
     </section>
   </main>
   <script src="js/flight_Complete.js"></script>

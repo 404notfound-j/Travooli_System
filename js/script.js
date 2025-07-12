@@ -470,8 +470,11 @@ function formatDisplayDate(date) {
 }
 
 function formatDateISO(date) {
-    return date.toISOString().split('T')[0];
+    if (!date) return '';
+    const adjusted = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12); // Set to noon to avoid UTC rollback
+    return adjusted.toISOString().split('T')[0];
 }
+
 
 function isSameDate(date1, date2) {
     return date1.toDateString() === date2.toDateString();
