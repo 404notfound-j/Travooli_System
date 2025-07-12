@@ -1,5 +1,4 @@
 <?php
-// Get popup parameters from URL or session
 $title = isset($_GET['title']) ? $_GET['title'] : 'Confirm Action';
 $description = isset($_GET['description']) ? $_GET['description'] : 'Are you sure you want to proceed with this action?';
 $cancelText = isset($_GET['cancelText']) ? $_GET['cancelText'] : 'Back';
