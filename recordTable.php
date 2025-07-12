@@ -71,11 +71,11 @@
                         <td><?php echo htmlspecialchars($row['amount']); ?></td>
                         <td>
                             <?php
-                                if ($row['status'] === 'Paid') {
+                                if ($row['status'] === 'Paid' || $row['status'] === 'completed') {
                                     $displayStatus = 'Completed';
                                     $badgeClass = 'Completed';
                                 } elseif ($row['status'] === 'Refunded') {
-                                    $displayStatus = 'Cancelled';
+                                    $displayStatus = 'Refunded';
                                     $badgeClass = 'Cancelled';
                                 } else {
                                     $displayStatus = htmlspecialchars($row['status']);

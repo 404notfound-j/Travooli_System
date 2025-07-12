@@ -285,6 +285,74 @@
     <div id="flightResults" class="flight-results-container"></div>
 </div>
 </div>
+  
+  <?php
+  // Get airline ratings and reviews
+  $airlines = [];
+  $sql = "SELECT airline_id, airline_name FROM airline_t";
+  $result = mysqli_query($connection, $sql);
+  
+  if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+      $airline_id = $row['airline_id'];
+      $airline = [
+        'airline_id' => $airline_id,
+        'airline_name' => $row['airline_name'],
+        'avg_rating' => 0,
+        'total_reviews' => 0,
+        'rating_text' => 'No reviews yet',
+        'feedbacks' => []
+      ];
+      
+      // Get average rating
+      $rating_sql = "SELECT AVG(rating) as avg_rating, COUNT(*) as total 
+                    FROM flight_feedback_t 
+                    WHERE airline_id = '$airline_id'";
+      $rating_result = mysqli_query($connection, $rating_sql);
+      
+      if ($rating_result && mysqli_num_rows($rating_result) > 0) {
+        $rating_row = mysqli_fetch_assoc($rating_result);
+        if ($rating_row['total'] > 0) {
+          $airline['avg_rating'] = round($rating_row['avg_rating'], 1);
+          $airline['total_reviews'] = $rating_row['total'];
+          
+          // Determine rating text
+          if ($airline['avg_rating'] >= 4.5) {
+            $airline['rating_text'] = "Excellent";
+          } else if ($airline['avg_rating'] >= 4.0) {
+            $airline['rating_text'] = "Very good";
+          } else if ($airline['avg_rating'] >= 3.0) {
+            $airline['rating_text'] = "Good";
+          } else if ($airline['avg_rating'] >= 2.0) {
+            $airline['rating_text'] = "Fair";
+          } else {
+            $airline['rating_text'] = "Poor";
+          }
+        }
+      }
+      
+      // Get recent feedbacks
+      $feedback_sql = "SELECT f.*, u.fst_name, u.lst_name 
+                      FROM flight_feedback_t f 
+                      JOIN user_detail_t u ON f.user_id = u.user_id 
+                      WHERE f.airline_id = '$airline_id' 
+                      ORDER BY f_feedback_id DESC 
+                      LIMIT 3";
+      $feedback_result = mysqli_query($connection, $feedback_sql);
+      
+      if ($feedback_result && mysqli_num_rows($feedback_result) > 0) {
+        while ($feedback_row = mysqli_fetch_assoc($feedback_result)) {
+          $airline['feedbacks'][] = $feedback_row;
+        }
+      }
+      
+      $airlines[] = $airline;
+    }
+  }
+  ?>
+
+
+
   <script src="js/flightBook.js"> </script>
 
   <?php include 'u_footer_1.php'; ?>

@@ -20,17 +20,30 @@ function closeModal() {
 
 // Function to handle delete confirmation
 function confirmDelete() {
-    // Add your delete account logic here
-    alert('Account deactivation confirmed. This is where you would implement the actual deactivation logic.');
-    
-    // For now, just close the modal
-    closeModal();
-    
-    // In a real implementation, you would:
-    // 1. Make an API call to deactivate the account
-    // 2. Handle the response
-    // 3. Redirect the user or show a success message
-    // 4. Clear user session data
+    // userIdToDelete should be set by the page that loads the popup
+    if (typeof window.userIdToDelete === 'undefined' || !window.userIdToDelete) {
+        alert('No user selected for deletion.');
+        closeModal();
+        return;
+    }
+    fetch('delete_user.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'user_id=' + encodeURIComponent(window.userIdToDelete)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Failed to delete user: ' + (data.error || 'Unknown error'));
+            closeModal();
+        }
+    })
+    .catch(() => {
+        alert('Failed to delete user.');
+        closeModal();
+    });
 }
 
 // Close modal when clicking outside of it
@@ -59,10 +72,4 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }
     });
-});
-
-// Auto-show modal on page load (for testing purposes)
-// Remove this in production or when integrating with other pages
-document.addEventListener('DOMContentLoaded', function() {
-    showModal();
 }); 

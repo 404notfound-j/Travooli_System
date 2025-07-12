@@ -356,6 +356,20 @@ body {
     color: #605DEC; /* yellow on hover */
 }
 
+/* Add styles for active stars */
+.stars i.active {
+  color: #FFD700;
+}
+
+.stars i {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.stars i:hover {
+  color: #FFC107;
+}
+
 
 textarea {
     width: 100%;

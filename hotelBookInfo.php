@@ -58,6 +58,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $firstname = mysqli_real_escape_string($connection, $_POST['firstname']);
     $lastname = mysqli_real_escape_string($connection, $_POST['lastname']);
     $nationality = mysqli_real_escape_string($connection, $_POST['nationality']);
+    // If nationality is "Other", use the value from other_nationality field
+    if ($nationality === 'Other' && !empty($_POST['other_nationality'])) {
+        $nationality = mysqli_real_escape_string($connection, $_POST['other_nationality']);
+    }
     $email = mysqli_real_escape_string($connection, $_POST['email']);
     $phone = mysqli_real_escape_string($connection, $_POST['phone']);
     
@@ -149,7 +153,7 @@ include 'userHeader.php'; ?>
                             <input type="text" id="firstname" name="firstname" placeholder="First name*" required>
                             <input type="text" id="lastname" name="lastname" placeholder="Last name*" required>
                         </div>
-                        <div class="form-row">
+                        <div class="form-row form-row-2col">
                             <select id="nationality" name="nationality" required>
                                 <option value="">Nationality</option>
                                 <option value="Malaysia">Malaysia</option>
@@ -171,6 +175,7 @@ include 'userHeader.php'; ?>
                                 <option value="Philippines">Philippines</option>
                                 <option value="Other">Other</option>
                             </select>
+                            <input type="text" id="other_nationality" name="other_nationality" placeholder="Please specify nationality" style="display: none;">
                         </div>
                         <div class="form-row form-row-2col">
                             <input type="email" id="email" name="email" placeholder="Email*" required>

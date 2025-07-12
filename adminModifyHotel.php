@@ -11,74 +11,80 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/adminSidebar.css">
     <link rel="stylesheet" href="css/adminModifyHotel.css">
+    <link rel="stylesheet" href="css/dlt_acc_popup.css">
+    <link rel="stylesheet" href="css/adminCancelHotel.css">
+
+    <style>
+        /* Section Titles */
+        .section-title-modify {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            color: #4379EE;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            opacity: 0.7;
+            padding-left: 0;
+            letter-spacing: 0.5px;
+        }
+    </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">
-            <img src="icon/Travooli logo.svg" alt="Travooli" class="logo-img">
-            <span>Management System</span>
-        </div>
-        
-        <nav class="nav-menu">
-            <a href="A_dashboard.php" class="nav-item">Dashboard</a>
-            <a href="#" class="nav-item">Flight</a>
-            <a href="#" class="nav-item active">Booking</a>
-            <a href="salesReport.php" class="nav-item">Report</a>
-            <a href="recordTable.php?section=payment&type=flight" class="nav-item">Payment</a>
-            <a href="recordTable.php?section=refund&type=flight" class="nav-item">Refund</a>
-            <a href="U_Manage.php" class="nav-item">User Management</a>
-            
-            <div class="pages-section">
-                <div class="section-title">PAGES</div>
-                <a href="#" class="nav-item">Calendar</a>
-                <a href="#" class="nav-item">To-Do</a>
-                <a href="#" class="nav-item">Contact</a>
-                <a href="#" class="nav-item">Receipt & Ticket</a>
-                <a href="#" class="nav-item">Team</a>
-            </div>
-        </nav>
-        
-        <div class="footer">
-            <a href="logout.php" class="logout-btn">Log Out</a>
-            <div class="copyright">
-                Travooli Management System © 2025.<br>
-                All Rights Reserved.
-            </div>
-        </div>
-    </div>
+<?php
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-    <div class="main-content">
-        <header class="header">
-            <div class="admin-profile-container" id="admin-profile-container">
-                <div class="admin-avatar">AD</div>
-                <div class="admin-info">
-                    <h4>Admin User</h4>
-                    <span>Admin</span>
-                </div>
-                <svg class="admin-dropdown-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                    <path d="M6 8.5L2.5 5H9.5L6 8.5Z"/>
-                </svg>
-                
-                <!-- Admin Profile Dropdown -->
-                <div class="admin-profile-dropdown" id="admin-profile-dropdown">
-                    <div class="admin-profile-info">
-                        <div class="admin-dropdown-avatar">AD</div>
-                        <div class="admin-profile-details">
-                            <span class="admin-dropdown-name">Admin User</span>
-                            <span class="admin-email">admin@travooli.com</span>
-                        </div>
-                    </div>
-                    <div class="admin-dropdown-divider"></div>
-                    <ul class="admin-dropdown-menu">
-                        <li><a href="admin_profile.php">My Profile</a></li>
-                        <li class="admin-logout-item"><a href="logout.php">Sign Out</a></li>
-                    </ul>
-                </div>
-            </div>
-        </header>
-        
-        <!-- Main Content Area -->
-        <main class="admin-main-content">
+// Include database connection
+include 'connection.php';
+
+// Get booking ID from URL parameter
+$bookingId = isset($_GET['bookingId']) ? $_GET['bookingId'] : '';
+
+// If no booking ID provided, redirect back to hotel booking list
+if (empty($bookingId)) {
+    header("Location: adminHotelBooking.php");
+    exit();
+}
+
+// Query to get booking details with related information
+$sql = "SELECT hb.h_book_id, h.name as hotel_name, rt.type_name, 
+               hb.check_in_date, hb.check_out_date, hb.status, 
+               c.fst_name, c.lst_name, c.nationality, c.email, c.phone_no,
+               hp.amount, hp.status as payment_status
+        FROM hotel_booking_t hb
+        LEFT JOIN hotel_t h ON hb.hotel_id = h.hotel_id
+        LEFT JOIN room_type_t rt ON hb.r_type_id = rt.r_type_id
+        LEFT JOIN customer_t c ON hb.customer_id = c.customer_id
+        LEFT JOIN hotel_payment_t hp ON hb.h_book_id = hp.h_book_id
+        WHERE hb.h_book_id = ?";
+
+$stmt = $connection->prepare($sql);
+$stmt->bind_param("s", $bookingId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Check if booking exists
+if ($result->num_rows === 0) {
+    // Booking not found, redirect back
+    header("Location: adminHotelBooking.php");
+    exit();
+}
+
+// Fetch booking data
+$booking = $result->fetch_assoc();
+
+// Format dates for display
+$checkInDate = date('d-m-Y', strtotime($booking['check_in_date']));
+$checkOutDate = date('d-m-Y', strtotime($booking['check_out_date']));
+
+// Set active nav item for the sidebar
+$activeNav = 'Booking';
+
+// Define page content
+ob_start();
+?>
             <div class="modify-booking-container">
                 <div class="page-header">
                     <a href="adminHotelBooking.php" class="back-button">
@@ -89,34 +95,38 @@
                 
                 <div class="booking-sections">
                     <!-- Booking Summary Title -->
-                    <h2 class="section-title">BOOKING SUMMARY</h2>
+                    <h2 class="section-title-modify">BOOKING SUMMARY</h2>
                     
                     <!-- Booking Summary Section -->
                     <section class="booking-summary-section">
                         <div class="summary-content">
                             <div class="summary-row">
                                 <div class="summary-label">Booking Reference</div>
-                                <div class="summary-value">: BK001234896</div>
+                            <div class="summary-value" id="booking-id">: <?php echo htmlspecialchars($booking['h_book_id']); ?></div>
                             </div>
                             <div class="summary-row">
                                 <div class="summary-label">Hotel</div>
-                                <div class="summary-value">: Emperor Hotel @ KLCC</div>
+                            <div class="summary-value">: <?php echo htmlspecialchars($booking['hotel_name']); ?></div>
+                        </div>
+                        <div class="summary-row">
+                            <div class="summary-label">Room Type</div>
+                            <div class="summary-value">: <?php echo htmlspecialchars($booking['type_name']); ?></div>
                             </div>
                             <div class="summary-row">
                                 <div class="summary-label">Check-In Date</div>
-                                <div class="summary-value">: 22-05-2025</div>
+                            <div class="summary-value">: <?php echo $checkInDate; ?></div>
                             </div>
                             <div class="summary-row">
                                 <div class="summary-label">Check-Out Date</div>
-                                <div class="summary-value">: 23-05-2025</div>
+                            <div class="summary-value">: <?php echo $checkOutDate; ?></div>
                             </div>
                             <div class="summary-row">
                                 <div class="summary-label">Payment Status</div>
-                                <div class="summary-value">: Paid</div>
+                            <div class="summary-value">: <?php echo $booking['payment_status'] ?? 'Pending'; ?></div>
                             </div>
                             <div class="summary-row">
                                 <div class="summary-label">Booking Status</div>
-                                <div class="summary-value">: Confirmed</div>
+                            <div class="summary-value">: <?php echo $booking['status']; ?></div>
                             </div>
                         </div>
                     </section>
@@ -127,7 +137,7 @@
                     </button>
                     
                     <!-- Guest Details Title -->
-                    <h2 class="section-title">GUEST DETAILS</h2>
+                    <h2 class="section-title-modify">GUEST DETAILS</h2>
                     
                     <!-- Guest Details Section -->
                     <section class="guest-details-section">
@@ -142,7 +152,7 @@
                             <div class="guest-details-row">
                                 <div class="guest-name-cell">
                                     <div class="editable-field">
-                                        <span id="guest-name">Michael Johnson</span>
+                                    <span id="guest-name"><?php echo htmlspecialchars($booking['fst_name'] . ' ' . $booking['lst_name']); ?></span>
                                         <button class="edit-btn" data-field="guest-name">
                                             <img src="icon/edit.svg" alt="Edit">
                                         </button>
@@ -150,7 +160,7 @@
                                 </div>
                                 <div class="nationality-cell">
                                     <div class="editable-field">
-                                        <span id="nationality">Malaysia</span>
+                                    <span id="nationality"><?php echo htmlspecialchars($booking['nationality']); ?></span>
                                         <button class="edit-btn" data-field="nationality">
                                             <img src="icon/edit.svg" alt="Edit">
                                         </button>
@@ -158,7 +168,7 @@
                                 </div>
                                 <div class="email-cell">
                                     <div class="editable-field">
-                                        <span id="email">aa@gmail.com</span>
+                                    <span id="email"><?php echo htmlspecialchars($booking['email']); ?></span>
                                         <button class="edit-btn" data-field="email">
                                             <img src="icon/edit.svg" alt="Edit">
                                         </button>
@@ -166,7 +176,7 @@
                                 </div>
                                 <div class="phone-cell">
                                     <div class="editable-field">
-                                        <span id="phone">011-0111 1110</span>
+                                    <span id="phone"><?php echo htmlspecialchars($booking['phone_no']); ?></span>
                                         <button class="edit-btn" data-field="phone">
                                             <img src="icon/edit.svg" alt="Edit">
                                         </button>
@@ -179,30 +189,42 @@
                     <!-- Action Buttons -->
                     <div class="action-buttons">
                         <button class="discard-btn" id="discard-btn">Discard</button>
-                        <button class="save-btn" id="save-btn">Save Change(s)</button>
-                    </div>
+                    <button class="save-btn" id="save-btn" data-booking-id="<?php echo htmlspecialchars($booking['h_book_id']); ?>">Save Change(s)</button>
                 </div>
             </div>
-        </main>
     </div>
     
     <!-- Cancel Booking Modal -->
-    <div class="modal" id="cancel-booking-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Are you sure to cancel your room?</h3>
+    <div class="modal-overlay" id="cancelHotelModal" style="display:none;">
+        <!-- Modal Dialog -->
+        <div class="modal-dialog">
+            <!-- Title Row -->
+            <div class="title-row">
+                <h2 class="modal-title">Are you sure to cancel your room?</h2>
             </div>
-            <div class="modal-body">
-                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Porttitor eget quam dui neque aenean. Facilisis feugiat conubia bibendum lobortis nunc. Mi nibh cubilia habitant dignissim curae.</p>
+            
+            <!-- Description -->
+            <div class="modal-description">
+                <p>Cancelling this hotel booking will result in the reservation being removed from the system. A full refund will be processed to the customer's original payment method, and the booking status will be updated to Cancelled. Please confirm that you want to proceed with cancelling this booking.</p>
             </div>
-            <div class="modal-footer">
-                <button class="btn-back" id="back-btn">Back</button>
-                <button class="btn-confirm" id="confirm-btn">Confirm</button>
+            
+            <!-- Actions -->
+            <div class="modal-actions">
+                <div class="button-row">
+                    <button class="btn btn-secondary" id="back-btn">Back</button>
+                    <button class="btn btn-primary btn-danger" id="confirm-btn" data-booking-id="<?php echo htmlspecialchars($booking['h_book_id']); ?>">Confirm</button>
+                </div>
             </div>
         </div>
     </div>
-    
-    <script src="js/adminSidebar.js"></script>
+</div>
+<?php
+$pageContent = ob_get_clean();
+
+// Include the admin sidebar layout
+include 'adminSidebar.php';
+?>
+
     <script src="js/adminModifyHotel.js"></script>
 </body>
 </html> 

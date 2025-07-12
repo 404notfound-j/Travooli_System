@@ -133,6 +133,9 @@ function loadFlightDetails(flightId, type, classCode) {
         }
         window.departFlightPrice = price;
         searchData.departFlightPricePerPax = price;
+        
+        // Store airline_id in sessionStorage for feedback display
+        searchData.airline_id = flight.airline_id;
       } else {
         const logoImage = document.getElementById("return-airline-logo");
         if (logoImage) {
@@ -141,6 +144,11 @@ function loadFlightDetails(flightId, type, classCode) {
         }
         window.returnFlightPrice = price;
         searchData.returnFlightPricePerPax = price;
+        
+        // If this is a return flight, we still want to keep the depart flight's airline_id
+        if (!searchData.airline_id) {
+          searchData.airline_id = flight.airline_id;
+        }
       }
 
       sessionStorage.setItem('flightSearch', JSON.stringify(searchData));

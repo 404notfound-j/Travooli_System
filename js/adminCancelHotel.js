@@ -23,25 +23,69 @@ function closeModal() {
     }
 }
 
-// Function to handle hotel cancellation confirmation
+// Function to confirm hotel cancellation
 function confirmCancelHotel() {
-    // Get booking ID from URL if available
-    const urlParams = new URLSearchParams(window.location.search);
-    const bookingId = urlParams.get('bookingId');
+    // Get booking ID from button data attribute
+    const confirmBtn = document.querySelector('.btn-primary.btn-danger');
+    let bookingId = confirmBtn ? confirmBtn.getAttribute('data-booking-id') : null;
 
-    // Add your hotel cancellation logic here
-    console.log('Hotel booking cancellation confirmed for ID:', bookingId);
+    // If no booking ID, try to get it from URL
+    if (!bookingId) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlBookingId = urlParams.get('bookingId');
+        
+        if (!urlBookingId) {
+            alert('Booking ID not found.');
+            return;
+        } else {
+            bookingId = urlBookingId;
+        }
+    }
 
-    // In a real implementation, you would:
-    // 1. Make an API call to cancel the hotel booking
-    // 2. Update the database status
-    // 3. Redirect the user or show a success message
+    // Create form data for AJAX request
+    const formData = new FormData();
+    formData.append('bookingId', bookingId);
+    formData.append('action', 'cancel');
 
-    // For now, just show an alert and redirect
-    alert('Hotel booking has been cancelled successfully. You can restore it from the booking list if needed.');
+    // Show loading state
+    if (confirmBtn) {
+        confirmBtn.textContent = 'Processing...';
+        confirmBtn.disabled = true;
+    }
 
-    // Redirect to the hotel bookings list page
-    window.location.href = 'adminHotelBooking.php?cancelled=true&bookingId=' + bookingId;
+    // Send AJAX request to cancel booking
+    fetch('updateHotelBooking.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            alert('Booking has been cancelled and refund processed successfully.');
+            // Redirect to booking list
+            window.location.href = 'adminHotelBooking.php';
+        } else {
+            // Show error message
+            alert('Error: ' + data.message);
+            
+            // Reset button state
+            if (confirmBtn) {
+                confirmBtn.textContent = 'Confirm';
+                confirmBtn.disabled = false;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while cancelling the booking. Please try again.');
+        
+        // Reset button state
+        if (confirmBtn) {
+            confirmBtn.textContent = 'Confirm';
+            confirmBtn.disabled = false;
+        }
+    });
 }
 
 // Close modal when clicking outside of it and bind events when DOM is ready

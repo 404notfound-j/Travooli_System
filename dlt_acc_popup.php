@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,12 +15,16 @@
         <div class="modal-dialog">
             <!-- Title Row -->
             <div class="title-row">
-                <h2 class="modal-title">Are you sure to delete this user?</h2>
+                <h2 class="modal-title">Delete User Confirmation</h2>
             </div>
             
             <!-- Description -->
             <div class="modal-description">
-                Lorem ipsum odor amet, consectetuer adipiscing elit. Porttitor eget quam dui neque aenean. Facilisis feugiat conubia bibendum lobortis nunc. Mi nibh cubilia habitant dignissim curae.
+                Are you sure you want to delete the following user?<br><br>
+                <strong>User ID:</strong> <span id="del-user-id"></span><br>
+                <strong>First Name:</strong> <span id="del-fst-name"></span><br>
+                <strong>Last Name:</strong> <span id="del-lst-name"></span><br><br>
+                This action will permanently delete all data for this user. This cannot be undone.
             </div>
             
             <!-- Actions -->

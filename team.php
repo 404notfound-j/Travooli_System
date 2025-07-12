@@ -35,7 +35,7 @@ ob_start();
       <img src="https://www.pngmart.com/files/23/Profile-PNG-Photo.png" alt="Profile Picture">
         <h3>Joanne Lee Jia Tian</h3>
         <p class="role">Member</p>
-        <p class="email">joannejietian@gmail.com/p>
+        <p class="email">joannejietian@gmail.com</p>
       </div>
 
       <div class="team-card">

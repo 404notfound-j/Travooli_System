@@ -34,26 +34,33 @@ document.addEventListener('DOMContentLoaded', function() {
   // --- Ratings Section Logic ---
   const stars = document.querySelectorAll('.stars i');
   let currentRating = 0;
-  
+
+  // Handle star hover
   stars.forEach((star, index) => {
+    // Mouse enter - fill stars up to this one
     star.addEventListener('mouseenter', () => {
       for (let i = 0; i <= index; i++) {
         stars[i].style.color = '#605DEC';
       }
     });
-    
+
+    // Mouse leave - return to selected state
     star.addEventListener('mouseleave', () => {
       if (currentRating === 0) {
+        // If no rating selected, reset all stars
         stars.forEach(s => s.style.color = '#a8a8b7');
       } else {
+        // If rating selected, show selected stars
         stars.forEach((s, i) => {
           s.style.color = i < currentRating ? '#605DEC' : '#a8a8b7';
         });
       }
     });
-    
+
+    // Click - set rating
     star.addEventListener('click', () => {
       currentRating = index + 1;
+      // Update all stars to reflect selection
       stars.forEach((s, i) => {
         s.style.color = i < currentRating ? '#605DEC' : '#a8a8b7';
         s.classList.toggle('selected', i < currentRating);
@@ -61,72 +68,98 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  document.querySelector('.submit-btn').addEventListener('click', function() {
-    const reviewText = document.querySelector('textarea').value.trim();
-    const userName = "James Doe"; // Get from user session - consider passing from PHP if available
-    
-    if (currentRating === 0) {
-      alert('Please select a rating before submitting.');
-      return;
-    }
-    
-    if (reviewText === '') {
-      alert('Please enter your review before submitting.');
-      return;
-    }
-    
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'save_review.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    
-    xhr.onload = function() {
-      if (this.status === 200) {
-        try {
-          const response = JSON.parse(this.responseText);
-          if (response.success) {
-            alert('Thank you for your review! It has been added to the flight details page.');
-            stars.forEach(s => {
-              s.style.color = '#a8a8b7';
-              s.classList.remove('selected');
-            });
-            document.querySelector('textarea').value = '';
-            currentRating = 0;
-          } else {
-            alert('Error: ' + response.message);
-          }
-        } catch (e) {
+  // Handle submit button
+  const submitBtn = document.querySelector('.submit-btn');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', function() {
+      const reviewText = document.querySelector('textarea').value.trim();
+      
+      if (currentRating === 0) {
+        alert('Please select a rating before submitting.');
+        return;
+      }
+      
+      if (reviewText === '') {
+        alert('Please enter your review before submitting.');
+        return;
+      }
+      
+      // Get data attributes from button
+      const bookingId = this.getAttribute('data-booking-id');
+      const flightId = this.getAttribute('data-flight-id');
+      const airlineId = this.getAttribute('data-airline-id');
+      
+      // Submit the feedback using fetch API
+      fetch('submit_flight_feedback.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=submitFeedback&f_book_id=${encodeURIComponent(bookingId)}&flight_id=${encodeURIComponent(flightId)}&airline_id=${encodeURIComponent(airlineId)}&rating=${currentRating}&feedback=${encodeURIComponent(reviewText)}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
           alert('Thank you for your review! It has been added to the flight details page.');
+          // Reset form
           stars.forEach(s => {
             s.style.color = '#a8a8b7';
             s.classList.remove('selected');
           });
           document.querySelector('textarea').value = '';
           currentRating = 0;
+        } else {
+          alert('Error: ' + data.message);
         }
-      } else {
+      })
+      .catch(error => {
+        console.error('Error:', error);
         alert('There was an error submitting your review. Please try again.');
-      }
-    };
-    
-    xhr.onerror = function() {
-      alert('There was an error submitting your review. Please try again.');
-    };
-    
-    const data = `rating=${currentRating}&review=${encodeURIComponent(reviewText)}&user=${encodeURIComponent(userName)}&type=flight`;
-    xhr.send(data);
-  });
-  
-  document.querySelector('.cancel-btn').addEventListener('click', function() {
-    stars.forEach(s => {
-      s.style.color = '#a8a8b7';
-      s.classList.remove('selected');
+      });
     });
-    document.querySelector('textarea').value = '';
-    currentRating = 0;
-  });
+  }
+  
+  // Handle cancel button
+  const cancelBtn = document.querySelector('.cancel-btn');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function() {
+      // Reset all stars
+      stars.forEach(s => {
+        s.style.color = '#a8a8b7';
+        s.classList.remove('selected');
+      });
+      document.querySelector('textarea').value = '';
+      currentRating = 0;
+    });
+  }
   
   // Make showCancelConfirmation available globally as it's called by onclick in PHP
   window.showCancelConfirmation = function() {
+    // Get booking ID from the cancel button or submit button
+    const cancelBtn = document.querySelector('.cancel-flight-btn');
+    const submitBtn = document.querySelector('.submit-btn');
+    
+    let bookingId = null;
+    
+    // Try to get booking ID from various sources
+    if (cancelBtn && cancelBtn.getAttribute('data-booking-id')) {
+      bookingId = cancelBtn.getAttribute('data-booking-id');
+      console.log("Got booking ID from cancel button:", bookingId);
+    } else if (submitBtn && submitBtn.getAttribute('data-booking-id')) {
+      bookingId = submitBtn.getAttribute('data-booking-id');
+      console.log("Got booking ID from submit button:", bookingId);
+    } else {
+      // Try to get from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      bookingId = urlParams.get('bookingId');
+      console.log("Got booking ID from URL:", bookingId);
+    }
+    
+    if (!bookingId || bookingId === 'N/A') {
+      alert("Cannot find booking ID. Please try again or contact support.");
+      return;
+    }
+    
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.top = '0';
@@ -140,7 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
                    '&description=' + encodeURIComponent('If you cancel your flight, you may be subject to cancellation fees depending on the airline\'s policy. Please check the cancellation policy for details.') +
                    '&confirmText=' + encodeURIComponent('Cancel Flight') +
                    '&confirmClass=btn-danger' +
-                   '&actionType=cancelFlight';
+                   '&actionType=cancelFlight' +
+                   '&bookingId=' + encodeURIComponent(bookingId);
 
     document.body.appendChild(iframe);
 
@@ -149,17 +183,32 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.removeChild(iframe);
         window.removeEventListener('message', handler);
       } else if (event.data && event.data.action === 'cancelFlight' && event.data.confirmed) {
+        console.log("Sending cancellation request with booking ID:", bookingId);
+        
+        // Use the booking ID from the event if available, otherwise use the one we found
+        const finalBookingId = event.data.bookingId || bookingId;
+        
         fetch('cancelFlight.php', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ action: 'cancel' })
+          body: JSON.stringify({ 
+            action: 'cancel',
+            booking_id: finalBookingId 
+          })
         })
-        .then(response => response.text())
-        .then(message => {
-          alert(message);
-          window.location.href = 'U_dashboard.php';
+        .then(response => response.json())
+        .then(data => {
+          console.log("Cancellation response:", data);
+          
+          if (data.success) {
+            alert(data.message || "Your booking has been successfully cancelled and refund processed.");
+            window.location.href = 'U_dashboard.php';
+          } else {
+            alert("Error: " + (data.error || "An error occurred while cancelling the flight."));
+            console.error("Cancellation error:", data);
+          }
         })
         .catch(error => {
           console.error('Cancellation failed:', error);

@@ -258,25 +258,51 @@ input.radio-button:checked::after {
 
 .form-input {
     width: 100%;
-    height: 48px;
-    padding: 8px 12px;
-    background-color: #ffffff;
-    border: 1px solid #a1afcc;
-    border-radius: 4px;
+    padding: 16px;
+    border: 1px solid #e4e7e9;
+    border-radius: 8px;
     font-family: 'Nunito Sans', Helvetica;
-    font-size: 18px;
-    color: #7b8db0;
+    font-size: 16px;
+    color: #191c1f;
+    background-color: white;
     margin-bottom: 16px;
-    transition: border-color 0.3s ease;
+    box-sizing: border-box;
 }
 
 .form-input:focus {
-    outline: none;
     border-color: #605dec;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(96, 93, 236, 0.2);
 }
 
 .form-input::placeholder {
-    color: #7b8db0;
+    color: #6e7491;
+}
+
+/* Error and validation styles */
+.error-message {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    display: block;
+    font-family: 'Nunito Sans', Helvetica;
+}
+
+input.error {
+    border-color: #f44336 !important;
+    border-width: 1px;
+    background-color: #fff8f8;
+}
+
+.highlight-required {
+    background-color: #fff8e1 !important;
+    border-color: #ffca28 !important;
+    transition: all 0.3s ease;
+}
+
+.highlight-required::placeholder {
+    color: #ff8f00;
 }
 
 .form-row {

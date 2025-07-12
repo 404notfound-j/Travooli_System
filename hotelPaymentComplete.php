@@ -9,12 +9,70 @@
     $response = ['success' => false, 'message' => 'Unknown error'];
 
     if ($booking_id) {
-      // Update booking status to 'Cancelled'
-      $update = "UPDATE hotel_booking_t SET status='Cancelled' WHERE h_book_id='$booking_id'";
-      if (mysqli_query($connection, $update)) {
-        $response = ['success' => true, 'message' => 'Booking cancelled successfully.'];
-      } else {
-        $response = ['success' => false, 'message' => 'Database error: ' . mysqli_error($connection)];
+      // Begin transaction
+      mysqli_begin_transaction($connection);
+      
+      try {
+        // First get payment amount from hotel_payment_t
+        $payment_query = "SELECT amount, method FROM hotel_payment_t WHERE h_book_id='$booking_id'";
+        $payment_result = mysqli_query($connection, $payment_query);
+        
+        if (!$payment_result || mysqli_num_rows($payment_result) == 0) {
+          throw new Exception("Payment record not found for booking ID: $booking_id");
+        }
+        
+        $payment_data = mysqli_fetch_assoc($payment_result);
+        $refund_amount = $payment_data['amount'];
+        $refund_method = $payment_data['method'];
+        
+        // Update booking status to 'cancelled'
+        $update_booking = "UPDATE hotel_booking_t SET status='Cancelled' WHERE h_book_id='$booking_id'";
+        if (!mysqli_query($connection, $update_booking)) {
+          throw new Exception("Failed to update booking status: " . mysqli_error($connection));
+        }
+        
+        // Update payment status to 'refunded'
+        $update_payment = "UPDATE hotel_payment_t SET status='Refunded' WHERE h_book_id='$booking_id'";
+        if (!mysqli_query($connection, $update_payment)) {
+          throw new Exception("Failed to update payment status: " . mysqli_error($connection));
+        }
+        
+        // Current date and time for refund
+        $refund_date = date('Y-m-d H:i:s');
+        
+        // Get the last refund ID and increment it
+        $last_id_query = "SELECT h_refund_id FROM hotel_refund_t ORDER BY h_refund_id DESC LIMIT 1";
+        $last_id_result = mysqli_query($connection, $last_id_query);
+        
+        if (mysqli_num_rows($last_id_result) > 0) {
+            $last_id_row = mysqli_fetch_assoc($last_id_result);
+            $last_id = $last_id_row['h_refund_id'];
+            
+            // Extract the numeric part and increment
+            $numeric_part = intval(substr($last_id, 2));
+            $new_numeric_part = $numeric_part + 1;
+            $refund_id = 'HF' . str_pad($new_numeric_part, 4, '0', STR_PAD_LEFT);
+        } else {
+            // No existing refunds, start with HF0001
+            $refund_id = 'HF0001';
+        }
+        
+        // Insert record into hotel_refund_t
+        $refund_insert = "INSERT INTO hotel_refund_t (h_refund_id, h_book_id, refund_amt, refund_date, status, refund_method) 
+                          VALUES ('$refund_id', '$booking_id', '$refund_amount', '$refund_date', 'Completed', '$refund_method')";
+        
+        if (!mysqli_query($connection, $refund_insert)) {
+          throw new Exception("Failed to create refund record: " . mysqli_error($connection));
+        }
+        
+        // If we got here, commit the transaction
+        mysqli_commit($connection);
+        $response = ['success' => true, 'message' => 'Booking cancelled and refund processed successfully.'];
+        
+      } catch (Exception $e) {
+        // An error occurred, rollback the transaction
+        mysqli_rollback($connection);
+        $response = ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
       }
     } else {
       $response = ['success' => false, 'message' => 'Booking ID missing.'];
@@ -256,10 +314,10 @@
       <section class ="cancel-flight">
         <h1>Cancellation Policy</h1>
         <p>
-          This flight has a flexible cancellation policy. If you cancel or change your flight up to 24 hours before the departure date, you may be eligible for a refund or minimal fees, depending on your ticket type. Refundable ticket holders are entitled to a full or partial refund.
+          This hotel booking has a flexible cancellation policy. If you cancel or change your reservation up to 24 hours before the check-in date, you may be eligible for a refund or minimal fees, depending on the hotel's policy. Refundable bookings are entitled to a full or partial refund.
         </p>
         <p>
-          All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.
+          All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. However, cancellation policies may vary based on the hotel and room type. For full details, please review the cancellation policy for this hotel during the booking process.
         </p> 
         <button class="cancel-flight-btn" onclick="showCancelBookingReminder('<?php echo $booking_id; ?>')">
           Cancel Booking

@@ -6,7 +6,7 @@ Date first written: 10-May-2025
 Date last modified: 6-Jul-2025 
  -->
 
-<?php
+ <?php
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }

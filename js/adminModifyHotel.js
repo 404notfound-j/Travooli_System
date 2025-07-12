@@ -1,9 +1,52 @@
 // Function to open cancel hotel modal
 window.openCancelHotelModal = function() {
     // Show the modal
-    const modal = document.getElementById('cancel-booking-modal');
-    modal.classList.add('show');
+    const modal = document.getElementById('cancelHotelModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
 };
+
+// Function to close cancel hotel modal
+function closeModal() {
+    const modal = document.getElementById('cancelHotelModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Function to confirm cancel hotel booking
+function confirmCancelHotel() {
+    // Get the booking ID from URL or data attribute
+    const bookingId = document.getElementById('booking-id').textContent.replace(': ', '');
+    
+    // Send AJAX request to cancel booking
+    fetch('updateHotelBooking.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `bookingId=${bookingId}&action=cancel`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Booking cancelled successfully!');
+            window.location.href = 'adminHotelBooking.php';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while cancelling the booking.');
+    });
+    
+    // Close the modal
+    closeModal();
+}
 
 // Variables to track changes
 let originalData = {
@@ -51,13 +94,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const fieldId = this.getAttribute('data-field');
+            
+            // Skip if this is the email field
+            if (fieldId === 'email') {
+                return;
+            }
+            
             const editableField = this.closest('.editable-field');
             const spanElement = document.getElementById(fieldId);
             const currentValue = spanElement.textContent;
             
             // Create input element
             const inputElement = document.createElement('input');
-            inputElement.type = fieldId === 'email' ? 'email' : fieldId === 'phone' ? 'tel' : 'text';
+            inputElement.type = fieldId === 'phone' ? 'tel' : 'text';
             inputElement.value = currentValue;
             inputElement.className = 'editable-field-input';
             
@@ -103,6 +152,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Hide edit button for email field
+    const emailEditButton = document.querySelector('[data-field="email"]');
+    if (emailEditButton) {
+        emailEditButton.style.display = 'none';
+    }
+    
     // Discard Changes Button
     const discardBtn = document.getElementById('discard-btn');
     discardBtn.addEventListener('click', function() {
@@ -135,18 +190,54 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Here you would send the updated data to the server
-        console.log('Saving updated values:', currentData);
+        // Get the booking ID from the save button's data attribute
+        const bookingId = this.getAttribute('data-booking-id');
         
-        // Update original values to the new values
-        Object.assign(originalData, currentData);
+        if (!bookingId) {
+            console.error('Booking ID not found');
+            alert('Error: Booking ID not found');
+            return;
+        }
         
-        // Reset change tracking
-        hasChanges = false;
-        updateSaveButtonState();
+        console.log('Saving changes for booking ID:', bookingId);
+        console.log('Current data:', currentData);
         
-        // Show success message
-        alert('Changes saved successfully!');
+        // Create form data for the request
+        const formData = new FormData();
+        formData.append('bookingId', bookingId);
+        formData.append('guestName', currentData.guestName);
+        formData.append('nationality', currentData.nationality);
+        formData.append('phone', currentData.phone);
+        
+        // Send AJAX request to update guest info
+        fetch('updateHotelGuest.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data received:', data);
+            if (data.success) {
+                // Update original values to the new values
+                Object.assign(originalData, currentData);
+                
+                // Reset change tracking
+                hasChanges = false;
+                updateSaveButtonState();
+                
+                // Show success message
+                alert('Guest information updated successfully!');
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating guest information.');
+        });
     });
     
     // Close Modal Button
@@ -190,27 +281,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.getElementById('back-btn');
     if (backBtn) {
         backBtn.addEventListener('click', function() {
-            const modal = document.getElementById('cancel-booking-modal');
-            modal.classList.remove('show');
+            closeModal();
         });
     }
 
     const confirmBtn = document.getElementById('confirm-btn');
     if (confirmBtn) {
-        confirmBtn.addEventListener('click', function() {
-            // Get the booking reference
-            const bookingReference = document.querySelector('.summary-value').textContent.replace(': ', '');
-            
-            // Redirect to booking list with cancelled parameter
-            window.location.href = `adminHotelBooking.php?cancelled=${bookingReference}`;
-        });
+        confirmBtn.addEventListener('click', confirmCancelHotel);
     }
 
     // Close modal when clicking outside
     window.addEventListener('click', function(event) {
-        const modal = document.getElementById('cancel-booking-modal');
+        const modal = document.getElementById('cancelHotelModal');
         if (event.target === modal) {
-            modal.classList.remove('show');
+            closeModal();
         }
     });
     
@@ -248,13 +332,6 @@ function saveInlineEdit(fieldId, inputElement) {
         return;
     }
     
-    // Validate email if field is email
-    if (fieldId === 'email' && !validateEmail(value)) {
-        alert('Please enter a valid email address.');
-        inputElement.focus();
-        return;
-    }
-    
     // Create new span element
     const spanElement = document.createElement('span');
     spanElement.id = fieldId;
@@ -270,9 +347,6 @@ function saveInlineEdit(fieldId, inputElement) {
             break;
         case 'nationality':
             currentData.nationality = value;
-            break;
-        case 'email':
-            currentData.email = value;
             break;
         case 'phone':
             currentData.phone = value;
@@ -297,13 +371,19 @@ function saveInlineEdit(fieldId, inputElement) {
             }
             
             const fieldId = this.getAttribute('data-field');
+            
+            // Skip if this is the email field
+            if (fieldId === 'email') {
+                return;
+            }
+            
             const editableField = this.closest('.editable-field');
             const spanElement = document.getElementById(fieldId);
             const currentValue = spanElement.textContent;
             
             // Create input element
             const inputElement = document.createElement('input');
-            inputElement.type = fieldId === 'email' ? 'email' : fieldId === 'phone' ? 'tel' : 'text';
+            inputElement.type = fieldId === 'phone' ? 'tel' : 'text';
             inputElement.value = currentValue;
             inputElement.className = 'editable-field-input';
             
@@ -374,9 +454,6 @@ function cancelInlineEdit(fieldId, inputElement) {
         case 'nationality':
             originalValue = currentData.nationality;
             break;
-        case 'email':
-            originalValue = currentData.email;
-            break;
         case 'phone':
             originalValue = currentData.phone;
             break;
@@ -405,13 +482,19 @@ function cancelInlineEdit(fieldId, inputElement) {
             }
             
             const fieldId = this.getAttribute('data-field');
+            
+            // Skip if this is the email field
+            if (fieldId === 'email') {
+                return;
+            }
+            
             const editableField = this.closest('.editable-field');
             const spanElement = document.getElementById(fieldId);
             const currentValue = spanElement.textContent;
             
             // Create input element
             const inputElement = document.createElement('input');
-            inputElement.type = fieldId === 'email' ? 'email' : fieldId === 'phone' ? 'tel' : 'text';
+            inputElement.type = fieldId === 'phone' ? 'tel' : 'text';
             inputElement.value = currentValue;
             inputElement.className = 'editable-field-input';
             
