@@ -13,6 +13,21 @@
     <link rel="stylesheet" href="css/adminModifyHotel.css">
     <link rel="stylesheet" href="css/dlt_acc_popup.css">
     <link rel="stylesheet" href="css/adminCancelHotel.css">
+
+    <style>
+        /* Section Titles */
+        .section-title-modify {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 20px;
+            color: #4379EE;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            opacity: 0.7;
+            padding-left: 0;
+            letter-spacing: 0.5px;
+        }
+    </style>
 </head>
 <body>
 <?php
@@ -80,7 +95,7 @@ ob_start();
                 
                 <div class="booking-sections">
                     <!-- Booking Summary Title -->
-                    <h2 class="section-title">BOOKING SUMMARY</h2>
+                    <h2 class="section-title-modify">BOOKING SUMMARY</h2>
                     
                     <!-- Booking Summary Section -->
                     <section class="booking-summary-section">
@@ -122,7 +137,7 @@ ob_start();
                     </button>
                     
                     <!-- Guest Details Title -->
-                    <h2 class="section-title">GUEST DETAILS</h2>
+                    <h2 class="section-title-modify">GUEST DETAILS</h2>
                     
                     <!-- Guest Details Section -->
                     <section class="guest-details-section">
