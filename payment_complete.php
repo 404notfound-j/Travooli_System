@@ -43,8 +43,7 @@ if (!empty($bookingIdToQuery)) {
                 fbi.base_fare_total AS ticket_base_price,
                 fbi.baggage_total AS baggage_fees,
                 fbi.meal_total AS meal_fees,
-                fbi.passenger_count AS num_passenger,
-                fbi.created_at AS flight_date
+                fbi.passenger_count AS num_passenger
               FROM flight_booking_t fb
               JOIN flight_info_t fi ON fb.flight_id = fi.flight_id
               JOIN airline_t a ON fi.airline_id = a.airline_id
@@ -202,7 +201,7 @@ if (empty($flightDetailsDB)) {
           <div class="flight-details">
             <div class="detail">
               <div class="icon"><img src="icon/calendar1.svg" alt="Calendar"></div>
-              <div><p>Date</p><span><?= date("Y-m-d", strtotime($flightDetailsDB[0]['flight_date'])) ?></span></div>
+              <div><p>Date</p><span></span></div>
             </div>
             <div class="detail">
               <div class="icon"><img src="icon/timmer.svg" alt="Clock"></div>

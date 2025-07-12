@@ -20,12 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // For formatting dates to ISO (YYYY-MM-DD) for data-attributes and backend
   function formatDateISO(date) {
-      if (!date) return '';
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-  }
+    if (!date) return '';
+    const adjusted = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12); // Set to noon to avoid UTC rollback
+    return adjusted.toISOString().split('T')[0];
+}
+
 
   // For formatting month and year for calendar headers (e.g., "July 2025")
   function formatMonthYear(date) {
