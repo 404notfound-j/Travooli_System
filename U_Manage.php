@@ -70,7 +70,7 @@ $usersToShow = array_slice($users, $start, $perPage);
             <td><?= htmlspecialchars($user['lst_name']) ?></td>
             <td><a href="mailto:<?= htmlspecialchars($user['email_address']) ?>"><?= htmlspecialchars($user['email_address']) ?></a></td>
             <td>
-                <button class="modify-btn" onclick="window.location.href='profile.php?admin_id=<?= htmlspecialchars($_SESSION['user_id']) ?>&user_id=<?= htmlspecialchars($user['user_id']) ?>&return=U_Manage.php'">Modify</button>
+                <button class="modify-btn" onclick="window.location.href='admin_edit_user.php?user_id=<?= htmlspecialchars($user['user_id']) ?>'">Modify</button>
                 <button class="delete-btn" onclick="openDeleteUserPopup('<?= htmlspecialchars($user['user_id']) ?>', '<?= htmlspecialchars($user['fst_name']) ?>', '<?= htmlspecialchars($user['lst_name']) ?>')">Delete</button>
             </td>
         </tr>
