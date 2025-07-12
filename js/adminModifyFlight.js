@@ -1,128 +1,276 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Get booking ID from URL or from the global variable set in PHP
+// Get booking ID from URL
+function getBookingIdFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    const bookingId = urlParams.get('bookingId') || window.bookingId || '';
+    return urlParams.get('bookingId') || '';
+}
+
+// Store booking ID for use throughout the script
+const bookingId = getBookingIdFromUrl();
     
-    // Initialize edit buttons functionality
-    initEditButtons();
+// Function to open cancel flight modal
+function openCancelFlightModal() {
+    document.getElementById('cancelFlightModal').style.display = 'flex';
+}
+
+// Function to close modal
+function closeModal() {
+    document.getElementById('cancelFlightModal').style.display = 'none';
+}
+
+// Function to confirm cancellation
+function confirmCancelFlight() {
+    // Use AJAX to cancel the flight booking
+    fetch('cancelFlight.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            booking_id: bookingId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Flight booking has been successfully cancelled and refund processed.');
+            // Redirect to booking list page after successful cancellation
+            window.location.href = 'adminFlightBooking.php';
+        } else {
+            alert('Error: ' + (data.message || 'Failed to cancel booking'));
+            console.error('Error details:', data);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while cancelling the booking.');
+    });
     
-    // Function to initialize edit buttons
-    function initEditButtons() {
+    // Close the modal
+    closeModal();
+}
+
+// Initialize editable fields
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle edit buttons for editable fields
         const editButtons = document.querySelectorAll('.edit-btn');
         
         editButtons.forEach(button => {
             button.addEventListener('click', function() {
-                const editableField = this.closest('.editable-field');
-                const fieldText = editableField.querySelector('span');
-                const currentValue = fieldText.textContent.trim();
+            const fieldContainer = this.closest('.editable-field');
+            const span = fieldContainer.querySelector('span');
                 
                 // If already in edit mode, save the changes
-                if (editableField.classList.contains('editing')) {
-                    const inputField = editableField.querySelector('input');
-                    const newValue = inputField.value.trim();
+            if (fieldContainer.classList.contains('editing')) {
+                const input = fieldContainer.querySelector('.edit-input');
+                const newValue = input.value.trim();
                     
-                    // Update the text with the new value
-                    fieldText.textContent = newValue;
+                if (newValue) {
+                    span.textContent = newValue;
+                }
                     
-                    // Remove the input field
-                    inputField.remove();
+                // Remove input field
+                input.remove();
                     
-                    // Toggle editing class
-                    editableField.classList.remove('editing');
-                    button.classList.remove('editing');
+                // Make span visible again
+                span.style.display = '';
+                
+                // Change button back to edit icon
+                this.innerHTML = '<i class="fas fa-pen" style="color: #4379EE;"></i>';
+                
+                // Remove editing class
+                fieldContainer.classList.remove('editing');
                     
-                    // Change button icon back to edit
-                    button.innerHTML = '<img src="icon/edit.svg" alt="Edit">';
+                // Ensure button is visible
+                this.style.display = '';
                 } else {
+                // Enter edit mode
+                const currentValue = span.textContent;
+                
                     // Create input field
-                    const inputField = document.createElement('input');
-                    inputField.type = 'text';
-                    inputField.value = currentValue;
-                    inputField.className = 'edit-input';
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentValue;
+                input.className = 'edit-input';
                     
-                    // Add input field before the span
-                    editableField.insertBefore(inputField, fieldText);
+                // Add input before span
+                fieldContainer.insertBefore(input, span);
                     
-                    // Focus on the input
-                    inputField.focus();
+                // Hide span
+                span.style.display = 'none';
                     
-                    // Toggle editing class
-                    editableField.classList.add('editing');
-                    button.classList.add('editing');
+                // Change button to tick icon
+                this.innerHTML = '<i class="fas fa-check" style="color: #4379EE;"></i>';
+                
+                // Add editing class
+                fieldContainer.classList.add('editing');
+                
+                // Focus input
+                input.focus();
                     
-                    // Change button icon to save
-                    button.innerHTML = '<i class="fas fa-check" style="color: #4379EE;"></i>';
-                    
-                    // Handle Enter key to save
-                    inputField.addEventListener('keydown', function(e) {
+                // Handle Enter key
+                input.addEventListener('keypress', function(e) {
                         if (e.key === 'Enter') {
-                            e.preventDefault();
-                            button.click();
+                        button.click(); // Trigger save by clicking the button
                         }
                     });
                     
-                    // Handle Escape key to cancel
-                    inputField.addEventListener('keydown', function(e) {
+                // Handle Escape key
+                input.addEventListener('keydown', function(e) {
                         if (e.key === 'Escape') {
-                            e.preventDefault();
-                            // Restore original value
-                            inputField.remove();
-                            editableField.classList.remove('editing');
-                            button.classList.remove('editing');
-                            button.innerHTML = '<img src="icon/edit.svg" alt="Edit">';
+                        // Cancel editing
+                        input.remove();
+                        span.style.display = '';
+                        button.innerHTML = '<i class="fas fa-pen" style="color: #4379EE;"></i>';
+                        fieldContainer.classList.remove('editing');
+                        button.style.display = ''; // Ensure button is visible
                         }
                     });
                 }
             });
         });
-    }
+
+    // Handle class and meal selection changes
+    const classSelects = document.querySelectorAll('.class-select');
+    const mealSelects = document.querySelectorAll('.meal-select');
     
-    // Function to open cancel flight modal
-    window.openCancelFlightModal = function() {
-        // Show in-page cancel flight modal if it exists
-        const modal = document.getElementById('cancelFlightModal');
-        if (modal) {
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        } else {
-            // Fallback to standalone page if modal markup is not present
-            const urlParams = new URLSearchParams(window.location.search);
-            const bookingId = urlParams.get('bookingId') || window.bookingId || '';
-            window.location.href = `adminCancelFlight.php?bookingId=${bookingId}`;
-        }
+    // Price mapping for different seat classes
+    const classPrices = {
+        'Economy': 0,
+        'Premium Economy': 150,
+        'Business': 500,
+        'First': 1000
     };
     
-    // Save changes button functionality
+    // Price mapping for different meal types
+    const mealPrices = {
+        'N/A': 0,
+        'Single meal': 15,
+        'Multi-meal': 30
+    };
+    
+    // Function to recalculate fares when selections change
+    function recalculateFares() {
+        let additionalAmount = 0;
+        let hasChanges = false;
+        
+        // Check class changes
+        classSelects.forEach(select => {
+            const originalClass = select.getAttribute('data-original');
+            const currentClass = select.value;
+            
+            if (originalClass !== currentClass) {
+                hasChanges = true;
+                // Calculate price difference
+                additionalAmount += classPrices[currentClass] - classPrices[originalClass];
+            }
+        });
+        
+        // Check meal changes
+        mealSelects.forEach(select => {
+            const originalMeal = select.getAttribute('data-original');
+            const currentMeal = select.value;
+            
+            if (originalMeal !== currentMeal) {
+                hasChanges = true;
+                // Calculate price difference
+                additionalAmount += mealPrices[currentMeal] - mealPrices[originalMeal];
+            }
+        });
+        
+        // Get original total and modification fee
+        const originalTotal = parseFloat(document.getElementById('original-total').value);
+        const modificationFee = parseFloat(document.getElementById('modification-fee').value);
+        
+        // Calculate new totals
+        const newTotal = originalTotal + additionalAmount;
+        const finalTotal = hasChanges ? newTotal + modificationFee : newTotal;
+        const additionalCharges = hasChanges ? additionalAmount + modificationFee : additionalAmount;
+        
+        // Update the display
+        document.getElementById('current-total').textContent = formatCurrency(originalTotal);
+        document.getElementById('new-total').textContent = formatCurrency(newTotal);
+        document.getElementById('additional-charges').textContent = formatCurrency(additionalCharges);
+        document.getElementById('final-total').textContent = formatCurrency(finalTotal);
+    }
+    
+    // Helper function to format currency
+    function formatCurrency(amount) {
+        return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+    
+    // Add event listeners to selects
+    classSelects.forEach(select => {
+        select.addEventListener('change', recalculateFares);
+    });
+    
+    mealSelects.forEach(select => {
+        select.addEventListener('change', recalculateFares);
+    });
+    
+    // Handle discard button
+    const discardBtn = document.querySelector('.discard-btn');
+    if (discardBtn) {
+        discardBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to discard all changes?')) {
+                window.location.reload();
+        }
+        });
+    }
+    
+    // Handle save changes button
     const saveBtn = document.querySelector('.save-btn');
     if (saveBtn) {
         saveBtn.addEventListener('click', function() {
             // Collect all changes
             const changes = collectChanges();
             
-            // Here you would typically make an AJAX call to your server to save the changes
-            console.log('Changes to save:', changes);
-            alert('Changes would be saved here.');
+            // Add fare information to changes
+            const originalTotal = parseFloat(document.getElementById('original-total').value);
+            const finalTotal = parseFloat(document.getElementById('final-total').textContent.replace(/,/g, ''));
             
-            // Redirect back to booking list after saving
-            // window.location.href = 'adminFlightBooking.php';
+            changes.original_amount = originalTotal;
+            changes.new_amount = finalTotal;
+            
+            // Send changes to server using AJAX
+            fetch('updateFlightBooking.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(changes)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Changes saved successfully!');
+                    // Refresh the current page instead of redirecting
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to save changes'));
+                    console.error('Error details:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving changes.');
+            });
         });
     }
     
-    // Discard changes button functionality
-    const discardBtn = document.querySelector('.discard-btn');
-    if (discardBtn) {
-        discardBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to discard all changes?')) {
-                // Redirect back to booking list without saving
-                window.location.href = 'adminFlightBooking.php';
+    // Add ESC key listener to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
             }
         });
-    }
+});
     
     // Function to collect all changes made to the booking
     function collectChanges() {
         const changes = {
-            bookingId: bookingId,
+        booking_id: bookingId,
             passengers: []
         };
         
@@ -130,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const passengerRows = document.querySelectorAll('.traveler-table tbody tr');
         passengerRows.forEach((row, index) => {
             const nameCell = row.querySelector('td:nth-child(1) .editable-field span');
-            const ageGroupCell = row.querySelector('td:nth-child(2) .editable-field span');
+            const ageGroupSelect = row.querySelector('td:nth-child(2) .dropdown-select select');
             const seatCell = row.querySelector('td:nth-child(3)');
             const classSelect = row.querySelector('td:nth-child(4) select');
             const mealSelect = row.querySelector('td:nth-child(5) select');
@@ -138,62 +286,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
             changes.passengers.push({
                 name: nameCell ? nameCell.textContent.trim() : '',
-                ageGroup: ageGroupCell ? ageGroupCell.textContent.trim() : '',
-                seat: seatCell ? seatCell.textContent.trim() : '',
+                age_group: ageGroupSelect ? ageGroupSelect.value : '',
+                seat_no: seatCell ? seatCell.textContent.trim() : '',
                 class: classSelect ? classSelect.value : '',
-                mealType: mealSelect ? mealSelect.value : '',
-                amount: amountCell ? amountCell.textContent.trim() : ''
+                meal_type: mealSelect ? mealSelect.value : '',
+                amount: amountCell ? amountCell.textContent.trim().replace('RM ', '') : '',
+                original_class: classSelect ? classSelect.getAttribute('data-original') : '',
+                original_meal: mealSelect ? mealSelect.getAttribute('data-original') : ''
             });
         });
         
         return changes;
     }
-});
-
-// ==== In-page Cancel Flight Popup Handling ====
-function closeModal() {
-    const modal = document.getElementById('cancelFlightModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-}
-
-function confirmCancelFlight() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const bookingId = urlParams.get('bookingId') || window.bookingId || '';
-
-    // TODO: Replace with real cancellation logic / API call
-    console.log('Flight booking cancellation confirmed for ID:', bookingId);
-    alert('Flight booking has been cancelled successfully.');
-
-    // Redirect to booking list page
-    window.location.href = 'adminFlightBooking.php?cancelled=true&bookingId=' + bookingId;
-}
-
-// Attach outside-click and ESC-close behaviour
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('cancelFlightModal');
-    const modalDialog = modal ? modal.querySelector('.modal-dialog') : null;
-
-    if (modal) {
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
-    }
-
-    if (modalDialog) {
-        modalDialog.addEventListener('click', function(event) {
-            event.stopPropagation();
-        });
-    }
-
-    // Close on ESC
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    });
-}); 

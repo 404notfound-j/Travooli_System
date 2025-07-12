@@ -54,9 +54,9 @@ if (!empty($bookingId)) {
             
             // Set basic booking info from the first segment
             if (empty($flightId)) {
-                $bookingStatus = $row['status'] ?: 'Confirmed';
+            $bookingStatus = $row['status'] ?: 'Confirmed';
                 $totalAmount = $row['amount'] ? number_format($row['amount'], 2) : '0.00';
-                $paymentStatus = $row['payment_status'] ?: 'Paid';
+            $paymentStatus = $row['payment_status'] ?: 'Paid';
                 $tripType = $row['trip_type'] ?: '';
             }
         }
@@ -130,7 +130,7 @@ if (!empty($bookingId)) {
                 $route_parts = [];
                 foreach ($airport_pairs as $pair) {
                     $route_parts[] = $pair['orig'] . ' → ' . $pair['dest'];
-                }
+            }
                 $route = implode(', ', $route_parts);
             }
             
@@ -142,12 +142,15 @@ if (!empty($bookingId)) {
         
         // Get passenger details for this booking
         $passenger_sql = "SELECT p.*, ps.class_id, sc.class_name, mo.opt_name as meal_type, 
-                                fs.seat_no, fs.flight_id
+                                fs.seat_no, fs.flight_id, 
+                                (fp.amount / fbi.passenger_count) as amount
                          FROM passenger_t p
                          JOIN passenger_service_t ps ON p.pass_id = ps.pass_id
                          LEFT JOIN seat_class_t sc ON ps.class_id = sc.class_id
                          LEFT JOIN meal_option_t mo ON ps.meal_id = mo.meal_id
                          LEFT JOIN flight_seats_t fs ON ps.pass_id = fs.pass_id
+                         LEFT JOIN flight_payment_t fp ON ps.f_book_id = fp.f_book_id
+                         LEFT JOIN flight_booking_info_t fbi ON ps.f_book_id = fbi.f_book_id
                          WHERE ps.f_book_id = ?";
         
         $passenger_stmt = mysqli_prepare($connection, $passenger_sql);
@@ -248,28 +251,9 @@ ob_start();
     <!-- Popup CSS -->
     <link rel="stylesheet" href="css/dlt_acc_popup.css">
     <link rel="stylesheet" href="css/adminCancelFlight.css">
-
+    <!-- JavaScript -->
+    <script src="js/adminModifyFlight.js"></script>
     
-    <script>
-        // Store booking ID from URL for JavaScript use
-        const bookingId = "<?php echo $bookingId; ?>";
-        
-        // Function to open cancel flight modal
-        function openCancelFlightModal() {
-            document.getElementById('cancelFlightModal').style.display = 'flex';
-        }
-        
-        // Function to close modal
-        function closeModal() {
-            document.getElementById('cancelFlightModal').style.display = 'none';
-        }
-        
-        // Function to confirm cancellation
-        function confirmCancelFlight() {
-            // Redirect to cancelFlight.php with the booking ID
-            window.location.href = 'cancelFlight.php?bookingId=' + bookingId;
-        }
-    </script>
     <style>
         /* Ensure scrolling works properly */
         html, body {
@@ -366,16 +350,17 @@ ob_start();
                                 <div class="editable-field">
                                     <span><?php echo htmlspecialchars($passenger['passenger_name']); ?></span>
                                     <button class="edit-btn">
-                                        <img src="icon/edit.svg" alt="Edit">
+                                        <i class="fas fa-pen" style="color: #4379EE;"></i>
                                     </button>
                                 </div>
                             </td>
                             <td>
-                                <div class="editable-field">
-                                    <span><?php echo htmlspecialchars($passenger['age_group']); ?></span>
-                                    <button class="edit-btn">
-                                        <img src="icon/edit.svg" alt="Edit">
-                                    </button>
+                                <div class="dropdown-select">
+                                    <select class="age-group-select">
+                                        <option value="Adult" <?php if(strpos($passenger['age_group'], 'Adult') !== false) echo 'selected'; ?>>Adult</option>
+                                        <option value="Child" <?php if(strpos($passenger['age_group'], 'Child') !== false) echo 'selected'; ?>>Child</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down"></i>
                                 </div>
                             </td>
                             <td>
@@ -383,7 +368,7 @@ ob_start();
                             </td>
                             <td>
                                 <div class="dropdown-select">
-                                    <select>
+                                    <select class="class-select" data-original="<?php echo htmlspecialchars($passenger['class']); ?>">
                                         <option <?php if($passenger['class'] == 'Business') echo 'selected'; ?>>Business</option>
                                         <option <?php if($passenger['class'] == 'Premium Economy') echo 'selected'; ?>>Premium Economy</option>
                                         <option <?php if($passenger['class'] == 'First') echo 'selected'; ?>>First</option>
@@ -394,7 +379,7 @@ ob_start();
                             </td>
                             <td>
                                 <div class="dropdown-select">
-                                    <select>
+                                    <select class="meal-select" data-original="<?php echo htmlspecialchars($passenger['meal_type']); ?>">
                                         <option <?php if($passenger['meal_type'] == 'Multi-meal') echo 'selected'; ?>>Multi-meal</option>
                                         <option <?php if($passenger['meal_type'] == 'Single meal') echo 'selected'; ?>>Single meal</option>
                                         <option <?php if($passenger['meal_type'] == 'N/A') echo 'selected'; ?>>N/A</option>
@@ -402,7 +387,7 @@ ob_start();
                                     <i class="fas fa-chevron-down"></i>
                                 </div>
                             </td>
-                            <td>RM <?php echo htmlspecialchars($passenger['amount']); ?></td>
+                            <td class="passenger-amount" data-original-amount="<?php echo str_replace(',', '', $passenger['amount']); ?>">RM <?php echo htmlspecialchars($passenger['amount']); ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -530,21 +515,24 @@ ob_start();
             <div class="fare-update">
                 <div class="fare-row">
                     <div class="fare-label">Current Total Amount</div>
-                    <div class="fare-value">: RM<?php echo htmlspecialchars($totalAmount); ?></div>
+                    <div class="fare-value">: RM<span id="current-total"><?php echo htmlspecialchars($totalAmount); ?></span></div>
                 </div>
                 <div class="fare-row">
                     <div class="fare-label">New Total Amount</div>
-                    <div class="fare-value">: RM16,500</div>
+                    <div class="fare-value">: RM<span id="new-total"><?php echo htmlspecialchars($totalAmount); ?></span></div>
                 </div>
                 <div class="fare-row">
                     <div class="fare-label">Additional Charge(s)</div>
-                    <div class="fare-value">: RM4,000</div>
+                    <div class="fare-value">: RM<span id="additional-charges">0.00</span></div>
                 </div>
                 <div class="fare-divider"></div>
                 <div class="fare-row total">
                     <div class="fare-label">Total</div>
-                    <div class="fare-total-value">: RM20,500</div>
+                    <div class="fare-total-value">: RM<span id="final-total"><?php echo htmlspecialchars($totalAmount); ?></span></div>
                 </div>
+                <!-- Hidden inputs for price information -->
+                <input type="hidden" id="modification-fee" value="50.00">
+                <input type="hidden" id="original-total" value="<?php echo str_replace(',', '', $totalAmount); ?>">
             </div>
             
             <div class="action-buttons">
