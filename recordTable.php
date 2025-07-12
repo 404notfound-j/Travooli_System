@@ -71,7 +71,7 @@
                         <td><?php echo htmlspecialchars($row['amount']); ?></td>
                         <td>
                             <?php
-                                if ($row['status'] === 'Paid' || $row['status'] === 'complete') {
+                                if ($row['status'] === 'Paid' || $row['status'] === 'completed') {
                                     $displayStatus = 'Completed';
                                     $badgeClass = 'Completed';
                                 } elseif ($row['status'] === 'Refunded') {
