@@ -10,61 +10,32 @@ $bookingId = isset($_GET['bookingId']) ? $_GET['bookingId'] : '';
 
 // Initialize variables with default values
 $flightId = '';
-$flightRoute = 'KUL → SIN, SIN → KUL';
-$flightOption = 'Round-trip';
-$totalAmount = '13,500';
-$paymentStatus = 'Paid';
-$bookingStatus = 'Confirmed';
+$flightRoute = '';
+$flightOption = '';
+$totalAmount = '';
+$paymentStatus = '';
+$bookingStatus = '';
 
 // Default passenger data
-$passengerDetails = [
-    [
-        'passenger_name' => 'John Doe',
-        'age_group' => 'Adult (30)',
-        'seat_no' => '1A (A2301), 2A (A2302)',
-        'class' => 'Business',
-        'meal_type' => 'Multi-meal',
-        'amount' => '3,500'
-    ],
-    [
-        'passenger_name' => 'Jane Doe',
-        'age_group' => 'Child (8)',
-        'seat_no' => '1B (A2301), 2B (A2302)',
-        'class' => 'Business',
-        'meal_type' => 'N/A',
-        'amount' => '2,100'
-    ],
-    [
-        'passenger_name' => 'Emily Davis',
-        'age_group' => 'Youth (16)',
-        'seat_no' => '3F (A2301), 5D (A2302)',
-        'class' => 'Premium Economy',
-        'meal_type' => 'Single meal',
-        'amount' => '2,700'
-    ],
-    [
-        'passenger_name' => 'Michael Johnson',
-        'age_group' => 'Senior (76)',
-        'seat_no' => '9B (A2301), 7A (A2302)',
-        'class' => 'First',
-        'meal_type' => 'Multi-meal',
-        'amount' => '5,200'
-    ]
-];
+$passengerDetails = [];
 
 // If booking ID is provided, fetch data from database
 if (!empty($bookingId)) {
-    // Get flight booking details
+    // Get flight booking details with all related flights for this booking
     $sql = "SELECT fb.f_book_id, fb.flight_id, fb.status, fp.amount, fp.payment_status,
-                   fi.orig_airport_id, fi.dest_airport_id, a1.city_full as origin_city, a2.city_full as destination_city,
-                   al.airline_name
+                   fi.orig_airport_id, fi.dest_airport_id, 
+                   a1.city_full as origin_city, a1.airport_short as origin_code,
+                   a2.city_full as destination_city, a2.airport_short as destination_code,
+                   al.airline_name, fbi.trip_type
             FROM flight_booking_t fb
             LEFT JOIN flight_payment_t fp ON fb.f_book_id = fp.f_book_id
             LEFT JOIN flight_info_t fi ON fb.flight_id = fi.flight_id
             LEFT JOIN airport_t a1 ON fi.orig_airport_id = a1.airport_id
             LEFT JOIN airport_t a2 ON fi.dest_airport_id = a2.airport_id
             LEFT JOIN airline_t al ON fi.airline_id = al.airline_id
-            WHERE fb.f_book_id = ?";
+            LEFT JOIN flight_booking_info_t fbi ON fb.f_book_id = fbi.f_book_id
+            WHERE fb.f_book_id = ?
+            ORDER BY fi.departure_time";
             
     $stmt = mysqli_prepare($connection, $sql);
     
@@ -73,23 +44,186 @@ if (!empty($bookingId)) {
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
         
-        if ($row = mysqli_fetch_assoc($result)) {
-            $flightId = $row['flight_id'] ?: 'TSI-MH-A2301';
-            $bookingStatus = $row['status'] ?: 'Confirmed';
-            $totalAmount = number_format($row['amount'] ?: 13500, 2);
-            $paymentStatus = $row['payment_status'] ?: 'Paid';
+        // Get all flight segments for this booking
+        $flight_segments = [];
+        $flightIds = [];
+        
+        while ($row = mysqli_fetch_assoc($result)) {
+            $flight_segments[] = $row;
+            $flightIds[] = $row['flight_id'];
             
-            // Format flight route
-            if (!empty($row['origin_city']) && !empty($row['destination_city'])) {
-                $flightRoute = $row['origin_city'] . ' → ' . $row['destination_city'];
+            // Set basic booking info from the first segment
+            if (empty($flightId)) {
+                $bookingStatus = $row['status'] ?: 'Confirmed';
+                $totalAmount = $row['amount'] ? number_format($row['amount'], 2) : '0.00';
+                $paymentStatus = $row['payment_status'] ?: 'Paid';
+                $tripType = $row['trip_type'] ?: '';
             }
         }
         
+        // Format flight IDs for display
+        $flightId = implode(', ', array_unique($flightIds));
+        
+        // Format flight route
+        if (count($flight_segments) > 0) {
+            // Check if this is a round-trip
+            $is_round_trip = false;
+            if (!empty($tripType)) {
+                $is_round_trip = ($tripType === 'round-trip');
+            }
+            
+            // Group flights by origin-destination pairs to identify routes
+            $airport_pairs = [];
+            foreach ($flight_segments as $segment) {
+                $orig = !empty($segment['origin_code']) ? $segment['origin_code'] : 
+                       (!empty($segment['orig_airport_id']) ? $segment['orig_airport_id'] : '');
+                $dest = !empty($segment['destination_code']) ? $segment['destination_code'] : 
+                       (!empty($segment['dest_airport_id']) ? $segment['dest_airport_id'] : '');
+                
+                if (!empty($orig) && !empty($dest)) {
+                    $airport_pairs[] = ['orig' => $orig, 'dest' => $dest];
+                }
+            }
+            
+            // Build route for display
+            $route = '';
+            
+            // If we have trip_type = round-trip or we can detect a round-trip pattern
+            if ($is_round_trip || count($flight_segments) >= 2) {
+                // Try to find a round-trip pattern (A→B and B→A)
+                $found_round_trip = false;
+                
+                if (count($airport_pairs) >= 2) {
+                    // Check for the classic round-trip pattern: A→B followed by B→A
+                    for ($i = 0; $i < count($airport_pairs) - 1; $i++) {
+                        $outbound = $airport_pairs[$i];
+                        $inbound = $airport_pairs[$i + 1];
+                        
+                        if ($outbound['orig'] === $inbound['dest'] && $outbound['dest'] === $inbound['orig']) {
+                            // Found a round-trip pattern
+                            $route = $outbound['orig'] . ' → ' . $outbound['dest'] . ', ' . $inbound['orig'] . ' → ' . $inbound['dest'];
+                            $found_round_trip = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // If we couldn't find a round-trip pattern but trip_type says it's round-trip,
+                // try to construct a reasonable route
+                if (!$found_round_trip && $is_round_trip && !empty($airport_pairs)) {
+                    $first = $airport_pairs[0];
+                    $route = $first['orig'] . ' → ' . $first['dest'];
+                    
+                    // If we have a second segment, add its route
+                    if (count($airport_pairs) > 1) {
+                        $last = $airport_pairs[count($airport_pairs) - 1];
+                        $route .= ', ' . $last['orig'] . ' → ' . $last['dest'];
+                    } else {
+                        // If only one segment but marked as round-trip, assume return to origin
+                        $route .= ', ' . $first['dest'] . ' → ' . $first['orig'];
+                    }
+                }
+            }
+            
+            // If we couldn't build a round-trip route, fall back to simple route
+            if (empty($route)) {
+                $route_parts = [];
+                foreach ($airport_pairs as $pair) {
+                    $route_parts[] = $pair['orig'] . ' → ' . $pair['dest'];
+                }
+                $route = implode(', ', $route_parts);
+            }
+            
+            $flightRoute = $route;
+            $flightOption = $is_round_trip ? 'Round-trip' : 'One-way';
+        }
+        
         mysqli_stmt_close($stmt);
+        
+        // Get passenger details for this booking
+        $passenger_sql = "SELECT p.*, ps.class_id, sc.class_name, mo.opt_name as meal_type, 
+                                fs.seat_no, fs.flight_id
+                         FROM passenger_t p
+                         JOIN passenger_service_t ps ON p.pass_id = ps.pass_id
+                         LEFT JOIN seat_class_t sc ON ps.class_id = sc.class_id
+                         LEFT JOIN meal_option_t mo ON ps.meal_id = mo.meal_id
+                         LEFT JOIN flight_seats_t fs ON ps.pass_id = fs.pass_id
+                         WHERE ps.f_book_id = ?";
+        
+        $passenger_stmt = mysqli_prepare($connection, $passenger_sql);
+        
+        if ($passenger_stmt) {
+            mysqli_stmt_bind_param($passenger_stmt, "s", $bookingId);
+            mysqli_stmt_execute($passenger_stmt);
+            $passenger_result = mysqli_stmt_get_result($passenger_stmt);
+            
+            if ($passenger_result && mysqli_num_rows($passenger_result) > 0) {
+                // Group passengers by their ID
+                $passenger_map = [];
+                
+                while ($passenger = mysqli_fetch_assoc($passenger_result)) {
+                    $pass_id = $passenger['pass_id'];
+                    
+                    if (!isset($passenger_map[$pass_id])) {
+                        // Calculate age if dob is available
+                        $age = '';
+                        if (!empty($passenger['dob'])) {
+                            $dob = new DateTime($passenger['dob']);
+                            $now = new DateTime();
+                            $age = $dob->diff($now)->y;
+                        }
+                        
+                        // Initialize passenger record
+                        $passenger_map[$pass_id] = [
+                            'passenger_name' => $passenger['fst_name'] . ' ' . $passenger['lst_name'],
+                            'age_group' => $passenger['pass_category'] . (!empty($age) ? ' (' . $age . ')' : ''),
+                            'seat_no' => '',
+                            'class' => $passenger['class_name'] ?? 'Economy',
+                            'meal_type' => $passenger['meal_type'] ?? 'Standard',
+                            'amount' => number_format(($passenger['amount'] ?? 0), 2)
+                        ];
+                    }
+                    
+                    // Add seat information
+                    if (!empty($passenger['seat_no'])) {
+                        $seat_info = $passenger['seat_no'] . ' (' . $passenger['flight_id'] . ')';
+                        
+                        if (empty($passenger_map[$pass_id]['seat_no'])) {
+                            $passenger_map[$pass_id]['seat_no'] = $seat_info;
+                        } else {
+                            $passenger_map[$pass_id]['seat_no'] .= ', ' . $seat_info;
+                        }
+                    }
+                }
+                
+                $passengerDetails = array_values($passenger_map);
+            }
+            
+            mysqli_stmt_close($passenger_stmt);
+        }
     }
-    
-    // Note: We're not querying passenger_details_t as it doesn't exist
-    // Using default passenger data instead
+}
+
+// If we still have no passenger details (e.g., database query failed), use default data
+if (empty($passengerDetails)) {
+    $passengerDetails = [
+        [
+            'passenger_name' => 'John Doe',
+            'age_group' => 'Adult (30)',
+            'seat_no' => '1A (A2301), 2A (A2302)',
+            'class' => 'Business',
+            'meal_type' => 'Multi-meal',
+            'amount' => '3,500'
+        ],
+        [
+            'passenger_name' => 'Jane Doe',
+            'age_group' => 'Child (8)',
+            'seat_no' => '1B (A2301), 2B (A2302)',
+            'class' => 'Business',
+            'meal_type' => 'N/A',
+            'amount' => '2,100'
+        ]
+    ];
 }
 
 // Set active nav item for the sidebar
@@ -119,6 +253,22 @@ ob_start();
     <script>
         // Store booking ID from URL for JavaScript use
         const bookingId = "<?php echo $bookingId; ?>";
+        
+        // Function to open cancel flight modal
+        function openCancelFlightModal() {
+            document.getElementById('cancelFlightModal').style.display = 'flex';
+        }
+        
+        // Function to close modal
+        function closeModal() {
+            document.getElementById('cancelFlightModal').style.display = 'none';
+        }
+        
+        // Function to confirm cancellation
+        function confirmCancelFlight() {
+            // Redirect to cancelFlight.php with the booking ID
+            window.location.href = 'cancelFlight.php?bookingId=' + bookingId;
+        }
     </script>
     <style>
         /* Ensure scrolling works properly */
@@ -275,6 +425,85 @@ ob_start();
                         </tr>
                     </thead>
                     <tbody>
+                        <?php
+                        // Get flight details for this booking
+                        $flights_found = false;
+                        
+                        if (!empty($bookingId)) {
+                            $flight_sql = "SELECT fb.flight_id, 
+                                           a1.city_full as origin_city, a1.airport_short as origin_code,
+                                           a2.city_full as destination_city, a2.airport_short as destination_code,
+                                           fi.departure_time, al.airline_name
+                                    FROM flight_booking_t fb
+                                    JOIN flight_info_t fi ON fb.flight_id = fi.flight_id
+                                    LEFT JOIN airport_t a1 ON fi.orig_airport_id = a1.airport_id
+                                    LEFT JOIN airport_t a2 ON fi.dest_airport_id = a2.airport_id
+                                    LEFT JOIN airline_t al ON fi.airline_id = al.airline_id
+                                    WHERE fb.f_book_id = ?
+                                    ORDER BY fi.departure_time";
+                                    
+                            $flight_stmt = mysqli_prepare($connection, $flight_sql);
+                            
+                            if ($flight_stmt) {
+                                mysqli_stmt_bind_param($flight_stmt, "s", $bookingId);
+                                mysqli_stmt_execute($flight_stmt);
+                                $flight_result = mysqli_stmt_get_result($flight_stmt);
+                                
+                                if ($flight_result && mysqli_num_rows($flight_result) > 0) {
+                                    $flights_found = true;
+                                    
+                                    // If we have a global flight route from booking summary, use it to extract individual routes
+                                    $routes = [];
+                                    if (!empty($flightRoute)) {
+                                        // Split by comma if there are multiple segments
+                                        $routeSegments = explode(',', $flightRoute);
+                                        foreach ($routeSegments as $segment) {
+                                            $routes[] = trim($segment);
+                                        }
+                                    }
+                                    
+                                    $i = 0; // Counter for routes
+                                    while ($flight = mysqli_fetch_assoc($flight_result)) {
+                                        // Use route from the booking summary if available
+                                        $route = '';
+                                        if (!empty($routes) && isset($routes[$i])) {
+                                            $route = $routes[$i];
+                                            $i++;
+                                        } else {
+                                            // Fallback to generating route from flight data
+                                            if (!empty($flight['origin_code']) && !empty($flight['destination_code'])) {
+                                                $route = $flight['origin_code'] . ' → ' . $flight['destination_code'];
+                                            } elseif (!empty($flight['origin_city']) && !empty($flight['destination_city'])) {
+                                                $route = $flight['origin_city'] . ' → ' . $flight['destination_city'];
+                                            }
+                                        }
+                                        
+                                        // Format date and time
+                                        $date_time = '';
+                                        if (!empty($flight['departure_time'])) {
+                                            $departure = new DateTime($flight['departure_time']);
+                                            $date = $departure->format('d M Y');
+                                            $time = $departure->format('H:i');
+                                            $date_time = $date . '<br>' . $time;
+                                        }
+                                        
+                                        echo '<tr>';
+                                        echo '<td>' . htmlspecialchars($flight['flight_id']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($flight['airline_name'] ?? 'N/A') . '</td>';
+                                        echo '<td>' . htmlspecialchars($route) . '</td>';
+                                        echo '<td>' . $date_time . '</td>';
+                                        echo '<td>Airbus A330-300</td>';
+                                        echo '</tr>';
+                                    }
+                                }
+                                
+                                mysqli_stmt_close($flight_stmt);
+                            }
+                        }
+                        
+                        // Display default data if no flights were found
+                        if (!$flights_found) {
+                        ?>
                         <tr>
                             <td>TSI-MH-A2301</td>
                             <td>MH1217</td>
@@ -289,6 +518,7 @@ ob_start();
                             <td>29 Jan 2025<br>14:00</td>
                             <td>Boeing 747</td>
                         </tr>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>

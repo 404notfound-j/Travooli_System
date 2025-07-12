@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 11, 2025 at 11:57 PM
+-- Generation Time: Jul 12, 2025 at 03:09 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -166,7 +166,9 @@ INSERT INTO `customer_t` (`customer_id`, `fst_name`, `lst_name`, `email`, `phone
 ('C0028', 'rj', 'xx', 'rjxx@gmail.com', '0122222222', 'Japan'),
 ('C0029', 'Chung', 'Bin', 'asunaoo87@gmail.com', '0146757339', 'Germany'),
 ('C0030', 'big ', 'bun', 'msi@gmail.com', '0146757339', 'Thailand'),
-('C0031', 'jeffrey', 'choo', 'jeffrey@gmail.com', '0146757339', 'Vietnam');
+('C0031', 'jeffrey', 'choo', 'jeffrey@gmail.com', '0146757339', 'Vietnam'),
+('C0032', 'ddd', 'ccc', 'ddd@gmail.com', '11111111', 'Turkey'),
+('C0033', 'lao', 'wy', 'dabian567@gmail.com', '121321321313', 'Philippines');
 
 -- --------------------------------------------------------
 
@@ -182,16 +184,18 @@ CREATE TABLE `flight_booking_info_t` (
   `meal_total` decimal(10,2) DEFAULT 0.00,
   `base_fare_total` decimal(10,2) NOT NULL,
   `total_amount` decimal(10,2) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `created_at` datetime DEFAULT current_timestamp(),
+  `trip_type` enum('one-way','round-trip') NOT NULL DEFAULT 'one-way' COMMENT 'Stores booking trip type: one-way or round-trip'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `flight_booking_info_t`
 --
 
-INSERT INTO `flight_booking_info_t` (`booking_info_id`, `f_book_id`, `passenger_count`, `baggage_total`, `meal_total`, `base_fare_total`, `total_amount`, `created_at`) VALUES
-('BI1752258296', 'BK1752258296', 1, 0.00, 0.00, 204.00, 216.24, '2025-07-12 02:24:56'),
-('BI1752268437', 'BK1752268437', 1, 0.00, 0.00, 960.00, 1017.60, '2025-07-12 05:13:57');
+INSERT INTO `flight_booking_info_t` (`booking_info_id`, `f_book_id`, `passenger_count`, `baggage_total`, `meal_total`, `base_fare_total`, `total_amount`, `created_at`, `trip_type`) VALUES
+('BI1752258296', 'BK1752258296', 1, 0.00, 0.00, 204.00, 216.24, '2025-07-12 02:24:56', 'round-trip'),
+('BI1752268437', 'BK1752268437', 1, 0.00, 0.00, 960.00, 1017.60, '2025-07-12 05:13:57', 'round-trip'),
+('BI1752271749', 'BK1752271749', 1, 0.00, 0.00, 249.00, 263.94, '2025-07-12 06:09:09', 'one-way');
 
 -- --------------------------------------------------------
 
@@ -213,7 +217,8 @@ CREATE TABLE `flight_booking_t` (
 
 INSERT INTO `flight_booking_t` (`f_book_id`, `user_id`, `flight_id`, `book_date`, `status`) VALUES
 ('BK1752258296', 'U029', 'AKF023', '2025-07-11', 'confirmed'),
-('BK1752268437', 'U030', 'AKF021', '2025-07-11', 'confirmed');
+('BK1752268437', 'U030', 'AKF021', '2025-07-11', 'cancelled'),
+('BK1752271749', 'U030', 'MHF108', '2025-07-11', 'confirmed');
 
 -- --------------------------------------------------------
 
@@ -235,7 +240,8 @@ CREATE TABLE `flight_feedback_t` (
 --
 
 INSERT INTO `flight_feedback_t` (`f_feedback_id`, `user_id`, `airline_id`, `f_book_id`, `rating`, `feedback`) VALUES
-('FB0001', 'U030', 'AK', 'BK1752268437', 5, 'test');
+('FB0001', 'U030', 'AK', 'BK1752268437', 5, 'test'),
+('FB0002', 'U030', 'MH', 'BK1752271749', 5, 'mh airline');
 
 -- --------------------------------------------------------
 
@@ -502,7 +508,8 @@ CREATE TABLE `flight_payment_t` (
 --
 
 INSERT INTO `flight_payment_t` (`f_payment_id`, `f_book_id`, `payment_date`, `amount`, `payment_method`, `payment_status`) VALUES
-('PAY244197', 'BK1752268437', '2025-07-12 05:13:57', 1017.60, 'Paypal', 'paid'),
+('PAY244197', 'BK1752268437', '2025-07-12 05:13:57', 1017.60, 'Paypal', 'refunded'),
+('PAY646315', 'BK1752271749', '2025-07-12 06:09:09', 263.94, 'Paypal', 'paid'),
 ('PAY826176', 'BK1752258296', '2025-07-12 02:24:56', 216.24, 'Paypal', 'paid');
 
 -- --------------------------------------------------------
@@ -519,6 +526,13 @@ CREATE TABLE `flight_refund_t` (
   `refund_date` datetime NOT NULL,
   `status` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `flight_refund_t`
+--
+
+INSERT INTO `flight_refund_t` (`f_refund_id`, `f_book_id`, `refund_amt`, `refund_method`, `refund_date`, `status`) VALUES
+('FR001', 'BK1752268437', 1017.60, 'credit', '2025-07-12 00:00:00', 'completed');
 
 -- --------------------------------------------------------
 
@@ -21139,7 +21153,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'EC', 'F1', 1, 'P4756'),
 ('MHF108', 'EC', 'F2', 1, 'P5110'),
 ('MHF108', 'EC', 'F3', 1, 'P3752'),
-('MHF108', 'EC', 'F4', 1, 'P3002'),
+('MHF108', 'EC', 'F4', 1, 'P8431'),
 ('MHF108', 'EC', 'F5', 1, 'P4746'),
 ('MHF108', 'EC', 'F6', 1, 'P9353'),
 ('MHF108', 'EC', 'F7', 1, 'P2209'),
@@ -21187,7 +21201,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'PE', 'F1', 1, 'P3682'),
 ('MHF108', 'PE', 'F2', 1, 'P8597'),
 ('MHF108', 'PE', 'F3', 1, 'P8097'),
-('MHF108', 'PE', 'F4', 1, 'P6190'),
+('MHF108', 'PE', 'F4', 1, 'P8431'),
 ('MHF108', 'PE', 'F5', 1, 'P1989'),
 ('MHF108', 'PE', 'F6', 1, 'P2210'),
 ('MHF108', 'PE', 'F7', 1, 'P7251'),
@@ -21235,7 +21249,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'BC', 'F1', 1, 'P2692'),
 ('MHF108', 'BC', 'F2', 1, 'P7381'),
 ('MHF108', 'BC', 'F3', 0, ''),
-('MHF108', 'BC', 'F4', 1, 'P1287'),
+('MHF108', 'BC', 'F4', 1, 'P8431'),
 ('MHF108', 'BC', 'F5', 1, 'P1299'),
 ('MHF108', 'BC', 'F6', 1, 'P4037'),
 ('MHF108', 'BC', 'F7', 1, 'P4748'),
@@ -21283,7 +21297,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'FC', 'F1', 0, ''),
 ('MHF108', 'FC', 'F2', 0, ''),
 ('MHF108', 'FC', 'F3', 0, ''),
-('MHF108', 'FC', 'F4', 0, ''),
+('MHF108', 'FC', 'F4', 1, 'P8431'),
 ('MHF108', 'FC', 'F5', 0, ''),
 ('MHF108', 'FC', 'F6', 0, ''),
 ('MHF108', 'FC', 'F7', 0, ''),
@@ -64174,7 +64188,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'EC', 'F1', 1, 'P4756'),
 ('MHF108', 'EC', 'F2', 1, 'P5110'),
 ('MHF108', 'EC', 'F3', 1, 'P3752'),
-('MHF108', 'EC', 'F4', 1, 'P3002'),
+('MHF108', 'EC', 'F4', 1, 'P8431'),
 ('MHF108', 'EC', 'F5', 1, 'P4746'),
 ('MHF108', 'EC', 'F6', 1, 'P9353'),
 ('MHF108', 'EC', 'F7', 1, 'P2209'),
@@ -64222,7 +64236,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'PE', 'F1', 1, 'P3682'),
 ('MHF108', 'PE', 'F2', 1, 'P8597'),
 ('MHF108', 'PE', 'F3', 1, 'P8097'),
-('MHF108', 'PE', 'F4', 1, 'P6190'),
+('MHF108', 'PE', 'F4', 1, 'P8431'),
 ('MHF108', 'PE', 'F5', 1, 'P1989'),
 ('MHF108', 'PE', 'F6', 1, 'P2210'),
 ('MHF108', 'PE', 'F7', 1, 'P7251'),
@@ -64270,7 +64284,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'BC', 'F1', 1, 'P2692'),
 ('MHF108', 'BC', 'F2', 1, 'P7381'),
 ('MHF108', 'BC', 'F3', 0, ''),
-('MHF108', 'BC', 'F4', 1, 'P1287'),
+('MHF108', 'BC', 'F4', 1, 'P8431'),
 ('MHF108', 'BC', 'F5', 1, 'P1299'),
 ('MHF108', 'BC', 'F6', 1, 'P4037'),
 ('MHF108', 'BC', 'F7', 1, 'P4748'),
@@ -64318,7 +64332,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'FC', 'F1', 0, ''),
 ('MHF108', 'FC', 'F2', 0, ''),
 ('MHF108', 'FC', 'F3', 0, ''),
-('MHF108', 'FC', 'F4', 0, ''),
+('MHF108', 'FC', 'F4', 1, 'P8431'),
 ('MHF108', 'FC', 'F5', 0, ''),
 ('MHF108', 'FC', 'F6', 0, ''),
 ('MHF108', 'FC', 'F7', 0, ''),
@@ -99058,7 +99072,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'EC', 'F1', 1, 'P4756'),
 ('MHF108', 'EC', 'F2', 1, 'P5110'),
 ('MHF108', 'EC', 'F3', 1, 'P3752'),
-('MHF108', 'EC', 'F4', 1, 'P3002'),
+('MHF108', 'EC', 'F4', 1, 'P8431'),
 ('MHF108', 'EC', 'F5', 1, 'P4746'),
 ('MHF108', 'EC', 'F6', 1, 'P9353'),
 ('MHF108', 'EC', 'F7', 1, 'P2209'),
@@ -99106,7 +99120,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'PE', 'F1', 1, 'P3682'),
 ('MHF108', 'PE', 'F2', 1, 'P8597'),
 ('MHF108', 'PE', 'F3', 1, 'P8097'),
-('MHF108', 'PE', 'F4', 1, 'P6190'),
+('MHF108', 'PE', 'F4', 1, 'P8431'),
 ('MHF108', 'PE', 'F5', 1, 'P1989'),
 ('MHF108', 'PE', 'F6', 1, 'P2210'),
 ('MHF108', 'PE', 'F7', 1, 'P7251'),
@@ -99154,7 +99168,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'BC', 'F1', 1, 'P2692'),
 ('MHF108', 'BC', 'F2', 1, 'P7381'),
 ('MHF108', 'BC', 'F3', 0, ''),
-('MHF108', 'BC', 'F4', 1, 'P1287'),
+('MHF108', 'BC', 'F4', 1, 'P8431'),
 ('MHF108', 'BC', 'F5', 1, 'P1299'),
 ('MHF108', 'BC', 'F6', 1, 'P4037'),
 ('MHF108', 'BC', 'F7', 1, 'P4748'),
@@ -99202,7 +99216,7 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF108', 'FC', 'F1', 0, ''),
 ('MHF108', 'FC', 'F2', 0, ''),
 ('MHF108', 'FC', 'F3', 0, ''),
-('MHF108', 'FC', 'F4', 0, ''),
+('MHF108', 'FC', 'F4', 1, 'P8431'),
 ('MHF108', 'FC', 'F5', 0, ''),
 ('MHF108', 'FC', 'F6', 0, ''),
 ('MHF108', 'FC', 'F7', 0, ''),
@@ -100423,9 +100437,9 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('AKF115', 'PE', 'B6', 0, ''),
 ('AKF115', 'PE', 'B7', 1, 'P2146'),
 ('AKF115', 'PE', 'B8', 0, ''),
-('AKF115', 'PE', 'C1', 1, 'P9163'),
-('AKF115', 'PE', 'C2', 0, '');
+('AKF115', 'PE', 'C1', 1, 'P9163');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('AKF115', 'PE', 'C2', 0, ''),
 ('AKF115', 'PE', 'C3', 1, 'P6650'),
 ('AKF115', 'PE', 'C4', 1, 'P8778'),
 ('AKF115', 'PE', 'C5', 1, 'P3245'),
@@ -102016,9 +102030,9 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('AKF123', 'BC', 'C6', 1, 'P5631'),
 ('AKF123', 'BC', 'C7', 1, 'P1091'),
 ('AKF123', 'BC', 'C8', 1, 'P9478'),
-('AKF123', 'BC', 'D1', 1, 'P5059'),
-('AKF123', 'BC', 'D2', 1, 'P6297');
+('AKF123', 'BC', 'D1', 1, 'P5059');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('AKF123', 'BC', 'D2', 1, 'P6297'),
 ('AKF123', 'BC', 'D3', 1, 'P1637'),
 ('AKF123', 'BC', 'D4', 1, 'P5216'),
 ('AKF123', 'BC', 'D5', 1, 'P4893'),
@@ -103609,9 +103623,9 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('AKF131', 'FC', 'D6', 1, 'P2361'),
 ('AKF131', 'FC', 'D7', 0, ''),
 ('AKF131', 'FC', 'D8', 0, ''),
-('AKF131', 'FC', 'E1', 0, ''),
-('AKF131', 'FC', 'E2', 1, 'P9842');
+('AKF131', 'FC', 'E1', 0, '');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('AKF131', 'FC', 'E2', 1, 'P9842'),
 ('AKF131', 'FC', 'E3', 0, ''),
 ('AKF131', 'FC', 'E4', 0, ''),
 ('AKF131', 'FC', 'E5', 1, 'P4241'),
@@ -105197,9 +105211,9 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('FYF140', 'EC', 'E1', 0, ''),
 ('FYF140', 'EC', 'E2', 1, 'P1128'),
 ('FYF140', 'EC', 'E3', 1, 'P3719'),
-('FYF140', 'EC', 'E4', 1, 'P2269'),
-('FYF140', 'EC', 'E5', 1, 'P5815');
+('FYF140', 'EC', 'E4', 1, 'P2269');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('FYF140', 'EC', 'E5', 1, 'P5815'),
 ('FYF140', 'EC', 'E6', 0, ''),
 ('FYF140', 'EC', 'E7', 1, 'P4820'),
 ('FYF140', 'EC', 'E8', 1, 'P1254'),
@@ -106772,10 +106786,10 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('MHF148', 'PE', 'C7', 1, 'P5804'),
 ('MHF148', 'PE', 'C8', 1, 'P4481'),
 ('MHF148', 'PE', 'D1', 1, 'P2107'),
-('MHF148', 'PE', 'D2', 1, 'P4073'),
-('MHF148', 'PE', 'D3', 1, 'P7590'),
-('MHF148', 'PE', 'D4', 0, '');
+('MHF148', 'PE', 'D2', 1, 'P4073');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('MHF148', 'PE', 'D3', 1, 'P7590'),
+('MHF148', 'PE', 'D4', 0, ''),
 ('MHF148', 'PE', 'D5', 1, 'P1005'),
 ('MHF148', 'PE', 'D6', 1, 'P5491'),
 ('MHF148', 'PE', 'D7', 1, 'P7206'),
@@ -108378,10 +108392,10 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('FYF156', 'BC', 'F4', 1, 'P4503'),
 ('FYF156', 'BC', 'F5', 1, 'P3902'),
 ('FYF156', 'BC', 'F6', 1, 'P9340'),
-('FYF156', 'BC', 'F7', 1, 'P1935'),
-('FYF156', 'BC', 'F8', 0, ''),
-('FYF156', 'FC', 'A1', 1, 'P1181');
+('FYF156', 'BC', 'F7', 1, 'P1935');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('FYF156', 'BC', 'F8', 0, ''),
+('FYF156', 'FC', 'A1', 1, 'P1181'),
 ('FYF156', 'FC', 'A2', 1, 'P9950'),
 ('FYF156', 'FC', 'A3', 1, 'P5561'),
 ('FYF156', 'FC', 'A4', 1, 'P7427'),
@@ -109968,10 +109982,10 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('AKF165', 'EC', 'A1', 1, 'P7276'),
 ('AKF165', 'EC', 'A2', 1, 'P8118'),
 ('AKF165', 'EC', 'A3', 0, ''),
-('AKF165', 'EC', 'A4', 1, 'P6017'),
-('AKF165', 'EC', 'A5', 1, 'P3781'),
-('AKF165', 'EC', 'A6', 1, 'P8593');
+('AKF165', 'EC', 'A4', 1, 'P6017');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('AKF165', 'EC', 'A5', 1, 'P3781'),
+('AKF165', 'EC', 'A6', 1, 'P8593'),
 ('AKF165', 'EC', 'A7', 1, 'P3614'),
 ('AKF165', 'EC', 'A8', 0, ''),
 ('AKF165', 'EC', 'B1', 1, 'P1754'),
@@ -111550,10 +111564,10 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('AKF173', 'EC', 'F6', 0, ''),
 ('AKF173', 'EC', 'F7', 0, ''),
 ('AKF173', 'EC', 'F8', 0, ''),
-('AKF173', 'PE', 'A1', 1, 'P6813'),
-('AKF173', 'PE', 'A2', 1, 'P3202'),
-('AKF173', 'PE', 'A3', 1, 'P8785');
+('AKF173', 'PE', 'A1', 1, 'P6813');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('AKF173', 'PE', 'A2', 1, 'P3202'),
+('AKF173', 'PE', 'A3', 1, 'P8785'),
 ('AKF173', 'PE', 'A4', 1, 'P9905'),
 ('AKF173', 'PE', 'A5', 1, 'P2472'),
 ('AKF173', 'PE', 'A6', 1, 'P5619'),
@@ -113129,10 +113143,10 @@ INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `
 ('AKF181', 'PE', 'E8', 1, 'P8091'),
 ('AKF181', 'PE', 'F1', 0, ''),
 ('AKF181', 'PE', 'F2', 1, 'P5639'),
-('AKF181', 'PE', 'F3', 0, ''),
-('AKF181', 'PE', 'F4', 0, ''),
-('AKF181', 'PE', 'F5', 1, 'P2823');
+('AKF181', 'PE', 'F3', 0, '');
 INSERT INTO `flight_seats_t` (`flight_id`, `class_id`, `seat_no`, `is_booked`, `pass_id`) VALUES
+('AKF181', 'PE', 'F4', 0, ''),
+('AKF181', 'PE', 'F5', 1, 'P2823'),
 ('AKF181', 'PE', 'F6', 1, 'P3585'),
 ('AKF181', 'PE', 'F7', 1, 'P3728'),
 ('AKF181', 'PE', 'F8', 0, ''),
@@ -114335,7 +114349,9 @@ INSERT INTO `hotel_booking_t` (`h_book_id`, `user_id`, `customer_id`, `hotel_id`
 ('BK0028', 'U028', 'C0028', 'H0013', 'RT004', '2025-07-17', '2025-07-24', 'Confirmed', 1, 2, 0),
 ('BK0029', 'U029', 'C0029', 'H0023', 'RT003', '2025-07-12', '2025-07-15', 'Cancelled', 2, 2, 2),
 ('BK0030', 'U029', 'C0030', 'H0029', 'RT001', '2025-07-15', '2025-07-16', 'Cancelled', 1, 1, 0),
-('BK0031', 'U030', 'C0031', 'H0033', 'RT004', '2025-09-12', '2025-09-14', 'Confirmed', 2, 3, 1);
+('BK0031', 'U030', 'C0031', 'H0033', 'RT004', '2025-09-12', '2025-09-14', 'Confirmed', 2, 3, 1),
+('BK0032', 'U030', 'C0032', 'H0003', 'RT001', '2025-09-12', '2025-09-14', 'Confirmed', 1, 1, 0),
+('BK0033', 'U030', 'C0033', 'H0005', 'RT003', '2025-08-11', '2025-08-17', 'Confirmed', 1, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -114436,7 +114452,9 @@ INSERT INTO `hotel_payment_t` (`h_payment_id`, `h_book_id`, `payment_date`, `amo
 ('HP0028', 'BK0028', '2025-07-11', 5120, 'Google Pay', 'Paid'),
 ('HP0029', 'BK0029', '2025-07-11', 2989, 'Google Pay', 'Refunded'),
 ('HP0030', 'BK0030', '2025-07-11', 180, 'Apple Pay', 'Refunded'),
-('HP0031', 'BK0031', '2025-07-11', 2756, 'Credit Card', 'Paid');
+('HP0031', 'BK0031', '2025-07-11', 2756, 'Credit Card', 'Paid'),
+('HP0032', 'BK0032', '2025-07-12', 360, 'Apple Pay', 'Paid'),
+('HP0033', 'BK0033', '2025-07-12', 2926, 'Credit Card', 'Paid');
 
 -- --------------------------------------------------------
 
@@ -114796,6 +114814,15 @@ CREATE TABLE `meal_option_t` (
   `price` decimal(6,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `meal_option_t`
+--
+
+INSERT INTO `meal_option_t` (`meal_id`, `opt_name`, `price`) VALUES
+('M001', 'Multi-meal', 25.50),
+('M002', 'Single meal', 12.00),
+('M003', 'N/A', 0.00);
+
 -- --------------------------------------------------------
 
 --
@@ -114832,6 +114859,7 @@ INSERT INTO `passenger_service_t` (`pass_id`, `f_book_id`, `class_id`, `baggage_
 ('P6692', 'BK1752163407', 'FC', 'BG01', 'M01'),
 ('P7433', 'BK1752200678', 'FC', 'BG01', 'M01'),
 ('P8250', 'BK1752163407', 'FC', 'BG01', 'M01'),
+('P8431', 'BK1752271749', '', 'BG01', 'M01'),
 ('P9650', 'BK1752164302', 'EC', 'BG01', 'M01'),
 ('P9917', 'BK1752164302', 'EC', 'BG01', 'M01'),
 ('P9939', 'BK1752165610', 'FC', 'BG01', 'M01');
@@ -114874,6 +114902,7 @@ INSERT INTO `passenger_t` (`pass_id`, `fst_name`, `lst_name`, `gender`, `dob`, `
 ('P6692', 'Edwin', 'Chua', '', '0000-00-00', 'Malaysia', 'Adult'),
 ('P7433', 'Edwin', 'Chua', '', '0000-00-00', 'Malaysia', 'Adult'),
 ('P8250', 'Ivan', 'Shark', 'male', '2025-07-02', 'Malaysia', 'Child'),
+('P8431', 'jeffrey', 'choo', 'Male', '0000-00-00', 'Malaysia', 'Adult'),
 ('P9650', 'Edwin', 'Chua', '', '0000-00-00', 'Malaysia', 'Adult'),
 ('P9917', 'Ivan', 'Shark', 'male', '2025-07-02', 'Malaysia', 'Child'),
 ('P9939', 'Edwin', 'Chua', '', '0000-00-00', 'Malaysia', 'Adult');
@@ -115017,7 +115046,8 @@ ALTER TABLE `customer_t`
 --
 ALTER TABLE `flight_booking_info_t`
   ADD PRIMARY KEY (`booking_info_id`),
-  ADD KEY `f_book_id` (`f_book_id`);
+  ADD KEY `f_book_id` (`f_book_id`),
+  ADD KEY `idx_trip_type` (`trip_type`);
 
 --
 -- Indexes for table `flight_booking_t`

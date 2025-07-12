@@ -1,174 +1,394 @@
-/* Hotel Booking Styles */
-.booking-container {
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
 .booking-container h1 {
-    margin-bottom: 20px;
-    color: #333;
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
+    font-size: 33px;
+    padding: 16px 16px 8px;
+    color: #4379EE;
+    margin-bottom: 10px;
 }
 
 /* Tabs */
 .booking-tabs {
     display: flex;
+    gap: 16px;
     margin-bottom: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+    padding-left: 16px;
 }
 
 .tab-button {
-    padding: 10px 20px;
-    background: none;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #64748b;
+    background: transparent;
     border: none;
-    font-size: 16px;
-    font-weight: 500;
-    color: #666;
+    padding: 8px 16px;
     cursor: pointer;
     position: relative;
-    transition: color 0.3s;
+    transition: all 0.3s ease;
 }
 
-.tab-button:hover {
-    color: #2c7be5;
+.tab-button:after {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: #4379EE;
+    transition: all 0.3s ease;
 }
 
 .tab-button.active {
-    color: #2c7be5;
+    color: #4379EE;
     font-weight: 600;
 }
 
-.tab-button.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
+.tab-button.active:after {
     width: 100%;
-    height: 2px;
-    background-color: #2c7be5;
 }
 
-/* Booking Table */
+.tab-button:hover {
+    color: #4379EE;
+}
+
+/* Table Styles */
 .booking-table-container {
-    overflow-x: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 0.3px solid #B9B9B9;
     margin-bottom: 20px;
+    overflow-x: auto;
 }
 
 .booking-table {
     width: 100%;
     border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+
+.booking-table thead {
+    background: #FCFDFD;
 }
 
 .booking-table th {
-    background-color: #f8f9fa;
-    padding: 12px 15px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: #2C4A69;
+    padding: 16px;
     text-align: left;
-    font-weight: 600;
-    color: #495057;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 0.3px solid #B7B9BA;
+    white-space: nowrap;
+    opacity: 0.9;
+    box-sizing: border-box;
+}
+
+/* Force consistent column widths for all booking rows */
+.booking-table th:nth-child(1), 
+.booking-table td:nth-child(1) {
+    width: 13%;
+    text-align: left;
+    padding-right: 0;
+}
+
+.booking-table th:nth-child(2), 
+.booking-table td:nth-child(2) {
+    width: 14%;
+    text-align: left;
+}
+
+.booking-table th:nth-child(3), 
+.booking-table td:nth-child(3) {
+    width: 18%;
+    text-align: left;
+    color: #415C78;
+}
+
+.booking-table th:nth-child(4), 
+.booking-table td:nth-child(4) {
+    width: 14%;
+    text-align: left;
+}
+
+.booking-table th:nth-child(5), 
+.booking-table td:nth-child(5) {
+    width: 12%;
+    text-align: left;
+}
+
+.booking-table th:nth-child(6), 
+.booking-table td:nth-child(6) {
+    width: 14%;
+    text-align: center;
+}
+
+.booking-table th:last-child, 
+.booking-table td:last-child {
+    width: 15%;
+    text-align: center;
 }
 
 .booking-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #e0e0e0;
-    color: #495057;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #415C78;
+    padding: 16px;
+    border-bottom: none;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
 }
 
-.booking-row {
-    transition: background-color 0.2s;
+/* Add divider lines between all rows */
+.booking-row td {
+    height: 70px; /* Set a consistent height for all row cells */
+    border-bottom: 0.3px solid #B7B9BA;
+}
+
+/* Apply consistent width to all rows */
+.booking-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+
+/* Ensure all rows have exactly the same spacing */
+.booking-table tr.booking-row {
+    height: 70px;
+    border-bottom: 0.3px solid #B7B9BA;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Add this to ensure content inside cells is consistently sized */
+.booking-row td * {
+    box-sizing: border-box;
+}
+
+/* Add divider between header and first row */
+.booking-table thead th {
+    border-bottom: 0.3px solid #B7B9BA;
+}
+
+/* Remove the double border between rows */
+.booking-row:not(:last-child) td {
+    border-bottom: 0.3px solid #B7B9BA;
+}
+
+.booking-row:last-child td {
+    border-bottom: none;
 }
 
 .booking-row:hover {
-    background-color: #f8f9fa;
+    background-color: rgba(67, 121, 238, 0.05);
 }
 
-/* Toggle Details */
 .toggle-details {
     display: flex;
     align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #1e293b;
     cursor: pointer;
-}
-
-.arrow-icon {
-    margin-right: 8px;
-    transition: transform 0.3s;
-    font-size: 12px;
-}
-
-.arrow-icon.rotated {
-    transform: rotate(180deg);
+    height: 100%;
+    padding-right: 0;
+    position: relative;
 }
 
 .booking-ref {
-    font-weight: 500;
-    color: #2c7be5;
-}
-
-/* Details Panel */
-.details-panel {
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    margin-top: 5px;
-}
-
-.details-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.details-table th {
-    background-color: #edf2f9;
-    padding: 10px;
-    text-align: left;
     font-weight: 600;
-    color: #495057;
-    font-size: 14px;
-}
-
-.details-table td {
-    padding: 10px;
-    border-bottom: 1px solid #e0e0e0;
-    font-size: 14px;
-}
-
-/* Status Styles */
-.status-confirmed {
+    color: #415C78;
     display: inline-block;
-    padding: 4px 8px;
-    background-color: #00d97e;
-    color: white;
-    border-radius: 4px;
+    margin-left: 8px;
+    opacity: 1;
+}
+
+.arrow-icon {
+    transition: transform 0.3s ease;
+    color: #8196B6;
     font-size: 12px;
-    font-weight: 600;
+    border: none;
+    margin-left: 5px;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.booking-row.active .arrow-icon {
+    transform: rotate(180deg);
+    color: #4379EE;
+}
+
+/* Status Badges */
+.status-confirmed, .status-cancelled {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-confirmed {
+    background-color: rgba(0, 182, 155, 0.2);
+    color: #00B69B;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-weight: 500;
 }
 
 .status-cancelled {
-    display: inline-block;
-    padding: 4px 8px;
-    background-color: #e63757;
-    color: white;
+    background-color: rgba(255, 132, 98, 0.2);
+    color: #FF8462;
+    padding: 6px 16px;
     border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 /* Modify Button */
 .modify-btn {
-    padding: 6px 12px;
-    background-color: #2c7be5;
-    color: white;
-    border: none;
+    background: #ffffff;
+    border: 1px solid #4379EE;
     border-radius: 4px;
-    cursor: pointer;
+    color: #4379EE;
+    font-family: 'Poppins', sans-serif;
     font-weight: 500;
-    transition: background-color 0.2s;
+    font-size: 12px;
+    padding: 6px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0 auto;
+    display: block;
 }
 
 .modify-btn:hover {
-    background-color: #1a68d1;
+    background: rgba(67, 121, 238, 0.05);
+}
+
+/* Details Row styling */
+.details-row {
+    display: table-row;
+    border-top: none;
+    margin: 0;
+    padding: 0;
+    background-color: #FFFFFF;
+}
+
+.details-panel {
+    display: none;
+    margin: 0;
+    padding: 10px 0;
+    border-bottom: 0.3px solid #B7B9BA;
+}
+
+.details-row.active .details-panel {
+    display: block;
+    border-bottom: 0.3px solid #B7B9BA;
+}
+
+.details-panel {
+    background: #FFFFFF;
+    padding: 0;
+    margin: 0;
+    border-radius: 10px;
+    border: none;
+    border-bottom: 0.3px solid #B7B9BA;
+}
+
+.details-table {
+    width: 95%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin: 0 auto;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 0.3px solid #B7B9BA;
+    background-color: #73a1b8;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+/* Details table header row - match the styling to the main table */
+.details-table thead tr {
+    background: #FCFDFD;
+    border-bottom: 0.3px solid #B7B9BA;
+}
+
+.details-table th {
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    color: #2C4A69;
+    padding: 10px 16px;
+    border-bottom: 0.3px solid #B7B9BA;
+    white-space: nowrap;
+    box-sizing: border-box;
+    opacity: 0.9;
+    background-color: #FCFDFD;
+    text-align: left;
+}
+
+.details-table td {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: #415C78;
+    padding: 8px 16px;
+    border-bottom: none;
+    vertical-align: middle;
+    box-sizing: border-box;
+    line-height: 1.4em;
+    background-color: #FCFDFD;
+}
+
+.details-table tr:not(:last-child) td {
+    border-bottom: 0.3px solid #B7B9BA;
+}
+
+.details-table tr:first-child td {
+    padding-top: 12px;
+}
+
+/* Style passenger names */
+.details-table td:first-child {
+    color: #415C78;
+    font-weight: 400;
+    padding-left: 24px;
+}
+
+/* Consistent width for each details table column */
+.details-table th:nth-child(1), .details-table td:nth-child(1) { 
+    width: 18%; 
+    text-align: left;
+}
+
+.details-table th:nth-child(2), .details-table td:nth-child(2) { 
+    width: 15%; 
+    text-align: left;
+}
+
+.details-table th:nth-child(3), .details-table td:nth-child(3) { 
+    width: 17%; 
+    text-align: left;
+}
+
+.details-table th:nth-child(4), .details-table td:nth-child(4) { 
+    width: 17%; 
+    text-align: left;
+}
+
+.details-table th:nth-child(5), .details-table td:nth-child(5) { 
+    width: 15%; 
+    text-align: left;
+}
+
+.details-table th:nth-child(6), .details-table td:nth-child(6) { 
+    width: 18%; 
+    text-align: right;
+    padding-right: 16px;
 }
 
 /* Pagination */
@@ -177,58 +397,84 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 20px;
+    padding: 0 10px;
 }
 
 .pagination-info {
-    color: #6c757d;
+    font-family: 'Poppins', sans-serif;
     font-size: 14px;
+    color: #64748b;
 }
 
 .pagination-controls {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .pagination-btn {
-    width: 36px;
-    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    background-color: #fff;
-    color: #495057;
+    width: 36px;
+    height: 36px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    color: #64748b;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
-.pagination-btn:hover:not([disabled]) {
-    background-color: #e9ecef;
-    border-color: #dee2e6;
+.pagination-btn:hover {
+    border-color: #605DEC;
+    color: #605DEC;
+    background: rgba(96, 93, 236, 0.05);
 }
 
-.pagination-btn[disabled] {
-    opacity: 0.5;
+.pagination-btn.disabled {
     cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
 }
 
-.pagination-btn.prev i,
-.pagination-btn.next i {
-    font-size: 12px;
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .booking-table {
+        min-width: 900px;
+    }
 }
 
-/* Loading state */
-.loading-details {
+@media (max-width: 768px) {
+    .booking-container h1 {
+        font-size: 24px;
+    }
+    
+    .tab-button {
+        font-size: 15px;
+        padding: 8px 12px;
+    }
+    
+    .pagination {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+}
+
+.empty-action-cell {
+    height: 32px;
+    width: 100%;
+    display: block;
+}
+
+/* Ensure all rows in the booking table have consistent widths */
+.booking-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Fix for row 3 (cancelled bookings) to ensure same width */
+.booking-table tr.booking-row td:last-child {
+    min-width: 90px;
     text-align: center;
-    color: #6c757d;
-    font-style: italic;
-}
-
-/* No records state */
-.no-records {
-    text-align: center;
-    padding: 30px;
-    color: #6c757d;
-    font-style: italic;
 } 

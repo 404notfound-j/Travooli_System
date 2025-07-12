@@ -71,16 +71,36 @@ try {
 
     $connection->begin_transaction();
 
-    // ➤ Insert into flight_booking_t
+    // ➤ Insert into flight_booking_t for the outbound flight
     $stmt1 = $connection->prepare("INSERT INTO flight_booking_t (f_book_id, user_id, flight_id, book_date, status)
                                    VALUES (?, ?, ?, ?, ?)");
     $stmt1->bind_param("sssss", $f_book_id, $data['user_id'], $data['flight_id'], $data['booking_date'], $data['status']);
     $stmt1->execute();
+    
+    // ➤ If this is a round-trip and we have a return flight, insert that as well
+    if ($trip_type === 'round-trip' && isset($data['return_flight_id']) && !empty($data['return_flight_id'])) {
+        $stmt1->bind_param("sssss", $f_book_id, $data['user_id'], $data['return_flight_id'], $data['booking_date'], $data['status']);
+        $stmt1->execute();
+    }
 
     // ➤ Insert into flight_booking_info_t
-    $stmt2 = $connection->prepare("INSERT INTO flight_booking_info_t (booking_info_id, f_book_id, passenger_count, baggage_total, meal_total, base_fare_total, total_amount)
-                                   VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt2->bind_param("ssidddd", $booking_info_id, $f_book_id, $data['num_passenger'], $data['baggage'], $data['meal'], $data['ticket'], $data['total_amount']);
+    $stmt2 = $connection->prepare("INSERT INTO flight_booking_info_t (booking_info_id, f_book_id, passenger_count, baggage_total, meal_total, base_fare_total, total_amount, trip_type)
+                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    
+    // Get trip type from data and validate it (only 'one-way' or 'round-trip' allowed)
+    $trip_type = isset($data['trip_type']) ? $data['trip_type'] : 'one-way';
+    
+    // Auto-detect round-trip if return_flight_id is provided but trip_type isn't explicitly set
+    if (!isset($data['trip_type']) && isset($data['return_flight_id']) && !empty($data['return_flight_id'])) {
+        $trip_type = 'round-trip';
+    }
+    
+    // Ensure trip_type is valid
+    if ($trip_type !== 'one-way' && $trip_type !== 'round-trip') {
+        $trip_type = 'one-way'; // Default to one-way if invalid value provided
+    }
+    
+    $stmt2->bind_param("ssidddds", $booking_info_id, $f_book_id, $data['num_passenger'], $data['baggage'], $data['meal'], $data['ticket'], $data['total_amount'], $trip_type);
     $stmt2->execute();
 
     // ➤ Insert each passenger
