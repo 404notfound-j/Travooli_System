@@ -224,10 +224,6 @@ $rating_text = "No reviews yet";
             
             <div class="reviews-divider"></div>
             
-            <div id="feedback-form-container">
-                <!-- Feedback form will be added by JavaScript if user can leave feedback -->
-            </div>
-            
             <!-- Reviews List -->
             <div class="reviews-list" id="reviews-list">
                 <!-- Reviews will be loaded by JavaScript -->

@@ -183,57 +183,41 @@
 
 /* Editable fields */
 .editable-field {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.editable-field span {
-    flex: 1;
 }
 
 .edit-btn {
-    background: transparent;
-    border: none;
-    color: #4379EE;
-    cursor: pointer;
-    padding: 4px;
-    font-size: 12px;
-    opacity: 0.8;
-    transition: all 0.2s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 8px;
+    padding: 4px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
 }
 
 .edit-btn:hover {
     opacity: 1;
 }
 
-.edit-btn.editing {
-    opacity: 1;
-}
-
-.edit-btn img {
-    width: 16px;
-    height: 16px;
-}
-
-/* Editing mode styles */
-.editable-field.editing span {
-    display: none;
-}
-
-.editable-field input {
-    flex: 1;
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px;
-    color: #1e293b;
-    padding: 6px 10px;
+/* Edit input styles */
+.edit-input {
+    padding: 4px 8px;
     border: 1px solid #4379EE;
     border-radius: 4px;
-    outline: none;
+    font-size: 14px;
+    margin-right: 8px;
+    width: 100%;
+}
+
+/* Ensure icons have consistent size */
+.edit-btn i {
+    font-size: 16px;
 }
 
 /* Dropdown styling */
@@ -262,6 +246,28 @@
     transform: translateY(-50%);
     color: #64748b;
     pointer-events: none;
+}
+
+/* Add CSS for age-group-select */
+.age-group-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #333;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+.age-group-select:focus {
+    outline: none;
+    border-color: #4379EE;
+    box-shadow: 0 0 0 2px rgba(67, 121, 238, 0.2);
 }
 
 /* Flight details table */
