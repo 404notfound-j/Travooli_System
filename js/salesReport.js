@@ -1,5 +1,5 @@
 const labels = salesData.map(item => item.name);
-const data = salesData.map(item => Number(item.revenue.replace(/[^\d]/g, '')));
+const data = salesData.map(item => Number(item.revenue.replace(/[^0-9.]/g, '')));
 const chartLabel = 'Revenue (RM)';
 
 const ctx = document.getElementById('salesBarChart').getContext('2d');
@@ -42,8 +42,7 @@ const salesBarChart = new Chart(ctx, {
                 grid: {
                     color: '#F0F4FA',
                     borderDash: [4, 4]
-                },
-                suggestedMax: 120000
+                }
             }
         }
     }
