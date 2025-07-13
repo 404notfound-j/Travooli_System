@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Map pages to navigation items (only for actual working pages)
         const pageMapping = {
             'A_dashboard.php': 'Dashboard',
+            'adminFlightBooking.php': 'Booking',
+            'adminHotelBooking.php': 'Booking',
             'salesReport.php': 'Report',
             'recordTable.php': function(href) {
                 // Handle recordTable.php with different parameters
@@ -41,6 +43,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         item.classList.add('active');
                     }
                 } else if (pageMapping[currentPage] && itemText === pageMapping[currentPage]) {
+                    item.classList.add('active');
+                }
+            }
+            // Check if current page should activate this nav item (for pages that share the same nav item)
+            else if (pageMapping[currentPage] && itemText === pageMapping[currentPage]) {
+                // Special handling for recordTable.php
+                if (currentPage === 'recordTable.php') {
+                    const expectedText = pageMapping[currentPage](href);
+                    if (expectedText && itemText === expectedText) {
+                        item.classList.add('active');
+                    }
+                } else {
                     item.classList.add('active');
                 }
             }

@@ -67,7 +67,6 @@ $initials = strtoupper(substr($adminData['fst_name'], 0, 1) . substr($adminData[
         
         <nav class="nav-menu">
             <a href="A_dashboard.php" class="nav-item">Dashboard</a>
-            <a href="#" class="nav-item">Flight</a>
             <a href="adminFlightBooking.php" class="nav-item">Booking</a>
             <a href="salesReport.php" class="nav-item">Report</a>
             <a href="recordTable.php?section=payment" class="nav-item">Payment</a>
@@ -75,11 +74,8 @@ $initials = strtoupper(substr($adminData['fst_name'], 0, 1) . substr($adminData[
             <a href="U_Manage.php" class="nav-item">User Management</a>
             
             <div class="pages-section">
-                <div class="section-title">PAGES</div>
-                <a href="#" class="nav-item">Calendar</a>
-                <a href="#" class="nav-item">To-Do</a>
+                <div class="section-title">MORE</div>
                 <a href="contact.php" class="nav-item">Contact</a>
-                <a href="#" class="nav-item">Receipt & Ticket</a>
                 <a href="team.php" class="nav-item">Team</a>
             </div>
         </nav>
