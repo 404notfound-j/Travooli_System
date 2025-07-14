@@ -13,7 +13,7 @@ function generateUniquePassengerId($connection) {
                     $digits[mt_rand(0, 9)] .
                     $letters[mt_rand(0, 25)];
 
-        $check = $connection->prepare("SELECT pass_id FROM passenger_t WHERE pass_id = ?");
+        $check = $connection->prepare("SELECT pass_id FROM flight_seats_t WHERE pass_id = ?");
         $check->bind_param("s", $randomId);
         $check->execute();
         $result = $check->get_result();
