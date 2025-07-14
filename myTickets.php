@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 $bookingIdToQuery = null;
 
-$latestBookingQuery = "SELECT f_book_id FROM flight_booking_t WHERE user_id = ? ORDER BY book_date DESC LIMIT 1";
+$latestBookingQuery = "SELECT f_book_id FROM flight_booking_t WHERE user_id = ? AND status = 'confirmed' ORDER BY book_date DESC LIMIT 1";
 $stmtLatestBooking = mysqli_prepare($connection, $latestBookingQuery);
 if ($stmtLatestBooking) {
     mysqli_stmt_bind_param($stmtLatestBooking, "s", $_SESSION['user_id']);
@@ -263,6 +263,9 @@ if ($loggedInUserId) {
     </section>
   </main>
   <script src="js/flight_Complete.js"></script>
+  <script>const bookingIdFromPHP = "<?= $bookingIdToQuery ?>";
+ sessionStorage.setItem("bookingId", bookingIdFromPHP);
+</script>
   <?php include 'u_footer_1.php'; ?>
   <?php include 'u_footer_2.php'; ?>
 </body>

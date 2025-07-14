@@ -256,7 +256,7 @@ if (empty($flightDetailsDB)) {
       <textarea placeholder="Share your thoughts..."></textarea>
       <div class="rating-buttons">
         <button class="cancel-btn">Cancel</button>
-        <button class="submit-btn">Submit</button>
+        <button class="submit-btn" data-booking-id="<?= $flightDetailsDB[0]['flight_booking_id'] ?>" data-airline-id="<?= $flightDetailsDB[0]['airline_id'] ?>">Submit</button>
       </div>
     </section>
 
@@ -265,7 +265,8 @@ if (empty($flightDetailsDB)) {
       <p>This flight has a flexible cancellation policy. You may be eligible for a refund if cancelled at least 24 hours before departure.</p> 
       <p>All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. 
       However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.</p> 
-      <button class="cancel-flight-btn" onclick="showCancelConfirmation()">Cancel Flight</button> 
+      <input type="hidden" id="booking-id-hidden" value="<?= $flightDetailsDB[0]['flight_booking_id'] ?>">
+      <button class="cancel-flight-btn" data-booking-id="<?= $flightDetailsDB[0]['flight_booking_id'] ?>" onclick="showCancelConfirmation()">Cancel Flight</button> 
     </section>
   </main>
   <script src="js/flight_Complete.js"></script>
@@ -367,6 +368,17 @@ if (empty($flightDetailsDB)) {
     });
     
     function showCancelConfirmation() {
+      // Get the booking ID from the hidden input field
+      const bookingIdElement = document.getElementById('booking-id-hidden');
+      const bookingId = bookingIdElement ? bookingIdElement.value : '<?= $flightDetailsDB[0]['flight_booking_id'] ?>';
+      
+      console.log('Using booking ID for cancellation:', bookingId);
+      
+      if (!bookingId || bookingId === 'N/A') {
+        alert("Cannot find booking ID. Please try again or contact support.");
+        return;
+      }
+      
       if (confirm('Are you sure you want to cancel this flight? This action cannot be undone.')) {
         // Show loading indicator
         const cancelBtn = document.querySelector('.cancel-flight-btn');
@@ -378,10 +390,11 @@ if (empty($flightDetailsDB)) {
         console.log('Sending cancellation request for booking ID:', bookingId);
         
         // Send cancellation request to server
-        fetch('cancelFlight.php?bookingId=' + encodeURIComponent(bookingId), {
+        fetch('cancelFlight.php?booking_id=' + encodeURIComponent(bookingId), {
           method: 'GET',
           headers: {
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           }
         })
         .then(response => {

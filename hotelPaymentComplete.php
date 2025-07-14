@@ -41,28 +41,46 @@
         $refund_date = date('Y-m-d H:i:s');
         
         // Get the last refund ID and increment it
-        $last_id_query = "SELECT h_refund_id FROM hotel_refund_t ORDER BY h_refund_id DESC LIMIT 1";
-        $last_id_result = mysqli_query($connection, $last_id_query);
+        $max_attempts = 5;
+        $attempt = 0;
+        $refund_id = null;
         
-        if (mysqli_num_rows($last_id_result) > 0) {
-            $last_id_row = mysqli_fetch_assoc($last_id_result);
-            $last_id = $last_id_row['h_refund_id'];
+        while ($attempt < $max_attempts && $refund_id === null) {
+          try {
+            // Generate a unique ID using timestamp and random number
+            $timestamp = time();
+            $random = mt_rand(1000, 9999);
+            $refund_id = 'HF' . $timestamp . $random;
             
-            // Extract the numeric part and increment
-            $numeric_part = intval(substr($last_id, 2));
-            $new_numeric_part = $numeric_part + 1;
-            $refund_id = 'HF' . str_pad($new_numeric_part, 4, '0', STR_PAD_LEFT);
-        } else {
-            // No existing refunds, start with HF0001
-            $refund_id = 'HF0001';
+            // Ensure ID is not too long for the database field - take last 8 digits if needed
+            if (strlen($refund_id) > 10) {
+              $refund_id = 'HF' . substr($timestamp . $random, -8);
+            }
+            
+            // Insert record into hotel_refund_t
+            $refund_insert = "INSERT INTO hotel_refund_t (h_refund_id, h_book_id, refund_amt, refund_date, status, refund_method) 
+                              VALUES ('$refund_id', '$booking_id', '$refund_amount', '$refund_date', 'Completed', '$refund_method')";
+            
+            if (!mysqli_query($connection, $refund_insert)) {
+              // If duplicate entry error, retry
+              if (mysqli_errno($connection) == 1062) {
+                $refund_id = null;
+                $attempt++;
+              } else {
+                throw new Exception("Failed to create refund record: " . mysqli_error($connection));
+              }
+            }
+          } catch (Exception $e) {
+            $refund_id = null;
+            $attempt++;
+            if ($attempt >= $max_attempts) {
+              throw new Exception("Failed to generate a unique refund ID after $max_attempts attempts: " . $e->getMessage());
+            }
+          }
         }
         
-        // Insert record into hotel_refund_t
-        $refund_insert = "INSERT INTO hotel_refund_t (h_refund_id, h_book_id, refund_amt, refund_date, status, refund_method) 
-                          VALUES ('$refund_id', '$booking_id', '$refund_amount', '$refund_date', 'Completed', '$refund_method')";
-        
-        if (!mysqli_query($connection, $refund_insert)) {
-          throw new Exception("Failed to create refund record: " . mysqli_error($connection));
+        if ($refund_id === null) {
+          throw new Exception("Failed to generate a unique refund ID after $max_attempts attempts");
         }
         
         // If we got here, commit the transaction

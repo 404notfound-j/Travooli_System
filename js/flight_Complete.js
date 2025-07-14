@@ -153,9 +153,20 @@ document.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
       bookingId = urlParams.get('bookingId');
       console.log("Got booking ID from URL:", bookingId);
+      
+      // If still not found, check if there's a PHP-rendered version in the page
+      if (!bookingId) {
+        // This assumes there's a hidden element or data attribute somewhere with the booking ID
+        const hiddenBookingId = document.querySelector('[data-booking-id]');
+        if (hiddenBookingId) {
+          bookingId = hiddenBookingId.getAttribute('data-booking-id');
+          console.log("Got booking ID from hidden element:", bookingId);
+        }
+      }
     }
     
     if (!bookingId || bookingId === 'N/A') {
+      console.error("Failed to find booking ID from any source");
       alert("Cannot find booking ID. Please try again or contact support.");
       return;
     }
@@ -191,7 +202,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('cancelFlight.php', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           },
           body: JSON.stringify({ 
             action: 'cancel',
@@ -206,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(data.message || "Your booking has been successfully cancelled and refund processed.");
             window.location.href = 'U_dashboard.php';
           } else {
-            alert("Error: " + (data.error || "An error occurred while cancelling the flight."));
+            alert("Error: " + (data.message || "An error occurred while cancelling the flight."));
             console.error("Cancellation error:", data);
           }
         })

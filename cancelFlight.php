@@ -6,6 +6,9 @@ ini_set('display_errors', 1);
 session_start();
 include 'connection.php';
 
+// Determine if this is a redirect or AJAX request
+$isRedirect = !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest';
+
 // Get booking ID either from POST data or URL parameter
 $data = json_decode(file_get_contents('php://input'), true);
 $bookingId = null;
@@ -171,7 +174,7 @@ try {
     
             // 4b. Free the specific seats in flight_seats_t (if you assign specific seats by booking)
             $updateSeatsT = "UPDATE flight_seats_t 
-                            SET is_booked = 0, f_book_id = NULL 
+                            SET is_booked = 0, pass_id = NULL 
                             WHERE f_book_id = ?";
             $stmt = mysqli_prepare($connection, $updateSeatsT);
             if (!$stmt) {
@@ -187,7 +190,7 @@ try {
         } else {
             // Just free the seats without updating class availability as a fallback
             $updateSeatsT = "UPDATE flight_seats_t 
-                            SET is_booked = 0, f_book_id = NULL 
+                            SET is_booked = 0, pass_id = NULL 
                             WHERE f_book_id = ?";
             $stmt = mysqli_prepare($connection, $updateSeatsT);
             if ($stmt) {
@@ -292,6 +295,24 @@ try {
             $row = mysqli_fetch_assoc($result);
             $hasMoreBookings = ($row['booking_count'] > 0);
             mysqli_stmt_close($stmt);
+        }
+    }
+
+    // Clear session data related to this booking
+    if (isset($_SESSION['booking_id']) && $_SESSION['booking_id'] == $f_book_id) {
+        unset($_SESSION['booking_id']);
+    }
+    if (isset($_SESSION['f_book_id']) && $_SESSION['f_book_id'] == $f_book_id) {
+        unset($_SESSION['f_book_id']);
+    }
+    // If the booking is in the booking_ids array, remove it
+    if (isset($_SESSION['booking_ids']) && is_array($_SESSION['booking_ids'])) {
+        $_SESSION['booking_ids'] = array_filter($_SESSION['booking_ids'], function($id) use ($f_book_id) {
+            return $id != $f_book_id;
+        });
+        // If the array is now empty, unset it
+        if (empty($_SESSION['booking_ids'])) {
+            unset($_SESSION['booking_ids']);
         }
     }
 
