@@ -53,17 +53,31 @@ if ($action === 'cancel') {
         $refundAmount = $paymentData['amount'];
         $refundMethod = $paymentData['method'];
         
-        // 2. Generate a new refund ID
-        $lastRefundQuery = "SELECT h_refund_id FROM hotel_refund_t ORDER BY h_refund_id DESC LIMIT 1";
-        $lastRefundResult = $connection->query($lastRefundQuery);
+        // 2. Generate a new refund ID with exactly 4 digits
+        $refundId = null;
         
-        if ($lastRefundResult && $lastRefundResult->num_rows > 0) {
-            $lastRefundId = $lastRefundResult->fetch_assoc()['h_refund_id'];
-            $numericPart = (int)substr($lastRefundId, 2); // Extract numeric part after 'HF'
-            $newNumericPart = $numericPart + 1;
-            $newRefundId = 'HF' . str_pad($newNumericPart, 4, '0', STR_PAD_LEFT);
-        } else {
-            $newRefundId = 'HF0001';
+        // Start with HF0001 and check if it exists
+        for ($i = 1; $i <= 9999; $i++) {
+            // Format to exactly 4 digits with leading zeros
+            $candidateId = 'HF' . str_pad($i, 4, '0', STR_PAD_LEFT);
+            
+            // Check if this ID already exists
+            $checkQuery = "SELECT h_refund_id FROM hotel_refund_t WHERE h_refund_id = ?";
+            $checkStmt = $connection->prepare($checkQuery);
+            $checkStmt->bind_param("s", $candidateId);
+            $checkStmt->execute();
+            $checkResult = $checkStmt->get_result();
+            
+            // If ID doesn't exist, use it
+            if ($checkResult->num_rows == 0) {
+                $newRefundId = $candidateId;
+                break;
+            }
+        }
+        
+        // If we couldn't find an available ID
+        if (!isset($newRefundId)) {
+            throw new Exception("No available refund IDs in the range HF0001-HF9999");
         }
         
         // 3. Get current date for refund date

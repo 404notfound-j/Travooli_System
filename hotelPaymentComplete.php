@@ -40,21 +40,32 @@
         // Current date and time for refund
         $refund_date = date('Y-m-d H:i:s');
         
-        // Get the last refund ID and increment it
+        // Find the next available 4-digit HFID starting from 0001
         $max_attempts = 5;
         $attempt = 0;
         $refund_id = null;
         
         while ($attempt < $max_attempts && $refund_id === null) {
           try {
-            // Generate a unique ID using timestamp and random number
-            $timestamp = time();
-            $random = mt_rand(1000, 9999);
-            $refund_id = 'HF' . $timestamp . $random;
+            // Start with HF0001 and check if it exists
+            for ($i = 1; $i <= 9999; $i++) {
+              // Format to exactly 4 digits with leading zeros
+              $candidate_id = 'HF' . str_pad($i, 4, '0', STR_PAD_LEFT);
+              
+              // Check if this ID already exists
+              $check_query = "SELECT h_refund_id FROM hotel_refund_t WHERE h_refund_id = '$candidate_id'";
+              $check_result = mysqli_query($connection, $check_query);
+              
+              // If ID doesn't exist, use it
+              if (!$check_result || mysqli_num_rows($check_result) == 0) {
+                $refund_id = $candidate_id;
+                break;
+              }
+            }
             
-            // Ensure ID is not too long for the database field - take last 8 digits if needed
-            if (strlen($refund_id) > 10) {
-              $refund_id = 'HF' . substr($timestamp . $random, -8);
+            // If we couldn't find an available ID
+            if ($refund_id === null) {
+              throw new Exception("No available refund IDs in the range HF0001-HF9999");
             }
             
             // Insert record into hotel_refund_t
