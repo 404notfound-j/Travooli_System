@@ -22,6 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
     $feedback = isset($_POST['feedback']) ? $_POST['feedback'] : '';
     
+    // Debug - Log the received values
+    error_log("Received feedback data - f_book_id: $f_book_id, airline_id: $airline_id, rating: $rating");
+    
     // Validate inputs
     if (empty($f_book_id)) {
         $response = ['success' => false, 'message' => 'Missing booking ID'];
@@ -48,10 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     mysqli_begin_transaction($connection);
     
     try {
-        // Get the last feedback ID and increment it
-        $last_id_query = "SELECT f_feedback_id FROM flight_feedback_t ORDER BY f_feedback_id DESC LIMIT 1";
-        $last_id_result = mysqli_query($connection, $last_id_query);
-        
         // Check if the feedback already exists for this booking
         $check_existing_query = "SELECT f_feedback_id FROM flight_feedback_t WHERE f_book_id = ? AND user_id = ?";
         $stmt_check = mysqli_prepare($connection, $check_existing_query);
@@ -68,25 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $existing_row = mysqli_fetch_assoc($check_result);
             $feedback_id = $existing_row['f_feedback_id'];
             
-            // Update the existing feedback instead of inserting a new one
-            $update_query = "UPDATE flight_feedback_t 
-                            SET rating = ?, feedback = ? 
-                            WHERE f_feedback_id = ?";
-            
-            $stmt_update = mysqli_prepare($connection, $update_query);
-            if (!$stmt_update) {
-                throw new Exception("Prepare failed for update: " . mysqli_error($connection));
-            }
-            
-            mysqli_stmt_bind_param($stmt_update, "sss", $rating, $sanitized_feedback, $feedback_id);
-            
-            if (!mysqli_stmt_execute($stmt_update)) {
-                throw new Exception("Execute failed for update: " . mysqli_stmt_error($stmt_update));
-            }
-            
-            mysqli_stmt_close($stmt_update);
-            mysqli_commit($connection);
-            $response = ['success' => true, 'message' => 'Feedback updated successfully'];
+            // User can only submit one feedback per booking
+            mysqli_stmt_close($stmt_check);
+            mysqli_rollback($connection);
+            $response = ['success' => false, 'message' => 'You have already submitted feedback for this flight'];
             
             // Return JSON response
             header('Content-Type: application/json');
@@ -96,55 +80,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         
         mysqli_stmt_close($stmt_check);
         
-        // Generate a new feedback ID
-        $feedback_id = 'FB0001'; // Default first ID with FB prefix
+        // Generate a new feedback ID with retry mechanism to handle duplicates
+        $max_attempts = 5;
+        $attempt = 0;
+        $feedback_id = null;
         
-        if (mysqli_num_rows($last_id_result) > 0) {
-            $last_id_row = mysqli_fetch_assoc($last_id_result);
-            $last_id = $last_id_row['f_feedback_id'];
+        while ($attempt < $max_attempts && $feedback_id === null) {
+            // Get the maximum ID and increment it
+            $max_id_query = "SELECT MAX(CAST(SUBSTRING(f_feedback_id, 3) AS UNSIGNED)) AS max_id FROM flight_feedback_t";
+            $max_id_result = mysqli_query($connection, $max_id_query);
             
-            // Extract the numeric part and increment
-            $numeric_part = intval(substr($last_id, 2));
-            $new_numeric_part = $numeric_part + 1;
-            $feedback_id = 'FB' . str_pad($new_numeric_part, 4, '0', STR_PAD_LEFT);
-        } else {
-            // If there are no existing records, check if FB0001 already exists
-            $check_first_id = "SELECT 1 FROM flight_feedback_t WHERE f_feedback_id = 'FB0001'";
-            $first_id_result = mysqli_query($connection, $check_first_id);
-            
-            if (mysqli_num_rows($first_id_result) > 0) {
-                // FB0001 exists, find the next available ID
-                $find_gap_query = "SELECT MIN(t1.f_feedback_id_num + 1) AS next_id
-                                  FROM (
-                                      SELECT CAST(SUBSTRING(f_feedback_id, 3) AS UNSIGNED) AS f_feedback_id_num
-                                      FROM flight_feedback_t
-                                  ) t1
-                                  LEFT JOIN (
-                                      SELECT CAST(SUBSTRING(f_feedback_id, 3) AS UNSIGNED) AS f_feedback_id_num
-                                      FROM flight_feedback_t
-                                  ) t2 ON t1.f_feedback_id_num + 1 = t2.f_feedback_id_num
-                                  WHERE t2.f_feedback_id_num IS NULL";
+            if ($max_id_result && $max_id_row = mysqli_fetch_assoc($max_id_result)) {
+                $max_id = $max_id_row['max_id'] ? (int)$max_id_row['max_id'] : 0;
+                $new_id = $max_id + 1;
+                $candidate_id = 'FB' . str_pad($new_id, 4, '0', STR_PAD_LEFT);
                 
-                $gap_result = mysqli_query($connection, $find_gap_query);
+                // Check if this ID already exists
+                $check_id_query = "SELECT 1 FROM flight_feedback_t WHERE f_feedback_id = ?";
+                $stmt_check_id = mysqli_prepare($connection, $check_id_query);
+                mysqli_stmt_bind_param($stmt_check_id, "s", $candidate_id);
+                mysqli_stmt_execute($stmt_check_id);
+                $check_id_result = mysqli_stmt_get_result($stmt_check_id);
                 
-                if ($gap_result && $gap_row = mysqli_fetch_assoc($gap_result)) {
-                    $next_id = $gap_row['next_id'];
-                    if ($next_id) {
-                        $feedback_id = 'FB' . str_pad($next_id, 4, '0', STR_PAD_LEFT);
-                    } else {
-                        // If no gap found, get the max ID and add 1
-                        $max_id_query = "SELECT MAX(CAST(SUBSTRING(f_feedback_id, 3) AS UNSIGNED)) + 1 AS next_id 
-                                        FROM flight_feedback_t";
-                        $max_id_result = mysqli_query($connection, $max_id_query);
-                        
-                        if ($max_id_result && $max_row = mysqli_fetch_assoc($max_id_result)) {
-                            $next_id = $max_row['next_id'] ?: 1;
-                            $feedback_id = 'FB' . str_pad($next_id, 4, '0', STR_PAD_LEFT);
-                        }
-                    }
+                if (mysqli_num_rows($check_id_result) == 0) {
+                    // ID is available
+                    $feedback_id = $candidate_id;
+                } else {
+                    // ID exists, try next one
+                    $attempt++;
                 }
+                
+                mysqli_stmt_close($stmt_check_id);
+            } else {
+                // If query fails, use a fallback approach
+                $attempt++;
+                $feedback_id = 'FB' . str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT);
             }
         }
+        
+        if ($feedback_id === null) {
+            throw new Exception("Failed to generate a unique feedback ID after $max_attempts attempts");
+        }
+        
+        // Debug - Log the generated ID
+        error_log("Generated feedback ID: $feedback_id for booking: $f_book_id, airline: $airline_id");
         
         // Prepare the feedback insert query with sanitized inputs
         $sanitized_feedback = mysqli_real_escape_string($connection, $feedback);
@@ -173,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         // Rollback the transaction on error
         mysqli_rollback($connection);
         $response = ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+        error_log("Error in submit_flight_feedback.php: " . $e->getMessage());
     }
     
     // Return JSON response
