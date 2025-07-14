@@ -22,6 +22,13 @@ if ($stmtLatestBooking) {
     mysqli_stmt_close($stmtLatestBooking);
 }
 
+// If no flight bookings found, redirect to no booking page
+if (empty($bookingIdToQuery)) {
+    error_log("No flight bookings found for user ID: " . $_SESSION['user_id'] . " - redirecting to noFlightBooking.php");
+    header("Location: noFlightBooking.php");
+    exit();
+}
+
 $ticketPrice = $baggagePrice = $mealPrice = $taxPrice = $finalTotalPrice = 0;
 $numPassenger = 0;
 $selectedSeatsDisplay = [];
@@ -127,23 +134,7 @@ if ($loggedInUserId) {
     }
 }
 
-if (empty($flightDetailsDB)) {
-    $flightDetailsDB[] = [
-        'flight_booking_id' => $bookingIdToQuery ?? 'N/A',
-        'flight_id' => 'N/A',
-        'book_date' => date('Y-m-d H:i:s'),
-        'departure_time' => '00:00:00',
-        'arrival_time' => '00:00:00',
-        'orig_airport_id' => 'N/A',
-        'dest_airport_id' => 'N/A',
-        'flight_date' => date('Y-m-d'),
-        'airline_name' => 'Travooli Airlines',
-        'airline_id' => 'TR',
-        'total_amount_paid' => 0, 'ticket_base_price' => 0,
-        'baggage_fees' => 0, 'meal_fees' => 0,
-        'num_passenger' => 0
-    ];
-}
+// Dummy data fallback removed - users with no bookings are now redirected to noFlightBooking.php
 ?>
 
 <html lang="en">
