@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const classId = flightSearch.classId || '';
     const flightDate = flightSearch.departDate || '';
     const trip = flightSearch.trip || '';
-    const tripType = trip === 'one' ? 'one way' : 'round' ? 'round trip' : trip;
+    const tripType = trip === 'one' ? 'One-way' : 'round' ? 'Round-trip' : trip;
 
 
     const userId = window.currentUserId || null;
