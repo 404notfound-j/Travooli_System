@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
       bookingId = urlParams.get('bookingId');
       console.log("Got booking ID from URL:", bookingId);
+<<<<<<< HEAD
       
       // If still not found, check if there's a PHP-rendered version in the page
       if (!bookingId) {
@@ -164,6 +165,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
+=======
+    }zz
+>>>>>>> 566e6b1fdfdfb49684e16a8fb4278855eef3a815
     
     if (!bookingId || bookingId === 'N/A') {
       console.error("Failed to find booking ID from any source");

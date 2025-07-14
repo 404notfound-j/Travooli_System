@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalPrice = parseFloat(flightSearch.finalTotalPrice || 0);
 
   // Use the *active* passenger counts from the previous page's selection
-  const activeAdults = parseInt(flightSearch.activeAdults) || 1;
+  const activeAdults = parseInt(flightSearch.activeAdults) || 0;
   const activeChildren = parseInt(flightSearch.activeChildren) || 0;
   const maxSeats = activeAdults + activeChildren; // Total number of seats to be selected
 
