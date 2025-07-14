@@ -2,21 +2,24 @@
 session_start();
 include 'connection.php';
 
-$bookingIdFromURL = $_GET['bookingId'] ?? null;
-$bookingIdToQuery = $bookingIdFromURL;
+if (!isset($_SESSION['user_id'])) {
+  // Redirect to sign in if not logged in
+  error_log("User not logged in, redirecting to signIn.php");
+  header("Location: signIn.php");
+  exit();
+}
+$bookingIdToQuery = null;
 
-if (empty($bookingIdToQuery) && isset($_SESSION['user_id'])) {
-    $latestBookingQuery = "SELECT f_book_id FROM flight_booking_t WHERE user_id = ? ORDER BY book_date DESC LIMIT 1";
-    $stmtLatestBooking = mysqli_prepare($connection, $latestBookingQuery);
-    if ($stmtLatestBooking) {
-        mysqli_stmt_bind_param($stmtLatestBooking, "s", $_SESSION['user_id']);
-        mysqli_stmt_execute($stmtLatestBooking);
-        $resultLatestBooking = mysqli_stmt_get_result($stmtLatestBooking);
-        if ($rowLatestBooking = mysqli_fetch_assoc($resultLatestBooking)) {
-            $bookingIdToQuery = $rowLatestBooking['f_book_id'];
-        }
-        mysqli_stmt_close($stmtLatestBooking);
+$latestBookingQuery = "SELECT f_book_id FROM flight_booking_t WHERE user_id = ? ORDER BY book_date DESC LIMIT 1";
+$stmtLatestBooking = mysqli_prepare($connection, $latestBookingQuery);
+if ($stmtLatestBooking) {
+    mysqli_stmt_bind_param($stmtLatestBooking, "s", $_SESSION['user_id']);
+    mysqli_stmt_execute($stmtLatestBooking);
+    $resultLatestBooking = mysqli_stmt_get_result($stmtLatestBooking);
+    if ($rowLatestBooking = mysqli_fetch_assoc($resultLatestBooking)) {
+        $bookingIdToQuery = $rowLatestBooking['f_book_id'];
     }
+    mysqli_stmt_close($stmtLatestBooking);
 }
 
 $ticketPrice = $baggagePrice = $mealPrice = $taxPrice = $finalTotalPrice = 0;
