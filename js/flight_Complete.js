@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);
       bookingId = urlParams.get('bookingId');
       console.log("Got booking ID from URL:", bookingId);
-    }
+    }zz
     
     if (!bookingId || bookingId === 'N/A') {
       alert("Cannot find booking ID. Please try again or contact support.");
