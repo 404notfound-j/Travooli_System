@@ -53,8 +53,7 @@ $sql = "SELECT f.*, u.fst_name, u.lst_name
         FROM flight_feedback_t f 
         JOIN user_detail_t u ON f.user_id = u.user_id 
         WHERE f.airline_id = '$airline_id' 
-        ORDER BY f_feedback_id DESC 
-        LIMIT 5";
+        ORDER BY f_feedback_id DESC";
 $result = mysqli_query($connection, $sql);
 
 if ($result && mysqli_num_rows($result) > 0) {

@@ -167,6 +167,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (href === 'hotelPaymentComplete.php' && (currentPage === 'hotelPaymentComplete.php' || currentPage === 'noHotelBooking.php')) {
             // Handle My Reservations highlighting for both reservation pages
             item.classList.add('active');
+        } else if (href === 'myTickets.php' && (currentPage === 'myTickets.php' || currentPage === 'noFlightBooking.php')) {
+            // Handle My Tickets highlighting for both ticket pages
+            item.classList.add('active');
         } else if (currentPage === href) {
             item.classList.add('active');
         }
