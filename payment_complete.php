@@ -269,6 +269,108 @@ if (empty($flightDetailsDB)) {
     </section>
   </main>
   <script src="js/flight_Complete.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const stars = document.querySelectorAll('.stars i');
+      const submitBtn = document.querySelector('.submit-btn');
+      const cancelBtn = document.querySelector('.cancel-btn');
+      const textarea = document.querySelector('.ratings textarea');
+      let currentRating = 0;
+      let feedbackSubmitted = false; // Track if feedback was submitted
+      
+      // Star rating functionality
+      stars.forEach((star, index) => {
+        star.addEventListener('click', () => {
+          if (feedbackSubmitted) return; // Prevent changes if already submitted
+          currentRating = index + 1;
+          stars.forEach((s, i) => {
+            if (i <= index) {
+              s.classList.add('active');
+            } else {
+              s.classList.remove('active');
+            }
+          });
+        });
+      });
+      
+      // Submit feedback
+      submitBtn.addEventListener('click', function() {
+        if (feedbackSubmitted) {
+          // If already submitted, just show a reminder message
+          alert('You have already submitted feedback for this booking.');
+          return;
+        }
+        
+        if (currentRating === 0) {
+          alert('Please select a rating');
+          return;
+        }
+        
+        const feedback = textarea.value;
+        const bookingId = '<?= $flightDetailsDB[0]['flight_booking_id'] ?>';
+        const airlineId = '<?= $flightDetailsDB[0]['airline_id'] ?>';
+        
+        // Send feedback to server
+        fetch('submit_flight_feedback.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'action=submitFeedback&f_book_id=' + encodeURIComponent(bookingId) + 
+                '&airline_id=' + encodeURIComponent(airlineId) + 
+                '&rating=' + encodeURIComponent(currentRating) + 
+                '&feedback=' + encodeURIComponent(feedback)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Thank you for your feedback!');
+            feedbackSubmitted = true; // Mark as submitted
+            
+            // Disable form elements after successful submission
+            textarea.value = '';
+            textarea.disabled = true;
+            stars.forEach(s => s.style.pointerEvents = 'none'); // Disable star clicks
+            submitBtn.disabled = true;
+            
+            // Store in localStorage that feedback was submitted for this booking
+            localStorage.setItem('feedback_submitted_' + bookingId, 'true');
+          } else {
+            // Only show the error message once
+            alert('Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred. Please try again later.');
+        });
+      });
+      
+      // Cancel feedback
+      cancelBtn.addEventListener('click', function() {
+        if (!feedbackSubmitted) {
+          textarea.value = '';
+          currentRating = 0;
+          stars.forEach(s => s.classList.remove('active'));
+        }
+      });
+      
+      // Check if feedback was already submitted for this booking
+      const bookingId = '<?= $flightDetailsDB[0]['flight_booking_id'] ?>';
+      if (localStorage.getItem('feedback_submitted_' + bookingId) === 'true') {
+        feedbackSubmitted = true;
+        textarea.disabled = true;
+        stars.forEach(s => s.style.pointerEvents = 'none');
+        submitBtn.disabled = true;
+      }
+    });
+    
+    function showCancelConfirmation() {
+      if (confirm('Are you sure you want to cancel this flight? This action cannot be undone.')) {
+        alert('Flight cancellation request submitted. You will receive further instructions via email.');
+      }
+    }
+  </script>
   <?php include 'u_footer_1.php'; ?>
   <?php include 'u_footer_2.php'; ?>
 </body>
