@@ -275,6 +275,7 @@ if (empty($flightDetailsDB)) {
       const submitBtn = document.querySelector('.submit-btn');
       const cancelBtn = document.querySelector('.cancel-btn');
       const textarea = document.querySelector('.ratings textarea');
+      const ratingsSection = document.querySelector('.ratings');
       let currentRating = 0;
       let feedbackSubmitted = false; // Track if feedback was submitted
       
@@ -367,7 +368,56 @@ if (empty($flightDetailsDB)) {
     
     function showCancelConfirmation() {
       if (confirm('Are you sure you want to cancel this flight? This action cannot be undone.')) {
-        alert('Flight cancellation request submitted. You will receive further instructions via email.');
+        // Show loading indicator
+        const cancelBtn = document.querySelector('.cancel-flight-btn');
+        if (cancelBtn) {
+          cancelBtn.disabled = true;
+          cancelBtn.textContent = 'Processing...';
+        }
+        
+        console.log('Sending cancellation request for booking ID:', bookingId);
+        
+        // Send cancellation request to server
+        fetch('cancelFlight.php?bookingId=' + encodeURIComponent(bookingId), {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Server returned status ' + response.status);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Server response:', data);
+          
+          if (data.success) {
+            alert('Flight has been successfully cancelled. A refund will be processed shortly.');
+            // Reload page or redirect to confirmation page
+            window.location.reload();
+          } else {
+            // Show detailed error message
+            let errorMsg = 'Failed to cancel flight.';
+            if (data.message) {
+              errorMsg += ' ' + data.message;
+            }
+            console.error('Cancellation error:', data);
+            alert(errorMsg + ' Please try again or contact support.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while cancelling your flight: ' + error.message);
+        })
+        .finally(() => {
+          // Re-enable button
+          if (cancelBtn) {
+            cancelBtn.disabled = false;
+            cancelBtn.textContent = 'Cancel Flight';
+          }
+        });
       }
     }
   </script>
