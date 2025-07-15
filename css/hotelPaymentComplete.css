@@ -226,7 +226,7 @@
     
     .barcode {
         width: 248px;
-        height: 181px;
+        height: auto;
         background-color: #ffffff;
         margin-left: auto;
     }
