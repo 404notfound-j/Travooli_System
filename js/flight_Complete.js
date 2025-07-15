@@ -268,22 +268,50 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.removeChild(iframe);
         window.removeEventListener('message', eventHandler);
       } else if (event.data && event.data.action === 'cancelFlight' && event.data.confirmed) {
-        // AJAX to cancel flight
+        // Show loading state on button
+        const cancelBtn = document.querySelector('.cancel-flight-btn');
+        const originalText = cancelBtn.textContent;
+        cancelBtn.textContent = 'Processing...';
+        cancelBtn.disabled = true;
+        
+        // AJAX to cancel flight with proper JSON and headers
         fetch('cancelFlight.php', {
           method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: 'action=cancel&booking_id=' + encodeURIComponent(bookingId)
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            booking_id: bookingId
+          })
         })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
             alert('Your flight booking has been cancelled successfully.');
-            window.location.href = 'U_dashboard.php';
+            if (data.redirect_url) {
+              window.location.href = data.redirect_url;
+            } else {
+              window.location.href = 'U_dashboard.php';
+            }
           } else {
             alert('Error: ' + data.message);
+            // Reset button state
+            cancelBtn.textContent = originalText;
+            cancelBtn.disabled = false;
           }
         })
-        .catch(() => alert('Network error, please try again.'));
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Network error, please try again.');
+          // Reset button state
+          cancelBtn.textContent = originalText;
+          cancelBtn.disabled = false;
+        });
+        
+        // Remove the iframe
+        document.body.removeChild(iframe);
+        window.removeEventListener('message', eventHandler);
       }
     });
   };
