@@ -73,11 +73,11 @@ if (isset($_SESSION['user_id'])) {
         <img src="icon/Travooli logo.svg" alt="Travooli" class="logo">
     </div>
         
-    <nav class="nav">
+            <nav class="nav">
             <ul class="nav-list" id="nav-menu">
                 <li class="nav-item active"><a href="U_dashboard.php">Flights</a></li>
                 <li class="nav-item"><a href="hotelBook.php">Hotels</a></li>
-                <li class="nav-item"><a href="myTickets.php">My Tickets</a></li>
+                <li class="nav-item"><a href="payment_complete.php">My Tickets</a></li>
                 <li class="nav-item"><a href="hotelPaymentComplete.php">My Reservations</a></li>
                 <li class="nav-item"><a href="signIn.php">Sign in</a></li>
                 <li class="nav-item"><a href="signUp.php" class="btn btn-primary">Sign up</a></li>
@@ -105,7 +105,7 @@ if (isset($_SESSION['user_id'])) {
             <ul class="nav-list" id="nav-menu">
                 <li class="nav-item active"><a href="U_dashboard.php">Flights</a></li>
                 <li class="nav-item"><a href="hotelBook.php">Hotels</a></li>
-                <li class="nav-item"><a href="myTickets.php">My Tickets</a></li>
+                <li class="nav-item"><a href="payment_complete.php">My Tickets</a></li>
                 <li class="nav-item"><a href="hotelPaymentComplete.php">My Reservations</a></li>
                 
                 <!-- Profile Section -->

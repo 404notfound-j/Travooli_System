@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/connection.php';
 
@@ -168,6 +169,10 @@ $stmt2->execute();
 
 
     $connection->commit();
+    
+    // Store booking ID in session for payment_complete.php (similar to hotel system)
+    $_SESSION['last_flight_booking_id'] = $f_book_id;
+    
     echo json_encode(['success' => true, 'bookingId' => $f_book_id, 'paymentId' => $payment_id]);
 
 } catch (Exception $e) {

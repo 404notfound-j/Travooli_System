@@ -2,14 +2,33 @@
 session_start();
 include 'connection.php';
 
-$bookingIdFromURL = $_GET['bookingId'] ?? null;
-$bookingIdToQuery = $bookingIdFromURL;
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    // Redirect to sign in if not logged in
+    error_log("User not logged in, redirecting to signIn.php");
+    header("Location: signIn.php");
+    exit();
+}
 
-if (empty($bookingIdToQuery) && isset($_SESSION['user_id'])) {
-    $latestBookingQuery = "SELECT f_book_id FROM flight_booking_t WHERE user_id = ? ORDER BY book_date DESC LIMIT 1";
+// Get the latest booking info
+$user_id = $_SESSION['user_id'];
+error_log("User ID: $user_id - Checking for flight bookings");
+
+// Check if there's a booking ID in the session (set by insertFlightPayment.php)
+$bookingIdFromSession = isset($_SESSION['last_flight_booking_id']) ? $_SESSION['last_flight_booking_id'] : null;
+
+// Also check URL parameter as fallback
+$bookingIdFromURL = $_GET['bookingId'] ?? null;
+
+// Determine which booking ID to use
+$bookingIdToQuery = $bookingIdFromSession ?: $bookingIdFromURL;
+
+// If still no booking ID, get the latest confirmed booking for this user
+if (empty($bookingIdToQuery)) {
+    $latestBookingQuery = "SELECT f_book_id FROM flight_booking_t WHERE user_id = ? AND status = 'confirmed' ORDER BY book_date DESC LIMIT 1";
     $stmtLatestBooking = mysqli_prepare($connection, $latestBookingQuery);
     if ($stmtLatestBooking) {
-        mysqli_stmt_bind_param($stmtLatestBooking, "s", $_SESSION['user_id']);
+        mysqli_stmt_bind_param($stmtLatestBooking, "s", $user_id);
         mysqli_stmt_execute($stmtLatestBooking);
         $resultLatestBooking = mysqli_stmt_get_result($stmtLatestBooking);
         if ($rowLatestBooking = mysqli_fetch_assoc($resultLatestBooking)) {
@@ -17,6 +36,14 @@ if (empty($bookingIdToQuery) && isset($_SESSION['user_id'])) {
         }
         mysqli_stmt_close($stmtLatestBooking);
     }
+}
+
+// If no flight bookings found, redirect to no booking page  
+if (empty($bookingIdToQuery)) {
+    error_log("No flight bookings found for user ID: $user_id - Redirecting to noFlightBooking.php");
+    unset($_SESSION['last_flight_booking_id']); // Clear session
+    header("Location: noFlightBooking.php");
+    exit();
 }
 
 $ticketPrice = $baggagePrice = $mealPrice = $taxPrice = $finalTotalPrice = 0;
@@ -34,119 +61,109 @@ $classLabel = 'Premium Economy';
 $flightDetailsDB = [];
 $passengersForDisplay = [];
 
-if (!empty($bookingIdToQuery)) {
-    $query = "SELECT
-                fb.f_book_id AS flight_booking_id, fb.user_id, fb.flight_id, fb.book_date, fb.status AS booking_status,
-                fi.departure_time, fi.arrival_time, fi.orig_airport_id, fi.dest_airport_id,
-                a.airline_name, a.airline_id,
-                fbi.total_amount AS total_amount_paid,
-                fbi.base_fare_total AS ticket_base_price,
-                fbi.baggage_total AS baggage_fees,
-                fbi.meal_total AS meal_fees,
-                fbi.passenger_count AS num_passenger,
-                fbi.flight_date AS flight_date
-              FROM flight_booking_t fb
-              JOIN flight_info_t fi ON fb.flight_id = fi.flight_id
-              JOIN airline_t a ON fi.airline_id = a.airline_id
-              JOIN flight_booking_info_t fbi ON fb.f_book_id = fbi.f_book_id
-              WHERE fb.f_book_id = ?";
+// Get flight booking details with user verification
+$query = "SELECT
+            fb.f_book_id AS flight_booking_id, fb.user_id, fb.flight_id, fb.book_date, fb.status AS booking_status,
+            fi.departure_time, fi.arrival_time, fi.orig_airport_id, fi.dest_airport_id,
+            a.airline_name, a.airline_id,
+            fbi.total_amount AS total_amount_paid,
+            fbi.base_fare_total AS ticket_base_price,
+            fbi.baggage_total AS baggage_fees,
+            fbi.meal_total AS meal_fees,
+            fbi.passenger_count AS num_passenger,
+            fbi.flight_date AS flight_date
+          FROM flight_booking_t fb
+          JOIN flight_info_t fi ON fb.flight_id = fi.flight_id
+          JOIN airline_t a ON fi.airline_id = a.airline_id
+          JOIN flight_booking_info_t fbi ON fb.f_book_id = fbi.f_book_id
+          WHERE fb.f_book_id = ? AND fb.user_id = ? AND fb.status != 'cancelled'";
 
-    $stmt = mysqli_prepare($connection, $query);
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "s", $bookingIdToQuery);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        if ($row = mysqli_fetch_assoc($result)) {
-            $flightDetailsDB[] = $row;
-            $ticketPrice = $row['ticket_base_price'];
-            $baggagePrice = $row['baggage_fees'];
-            $mealPrice = $row['meal_fees'];
-            $finalTotalPrice = $row['total_amount_paid'];
-            $numPassenger = $row['num_passenger'];
-            $classLabel = $classLabelMap[$classId] ?? 'Unknown';
-            
-            // Debug - Log the retrieved values
-            error_log("Retrieved flight details - booking_id: {$row['flight_booking_id']}, airline_id: {$row['airline_id']}");
-        }
-        mysqli_stmt_close($stmt);
-    }
-
-    $passengerQuery = "
-      SELECT 
-        pt.pass_id, pt.fst_name, pt.lst_name, pt.gender, pt.dob, pt.country,
-        ps.class_id, ps.baggage_id, ps.meal_id,
-        fs.seat_no
-      FROM passenger_service_t ps
-      JOIN passenger_t pt ON ps.pass_id = pt.pass_id
-      LEFT JOIN flight_seats_t fs ON fs.pass_id = pt.pass_id
-      WHERE ps.f_book_id = ?
-    ";
-
-    $stmtPassengers = mysqli_prepare($connection, $passengerQuery);
-    if ($stmtPassengers) {
-        mysqli_stmt_bind_param($stmtPassengers, "s", $bookingIdToQuery);
-        mysqli_stmt_execute($stmtPassengers);
-        $resultPassengers = mysqli_stmt_get_result($stmtPassengers);
-        while ($row = mysqli_fetch_assoc($resultPassengers)) {
-            $passengersForDisplay[] = $row;
-        }
-
-        $seen = [];
-        $uniquePassengers = [];
-
-        foreach ($passengersForDisplay as $p) {
-            if (!in_array($p['pass_id'], $seen)) {
-                $seen[] = $p['pass_id'];
-                $uniquePassengers[] = $p;
-            }
-        }
-        $passengersForDisplay = $uniquePassengers;
-
-        mysqli_stmt_close($stmtPassengers);
-    }
+$stmt = mysqli_prepare($connection, $query);
+if (!$stmt) {
+    error_log("Database error in payment_complete.php: " . mysqli_error($connection));
+    header("Location: noFlightBooking.php");
+    exit();
 }
 
+mysqli_stmt_bind_param($stmt, "ss", $bookingIdToQuery, $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+if ($row = mysqli_fetch_assoc($result)) {
+    $flightDetailsDB[] = $row;
+    $ticketPrice = $row['ticket_base_price'];
+    $baggagePrice = $row['baggage_fees'];
+    $mealPrice = $row['meal_fees'];
+    $finalTotalPrice = $row['total_amount_paid'];
+    $numPassenger = $row['num_passenger'];
+    $classLabel = $classLabelMap[$classId] ?? 'Unknown';
+    
+    error_log("Retrieved flight details - booking_id: {$row['flight_booking_id']}, airline_id: {$row['airline_id']}");
+} else {
+    // Booking not found or doesn't belong to this user
+    error_log("Booking not found or access denied for booking ID: $bookingIdToQuery, user ID: $user_id");
+    unset($_SESSION['last_flight_booking_id']);
+    header("Location: noFlightBooking.php");
+    exit();
+}
+mysqli_stmt_close($stmt);
+
+// Get passenger details for this booking
+$passengerQuery = "
+  SELECT 
+    pt.pass_id, pt.fst_name, pt.lst_name, pt.gender, pt.dob, pt.country,
+    ps.class_id, ps.baggage_id, ps.meal_id,
+    fs.seat_no
+  FROM passenger_service_t ps
+  JOIN passenger_t pt ON ps.pass_id = pt.pass_id
+  LEFT JOIN flight_seats_t fs ON fs.pass_id = pt.pass_id
+  WHERE ps.f_book_id = ?
+";
+
+$stmtPassengers = mysqli_prepare($connection, $passengerQuery);
+if ($stmtPassengers) {
+    mysqli_stmt_bind_param($stmtPassengers, "s", $bookingIdToQuery);
+    mysqli_stmt_execute($stmtPassengers);
+    $resultPassengers = mysqli_stmt_get_result($stmtPassengers);
+    while ($row = mysqli_fetch_assoc($resultPassengers)) {
+        $passengersForDisplay[] = $row;
+    }
+
+    // Remove duplicate passengers (if any)
+    $seen = [];
+    $uniquePassengers = [];
+    foreach ($passengersForDisplay as $p) {
+        if (!in_array($p['pass_id'], $seen)) {
+            $seen[] = $p['pass_id'];
+            $uniquePassengers[] = $p;
+        }
+    }
+    $passengersForDisplay = $uniquePassengers;
+
+    mysqli_stmt_close($stmtPassengers);
+}
+
+// Get user information 
 $userName = "Guest";
 $userProfilePhotoSrc = 'images/default_profile.png';
-$loggedInUserId = $_SESSION['user_id'] ?? null;
 
-if ($loggedInUserId) {
-    $userQuery = "SELECT fst_name, profile_pic FROM user_detail_t WHERE user_id = ?";
-    $stmtUser = mysqli_prepare($connection, $userQuery);
-    if ($stmtUser) {
-        mysqli_stmt_bind_param($stmtUser, "s", $loggedInUserId);
-        mysqli_stmt_execute($stmtUser);
-        $userResult = mysqli_stmt_get_result($stmtUser);
-        if ($userRow = mysqli_fetch_assoc($userResult)) {
-            $userName = htmlspecialchars($userRow['fst_name']);
-            if (!empty($userRow['profile_pic'])) {
-                $userProfilePhotoSrc = 'getProfileImage.php?user_id=' . urlencode($loggedInUserId);
-            }
+$userQuery = "SELECT fst_name, profile_pic FROM user_detail_t WHERE user_id = ?";
+$stmtUser = mysqli_prepare($connection, $userQuery);
+if ($stmtUser) {
+    mysqli_stmt_bind_param($stmtUser, "s", $user_id);
+    mysqli_stmt_execute($stmtUser);
+    $userResult = mysqli_stmt_get_result($stmtUser);
+    if ($userRow = mysqli_fetch_assoc($userResult)) {
+        $userName = htmlspecialchars($userRow['fst_name']);
+        if (!empty($userRow['profile_pic'])) {
+            $userProfilePhotoSrc = 'getProfileImage.php?user_id=' . urlencode($user_id);
         }
-        mysqli_stmt_close($stmtUser);
     }
+    mysqli_stmt_close($stmtUser);
 }
 
-if (empty($flightDetailsDB)) {
-    $flightDetailsDB[] = [
-        'flight_booking_id' => $bookingIdToQuery ?? 'N/A',
-        'flight_id' => 'N/A',
-        'book_date' => date('Y-m-d H:i:s'),
-        'departure_time' => '00:00:00',
-        'arrival_time' => '00:00:00',
-        'orig_airport_id' => 'N/A',
-        'dest_airport_id' => 'N/A',
-        'flight_date' => date('Y-m-d'),
-        'airline_name' => 'Travooli Airlines',
-        'airline_id' => 'TR',
-        'total_amount_paid' => 0, 'ticket_base_price' => 0,
-        'baggage_fees' => 0, 'meal_fees' => 0,
-        'num_passenger' => 0
-    ];
-    
-    // Debug - Log the fallback values
-    error_log("Using fallback flight details - booking_id: {$flightDetailsDB[0]['flight_booking_id']}, airline_id: {$flightDetailsDB[0]['airline_id']}");
-}
+// Clear the session booking ID now that we've successfully retrieved the booking
+unset($_SESSION['last_flight_booking_id']);
 
 // Debug - Output the values that will be used for data attributes
 error_log("Data attributes for feedback - booking_id: {$flightDetailsDB[0]['flight_booking_id']}, airline_id: {$flightDetailsDB[0]['airline_id']}");
