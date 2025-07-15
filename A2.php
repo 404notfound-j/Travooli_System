@@ -195,7 +195,7 @@ $hotel_images = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travooli - Hotel Booking</title>
-    <link rel="stylesheet" href="css/hotelBook.css">
+    <link rel="stylesheet" href="A2.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="js/loginReminder.js"></script>

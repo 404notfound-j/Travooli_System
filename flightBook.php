@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Travooli Flight Search</title>
   <link rel="stylesheet" href="css/booking.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -226,68 +227,72 @@
   </div>
 
   <div class="main-content">
-    <div class="filters">
-      <h2>Filters</h2>
-      <div class="filter-group">
-        <h4>Seat class</h4>
-        <button class="filter-button">Economy</button>
-        <button class="filter-button">Premium Economy</button>
-        <button class="filter-button">Business Class</button>
-        <button class="filter-button">First Class</button>
-      </div>
-      <hr>
-      <div class="filter-group">
-        <h4>Time</h4>
-          <input type="range" id="timeRange" min="360" max="1380" step="30" value="360">
-          <div class="range-labels">
-          <span id="startTime">6:00AM</span>
-          <span>11:00PM</span>
+    <div class="layout">
+        <div class="filters">
+        <h2>Filters</h2>
+        <div class="filter-group">
+            <div class="seat-class">
+                <h4>Seat class</h4>
+                <div class ="class-button">
+                    <button class="filter-button">Economy</button>
+                    <button class="filter-button">Premium Economy</button>
+                    <button class="filter-button">Business Class</button>
+                    <button class="filter-button">First Class</button>
+                </div>
+            </div>
         </div>
-      </div>
-      <hr>
-      <div class="filter-group">
-        <h4>Rating</h4>
-        <div class="rating-buttons">
-          <button>0+</button>
-          <button>1+</button>
-          <button>2+</button>
-          <button>3+</button>
-          <button>4+</button>
+        <hr>
+        <div class="filter-group">
+            <h4>Time</h4>
+            <input type="range" id="timeRange" min="360" max="1380" step="30" value="360">
+            <div class="range-labels">
+            <span id="startTime">6:00AM</span>
+            <span>11:00PM</span>
+            </div>
         </div>
-      </div>
-      <hr>
-      <div class="filter-group">
-        <h4>Airlines</h4>
-        <div class="checkbox-group">
-        <label class="flex">
-            <input type="checkbox" value="AK">
-            <span>AirAsia</span>
-            </label>
+        <hr>
+        <div class="filter-group">
+            <h4>Rating</h4>
+            <div class="rating-buttons">
+                <button>0+</button>
+                <button>1+</button>
+                <button>2+</button>
+                <button>3+</button>
+                <button>4+</button>
+            </div>
+        </div>
+        <hr>
+        <div class="filter-group">
+            <h4>Airlines</h4>
+            <div class="checkbox-group">
+                <label class="flex">
+                    <input type="checkbox" value="AK">
+                    <span>AirAsia</span>
+                </label>
 
-            <label class="flex">
-            <input type="checkbox" value="MH">
-            <span>Mas</span>
-            </label>
+                <label class="flex">
+                    <input type="checkbox" value="MH">
+                    <span>Mas</span>
+                </label>
 
-            <label class="flex">
-            <input type="checkbox" value="FY">
-            <span>FireFly</span>
-        </label>
+                <label class="flex">
+                    <input type="checkbox" value="FY">
+                    <span>FireFly</span>
+                </label>
+            </div>
         </div>
-      </div>
-      <hr>
-      <div class="action-buttons">
-      <button class="cancel-btn" id="cancelBtn">Cancel</button>
-        <button class="apply-btn">Apply Filters</button>
-      </div>
+        <div class="action-buttons">
+        <button class="cancel-btn" id="cancelBtn">Cancel</button>
+            <button class="apply-btn">Apply Filters</button>
+        </div>
+        </div>
+        <div class="main-panel">
+        <div id="flightResults" class="flight-results-container"></div>
+        </div>
     </div>
-    <div class="main-panel">
-    <div id="flightResults" class="flight-results-container"></div>
-</div>
 </div>
   
   <?php
-  // Get airline ratings and reviews
   $airlines = [];
   $sql = "SELECT airline_id, airline_name FROM airline_t";
   $result = mysqli_query($connection, $sql);

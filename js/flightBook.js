@@ -833,18 +833,20 @@ document.addEventListener('DOMContentLoaded', function () {
                   html += `
                       <div class="flight-card roundtrip-card">
                           <div class="airline-section">
-                              <img src="images/${depart.airline_id}.png" class="airline-logo" alt="${depart.airline_id} Logo">
+                              <img src="images/${depart.airline_id} copy.png" class="airline-logo" alt="${depart.airline_id} Logo">
                           </div>
                           <div class="content-section">
                               <div class="top-row">
-                                  <div class="rating-box">
-                                      <span class="rating-score">${isNaN(ratingScoreDepart) ? 'N/A' : ratingScoreDepart.toFixed(1)}</span>
-                                      <span class="reviews">${reviewTextDepart}</span>
-                                  </div>
-                                  <div class="price-box">
-                                      <span class="from">starting from</span>
-                                      <span class="price">RM ${(Number(depart.price) + Number(ret.price)).toFixed(2)}</span>
-                                  </div>
+                                    <div class="rating">
+                                        <div class="rating-box">
+                                            <span class="rating-score">${isNaN(ratingScoreDepart) ? 'N/A' : ratingScoreDepart.toFixed(1)}</span>     
+                                        </div>
+                                        <span class="reviews">${reviewTextDepart}</span>
+                                    </div>
+                                    <div class="price-box">
+                                        <span class="from">starting from</span>
+                                        <span class="price">RM ${(Number(depart.price) + Number(ret.price)).toFixed(2)}<span class="person">/person</span></span>
+                                    </div>
                               </div>
                               <div class="schedule">
                                   <div class="flight-detail">
@@ -863,7 +865,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                   </div>
                               </div>
                               <div class="buttons-row">
-                                  <button class="heart-btn"><i class="fa-solid fa-heart"></i></button>
+                                  <button class="like-button"><i class="fa-regular fa-heart"></i></button>
                                   <button class="view-details-btn"
                                       data-depart-id="${depart.flight_id}"
                                       data-return-id="${ret.flight_id}"
@@ -896,17 +898,19 @@ document.addEventListener('DOMContentLoaded', function () {
                   html += `
                       <div class="flight-card">
                           <div class="airline-section">
-                              <img src="images/${flight.airline_id}.png" class="airline-logo" alt="${flight.airline_id} Logo">
+                              <img src="images/${flight.airline_id} copy.png" class="airline-logo" alt="${flight.airline_id} Logo">
                           </div>
                           <div class="content-section">
                               <div class="top-row">
-                                  <div class="rating-box">
-                                      <span class="rating-score">${isNaN(ratingScoreFlight) ? 'N/A' : ratingScoreFlight.toFixed(1)}</span>
-                                      <span class="reviews">${reviewTextFlight}</span>
-                                  </div>
+                                <div class="rating">
+                                    <div class="rating-box">
+                                        <span class="rating-score">${isNaN(ratingScoreFlight) ? 'N/A' : ratingScoreFlight.toFixed(1)}</span>
+                                    </div>  
+                                    <span class="reviews">${reviewTextFlight}</span>
+                                </div>
                                   <div class="price-box">
                                       <span class="from">starting from</span>
-                                      <span class="price">RM ${parseFloat(flight.price).toFixed(2)}</span>
+                                      <span class="price">RM ${parseFloat(flight.price).toFixed(2)}<span class="person">/person</span></span>
                                   </div>
                               </div>
                               <div class="schedule">
@@ -919,7 +923,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                   </div>
                               </div>
                               <div class="buttons-row">
-                                  <button class="heart-btn"><i class="fa-solid fa-heart"></i></button>
+                                  <button class="like-button"><i class="fa-regular fa-heart"></i></button>
                                   <button class="view-details-btn"
                                       data-flight-id="${flight.flight_id}"
                                       data-type="one">
@@ -936,6 +940,18 @@ document.addEventListener('DOMContentLoaded', function () {
       attachViewHandlers();
   }
 
+  document.addEventListener('click', function (e) {
+    const likeBtn = e.target.closest('.like-button');
+    if (likeBtn) {
+      likeBtn.classList.toggle('liked');
+      const icon = likeBtn.querySelector('i');
+      if (icon) {
+        icon.classList.toggle('fa-regular');
+        icon.classList.toggle('fa-solid');
+      }
+    }
+  });
+  
   // --- Apply Filters Button Handler ---
   document.querySelector('.apply-btn').addEventListener('click', function () {
     const searchInfo = JSON.parse(sessionStorage.getItem("flightSearch") || '{}');

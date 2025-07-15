@@ -98,7 +98,7 @@ function loadFlightDetails(flightId, type, classCode) {
       updateText(`${type}-departure-airport-code`, flight.orig_airport_id);
       updateText(`${type}-arrival-airport-code`, flight.dest_airport_id);
       updateText(`${type}-flight-duration`, duration);
-      updateText(`${type}-airline-name`, flight.airline_name);
+      updateText(`${type}-airline-name`, flight.airline_name );
       updateText(`${type}-aircraft-type`, flight.flight_id);
 
       const price = parseFloat(flight.price);
@@ -116,14 +116,18 @@ function loadFlightDetails(flightId, type, classCode) {
       if (classDisplayEl) {
           classDisplayEl.textContent = classDisplayName;
       }
+      const aircraftName = "Boeing 777";
+      const airlineDisplay = `${flight.airline_name || flight.airline_id} ${aircraftName}`;
+
+      
       // --- END NEW ---
 
       // Retrieve searchData again to ensure it's the latest from sessionStorage before modification
       const searchData = JSON.parse(sessionStorage.getItem('flightSearch') || '{}');
 
       if (type === 'depart') {
-        updateText("depart-flight-airline-plane", flight.airline_name || flight.airline_id);
-        updateText(`${type}-origin-airport-info`, `${flight.origin_airport_full || ''}, ${flight.origin_airport_address || ''}`);
+        updateText("depart-flight-airline-plane", airlineDisplay);
+        updateText(`${type}-origin-airport-info`, `${flight.origin_airport_full || ''}, ${flight.origin_airport_address || ''}`) ;
         const airlineImage = document.getElementById("depart-airplane-image");
         if (airlineImage) airlineImage.src = `images/${flight.airline_id}.jpg`;
         const logoImage = document.getElementById("depart-airline-logo");
@@ -203,6 +207,12 @@ const likeButton = document.querySelector('.like-button');
 if (likeButton) {
   likeButton.addEventListener('click', () => {
     likeButton.classList.toggle('liked');
+
+    const icon = likeButton.querySelector('i');
+    if (icon) {
+      icon.classList.toggle('fa-regular');
+      icon.classList.toggle('fa-solid');
+    }
   });
 }
 

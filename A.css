@@ -85,7 +85,6 @@ body {
     border: 1px solid #605dec;
     padding: 10px;
     margin-bottom: 8px;
-    font-size: 15px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
@@ -209,243 +208,260 @@ input[type="range"]::-webkit-slider-thumb {
 
 .action-buttons {
     display: flex;
-    gap: 10px;
-    justify-content: space-between;
+    gap: 24px;
     margin-top: 2.5rem;
 }
 
 .action-buttons button {
     flex: 1;
-    font-size: 15px;
+    align-items: flex-start;
     border-radius: 5px;
-    padding: 0.5rem 1.5rem;
-    border: none;
+    border: 2px solid #605DEC;
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: "Nunito Sans";
-    font-size: 18px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    margin-bottom: 1rem;
 }
 
 .cancel-btn {
     background-color: transparent;    
-    width: 86px;    
-    color: #605dec;                          
-    border: 2px solid #605DEC;           
-    border-radius: 6px;                   
-    padding: 10px 30px;                    
-    font-size: 16px;                      
-    font-weight: bold;                    
-    cursor: pointer;                       
-    transition: all 0.3s ease;                                      
+    max-width: 86px;    
+    color: #605dec;     
+    padding: 0;                                                         
 }
 
 .cancel-btn:hover {
-  background-color: #5c63f2;             
-  color: black;                         
+    background-color: #7d83ff18;                                 
 }
+
 .apply-btn {
-  background-color: #5c63f2;
-  color: white;
+    padding: 12px 24px;
+    background-color: #605DEC;
+    color: white;
+    max-width: 150px;
 }
 
 .apply-btn:hover {
-  background-color: #7d83ff;
+    background: #4845CC;
+    border-color: #4845CC;;
 }
 
 /*new flight details*/
 
 .flight-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(44, 62, 80, 0.10);
-  padding: 28px 28px 18px 28px;
-  margin: 32px auto 0 auto;
-  max-width: 900px;
-  display: flex;
-  flex-direction: row;
-  gap: 32px;
-  position: relative;
-  align-items: flex-start;
-}
+    background: #fff;
+    border-radius: 16px;
+    display: flex;
+    padding: 32px;
+    margin: 32px auto;
+    width: 810px;
+    height: 300px;
+    gap: 16px;
+    height: fit-content;
+  }
+  
+  .airline-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: top;
+    width: 120px;
+  }
+  
+  .airline-logo {
+    width: 120px;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    margin-bottom: 0;
+  }
+  
+  .airline-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #555;
+    margin-top: 8px;
+  }
+  
+  .content-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 590px;
+    gap: 0;
+    height: fit-content;
+  }
+  
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    height: 44px;
+  }
+  
+  .rating-box {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #5c63f2;
+    border-radius: 8px;
+    padding: 8.5px 11px;
+  }
+  
+  .rating-score {
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #121;
+  }
+  
+  .reviews {
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #112;
+  }
+  
+  .price-box {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+  
+  .price-box .from {
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #121;
+    opacity: 0.75;
+  }
+  
+  .price-box .price {
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    color: #605DEC;
+  }
+  
+  .person{
+    font-size: 14px;
+  }
+  .schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  
+  .flight-detail {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    flex-wrap: wrap;
+    gap: 65px;
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  
+  .flight-time {
+    width: 165px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #111;
+    display: flex;
+    gap: 8px;
+  }
+  
+  .flight-meta {
+    color: #888;
+    font-size: 15px;
+  }
+  
+  .flight-meta-duration {
+    color: #111;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .buttons-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-top: 1px solid #e5e7eb;
+    padding: 20px 0 0 0; 
+    margin-top: auto;
+  }
 
-.airline-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 140px;
-  margin-right: 32px;
-}
+  .view-details-btn {
+    flex: 1;
+    background: #605DEC;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 14px 0;
+    border-radius: 5px;
+    width: 480px;
+    height: 48px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  
+  .view-details-btn:hover {
+    background: #4845CC;
+  }
+  
+  
+  .like-button {
+    border: 2px solid #605DEC;
+    height: 48px;
+    width: 48px;
+    background: transparent;
+    border: 1px solid #605DEC;
+    padding: 10px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #5c595f;
+    font-weight: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .like-button i {
+    font-size: 16px;
+  }
+  
+  .like-button:hover {
+    background-color: #f5f6ff;
+  }
 
-.airline-logo {
-  width: 150px;
-  height: 180px;
-  object-fit: contain;
-  margin-top: 40px;
-  margin-left: 30px;
-  align-items: center;
-}
-
-.airline-name {
-  font-family: 'Poppins', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: #e11d48;
-  margin-top: 8px;
-  margin-bottom: 0;
-  letter-spacing: -1px;
-}
-
-.content-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.top-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 8px;
-}
-
-.rating-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fff;
-  padding: 4px 12px 4px 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #222;
-}
-.rating-score {
-  color: #5c63f2;
-  background: #f5f6ff;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 30px;
-  padding: 8px;
-  margin-right: 6px;
-  margin-bottom: 10px;
-}
-.reviews {
-  color: #222;
-  font-size: 18px;
-  font-weight: 400;
-  margin-left: 4px;
-}
-
-.price-box {
-  margin-left: auto;
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-start;
-}
-.price-box .from {
-  color: #888;
-  font-size: 15px;
-  margin-bottom: 2px;
-}
-
-.price-box .price {
-  color: #5c63f2;
-  font-weight: 800;
-  font-size: 26px;
-  letter-spacing: -1px;
-  margin-top: 0;
-}
-
-.schedule {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.flight-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 4px 0;
-}
-
-.flight-time {
-  display: flex;
-  padding-left: 20px;
-  gap: 60px; 
-  align-items: center;
-  font-weight: 600;
-  font-size: 18px;
-  color: #111;
-  flex-wrap: wrap;
-}
-.flight-meta {
-  font-size: 14px;
-  color: #333;
-  text-align: center;
-  margin-top: 10px;
-  margin-right: 40px;
-}
-
-
-.buttons-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-top: 1.5px solid #e5e7eb;
-  padding-top: 18px;
-}
-.heart-btn {
-  border: 1.5px solid #d1d5db;
-  background: #fff;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 22px;
-  margin-right: 8px;
-  transition: border 0.2s, background 0.2s;
-}
-.heart-btn i {
-  font-size: 22px;
-  color: #bbb;
-  transition: color 0.3s;
-}
-.heart-btn.favorited i,
-.heart-btn .fa-heart.liked {
-  color: #e11d48 !important;
-}
-
-.view-details-btn {
-  flex: 1;
-  background: #605DEC;
-  color: #fff;
-  border: none;
-  padding: 16px 0;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 20px;
-  box-shadow: 0 2px 8px rgba(96, 93, 236, 0.10);
-  transition: background 0.2s;
-  margin-left: 0;
-}
-.view-details-btn:hover {
-  background: #1513A0;
-}
-
-ul {
-  list-style: none;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
+  .like-button.liked i {
+    color: #605dec;
 }
 
 /* Gradient Text Style */
@@ -1567,13 +1583,6 @@ input:focus ~ .input-border {
 .rating-display {
   display: flex;
   align-items: center;
-}
-
-.rating-score {
-  font-size: 36px;
-  font-weight: 700;
-  color: #5c63f2;
-  margin-right: 15px;
 }
 
 .rating-details {

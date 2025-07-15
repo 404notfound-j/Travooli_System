@@ -50,7 +50,7 @@ $rating_text = "No reviews yet";
   <title>Flight Details</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="css/flightDetails.css">
+  <link rel="stylesheet" href="A1.css">
   <link rel="stylesheet" href="css/feedback.css">
   
   <!-- ✅ Inject login status for JS -->

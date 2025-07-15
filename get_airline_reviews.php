@@ -37,7 +37,7 @@ if ($result && mysqli_num_rows($result) > 0) {
         if ($response['avg_rating'] >= 4.5) {
             $response['rating_text'] = "Excellent";
         } else if ($response['avg_rating'] >= 4.0) {
-            $response['rating_text'] = "Very good";
+            $response['rating_text'] = "Excellent";
         } else if ($response['avg_rating'] >= 3.0) {
             $response['rating_text'] = "Good";
         } else if ($response['avg_rating'] >= 2.0) {

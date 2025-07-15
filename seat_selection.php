@@ -27,6 +27,11 @@ include 'connection.php';
         <h3 class="subtitle">
             <span id="class-name">Class</span>
         </h3>
+        
+        <div id="seat-selection-status">
+                    <p><strong><span id="seat-count">Loading...</span></strong></p>
+                    <p>Selected Seats: <span id="seat-list">-</span></p>
+        </div>
 
 
         <div class="layout">
@@ -58,16 +63,12 @@ include 'connection.php';
                     ?>
                 </div>
 
-                <div id="seat-selection-status">
-                    <p><strong><span id="seat-count">Loading...</span></strong></p>
-                    <p>Selected Seats: <span id="seat-list">-</span></p>
-                </div>
-
                 <div class="legend">
                     <div class="legend-item"><div class="available-icon"></div>Available</div>
                     <div class="legend-item"><div class="selected-icon"></div>Selected</div>
                     <div class="legend-item"><div class="unavailable-icon"></div>Unavailable</div>
                 </div>
+
             </div>
 
             <div class="price-details">

@@ -155,7 +155,7 @@ if ($loggedInUserId) {
   </header>
   <main class="container">
     <h1 class="title">Have a good trip, <?= $userName ?>!</h1>
-    <p class="reference">Booking Reference: <span><?= $flightDetailsDB[0]['flight_booking_id'] ?></span></p>
+    <p class="reference">Booking Reference: <span>#<?= $flightDetailsDB[0]['flight_booking_id'] ?></span></p>
     <p class="description">
         Thank you for booking your travel with <span>Travooli</span>!<br>
         Below is a summary of your trip.

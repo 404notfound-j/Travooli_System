@@ -38,8 +38,40 @@ body {
     color: var(--purple-blue);
     font-size: 24px;
     font-weight: 700;
-    margin-bottom: 2rem;
+    margin-bottom: 16px;
     font-family: 'Nunito Sans', sans-serif;
+    line-height: 50%;
+}
+
+#seat-selection-status{
+    display: flex;
+    flex-direction: row;
+    gap: 150px;
+    margin-bottom: 16px;
+}
+
+#seat-count {
+    color: #FFF;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+}
+
+#seat-list {
+    color: #FFF;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+}
+
+#seat-selection-status p{
+    color: #FFF;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
 }
 
 .layout {

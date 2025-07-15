@@ -293,7 +293,6 @@
 </div>
   
   <?php
-  // Get airline ratings and reviews
   $airlines = [];
   $sql = "SELECT airline_id, airline_name FROM airline_t";
   $result = mysqli_query($connection, $sql);

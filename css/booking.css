@@ -7,108 +7,26 @@ body {
   background: #031E2F;
   color: #FFFFFF;
 }
-.filter-bar {
-  width: 100%;
-  padding: 20px;
-  background: #0b2341;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  /* Bottom-only shadow */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  margin-bottom: 0;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  margin-right: 20px;
-}
-.filter-bar-inner {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  max-width: 1100px;
-  width: 100%;
-  margin-left: auto;
-}
+
 .main-content {
   display: flex;
 }
-.main-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
-}
-.sort-bar {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  margin-top: 0;
-  padding: 18px 32px 0 32px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  gap: 32px;
-  font-size: 18px;
-  max-width: 850px;
-  margin-left: auto;
-  margin-right: auto;
-  justify-content: center;
-}
-.sort-option {
-  flex: 1 1 0;
-  min-width: 150px;
-  max-width: 200px;
-  text-align: center;
-  padding: 0 12px 12px 12px;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  color: #222;
-  font-weight: 600;
-}
 
-.sort-option.selected {
-  border-bottom: 3px solid #5c63f2;
-  color: #222;
-}
-.sort-option span {
-  display: block;
-  font-size: 14px;
-  color: #888;
-  font-weight: 400;
-  margin-top: 5px;
-}
-
-.sort-other {
-  margin-left: auto;
-  color: #222;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  margin-top: -8px;
-  font-weight: bold;
+.layout {
+    display: flex;
+    padding-left: 10rem;
+    gap: 3rem;
 }
 
 .filters {
-  width: 280px;
-  background: #0b2341;
+  width: 340px;
   color: white;
   min-height: 100vh;
   padding-top: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
-  box-sizing: border-box;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   margin-left: 0px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border: 1px solid rgba(255,255,255,0.07);
-  border-top: none;
 }
-
-
 
 .filter-box {
   flex: 1;
@@ -130,66 +48,47 @@ body {
   margin-right: 8px;
 }
 
-.search-btn {
-  background-color: #5c63f2;
-  color: white;
-  padding: 10px 20px;
-  margin-left: 5px;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  box-shadow: 0 2px 6px rgba(96, 93, 236, 0.2);
-}
-
-.search-btn:hover {
-  background-color: #1513A0;
-  box-shadow: 0 4px 8px #605dec4d;
-}
-
-@media screen and (max-width: 768px) {
-  .filter-bar {
-    flex-direction: column;
-    gap: 6px;
-    margin-left: 20px;
-  }
-  .filter-box {
-    max-width: 100%;
-    width: 90%;
-    margin-left: 20px;
-  }
-}
 .filters h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  margin-left: 20px;
+    font-family: Montserrat, "sans-serif";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    margin-bottom: 2rem;
 }
 
-.filter-group {
-  margin-bottom: 20px;
-  margin-left: 20px;
-}
 
 .filter-group h4 {
-  font-size: 18px;
-  margin-bottom: 15px;
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    margin-bottom: 1rem;
 }
-.filters hr {
-  margin-left: 15px;
+
+.filters hr{
+    margin: 2rem 0;
+    opacity: 0.25;
+    height: 0.5px;
 }
 
 .filter-button {
-  width: 100%;
-  background: transparent;
-  border: 1px solid #5c63f2;
-  color: white;
-  padding: 10px;
-  margin-bottom: 8px;
-  font-size: 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, border-color 0.3s;
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    width: 100%;
+    color: #FFF;
+    background: transparent;
+    border: 1px solid #605dec;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .filter-button:hover {
@@ -197,24 +96,29 @@ body {
 }
 
 .filter-button.selected {
-  background-color: #2e33b6;
-  border-color: #2e33b6;
+  background-color: #403edf;
+  border-color: #403edf;
 }
 
 .rating-buttons {
   display: flex;
-  gap: 10px;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 .rating-buttons button {
-  background: transparent;
-  border: 1px solid #5c63f2;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, border-color 0.3s;
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    border: 1px solid #605DEC;
+    background: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .rating-buttons button:hover {
@@ -222,294 +126,343 @@ body {
 }
 
 .rating-buttons button.selected {
-  background-color: #2e33b6;
-  border-color: #2e33b6;
+  background-color: #403edf;
+  border-color: #403edf;
 }
 
 .checkbox-group label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 16px;
-  cursor: pointer;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .checkbox-group input[type="checkbox"] {
-  margin-right: 10px;
-  width: 20px;
-  height: 20px;
-  accent-color: #5c63f2;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid white;
+    border-radius: 3px;
+    background-color: transparent;
+    margin-right: 1rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+}
+
+.checkbox-group input[type="checkbox"]:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.checkbox-group input[type="checkbox"]:checked::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+#timeRange{
+    height: 2px;
 }
 
 input[type="range"] {
-  width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 5px;
-  background: white;
-  outline: none;
-  margin-top: 6px;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 5px;
+    background: white;
+    outline: none;
+    margin-top: 6px;
 }
 
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 28px;
-  height: 28px;
-  background: #5c63f2;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
-  margin-top: 0px;
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #605dec;
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 .range-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-top: 10px;
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
 }
 
 .action-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  margin-top: 30px;
+    display: flex;
+    gap: 24px;
+    margin-top: 2.5rem;
 }
 
 .action-buttons button {
-  flex: 1;
-  padding: 10px;
-  font-size: 15px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+    flex: 1;
+    align-items: flex-start;
+    border-radius: 5px;
+    border: 2px solid #605DEC;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: "Nunito Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin-bottom: 1rem;
 }
 
 .cancel-btn {
-  background-color: transparent;        
-  color: white;                          
-  border: 1px solid #5c63f2;           
-  border-radius: 6px;                   
-  padding: 10px 30px;                    
-  font-size: 16px;                      
-  font-weight: bold;                    
-  cursor: pointer;                       
-  transition: all 0.3s ease;             
-  box-shadow: 0 0 4px #5c63f2;          
-  background: black;                     
+    background-color: transparent;    
+    max-width: 86px;    
+    color: #605dec;     
+    padding: 0;                                                         
 }
 
 .cancel-btn:hover {
-  background-color: #5c63f2;             
-  color: black;                         
+    background-color: #7d83ff18;                                 
 }
+
 .apply-btn {
-  background-color: #5c63f2;
-  color: white;
+    padding: 12px 24px;
+    background-color: #605DEC;
+    color: white;
+    max-width: 150px;
 }
 
 .apply-btn:hover {
-  background-color: #7d83ff;
+    background: #4845CC;
+    border-color: #4845CC;;
 }
 
-hr {
-  border: 0;
-  border-top: 1px solid #ffffff;
-  margin: 30px 0;
-}
 /*new flight details*/
 
 .flight-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(44, 62, 80, 0.10);
-  padding: 28px 28px 18px 28px;
-  margin: 32px auto 0 auto;
-  max-width: 900px;
-  display: flex;
-  flex-direction: row;
-  gap: 32px;
-  position: relative;
-  align-items: flex-start;
-}
+    background: #fff;
+    border-radius: 16px;
+    display: flex;
+    padding: 32px;
+    margin: 32px auto;
+    width: 810px;
+    height: 300px;
+    gap: 16px;
+    height: fit-content;
+  }
+  
+  .airline-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: top;
+    width: 120px;
+  }
+  
+  .airline-logo {
+    width: 120px;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    margin-bottom: 0;
+  }
+  
+  .airline-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #555;
+    margin-top: 8px;
+  }
+  
+  .content-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 590px;
+    gap: 0;
+    height: fit-content;
+  }
+  
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    height: 44px;
+  }
+  
+  .rating-box {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #5c63f2;
+    border-radius: 8px;
+    padding: 8.5px 11px;
+  }
+  
+  .rating-score {
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #121;
+  }
+  
+  .reviews {
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #112;
+  }
+  
+  .price-box {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+  
+  .price-box .from {
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #121;
+    opacity: 0.75;
+  }
+  
+  .price-box .price {
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    color: #605DEC;
+  }
+  
+  .person{
+    font-size: 14px;
+  }
+  .schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  
+  .flight-detail {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    flex-wrap: wrap;
+    gap: 65px;
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  
+  .flight-time {
+    width: 165px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #111;
+    display: flex;
+    gap: 8px;
+  }
+  
+  .flight-meta {
+    color: #888;
+    font-size: 15px;
+  }
+  
+  .flight-meta-duration {
+    color: #111;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .buttons-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-top: 1px solid #e5e7eb;
+    padding: 20px 0 0 0; 
+    margin-top: auto;
+  }
 
-.airline-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 140px;
-  margin-right: 32px;
-}
+  .view-details-btn {
+    flex: 1;
+    background: #605DEC;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 14px 0;
+    border-radius: 5px;
+    width: 480px;
+    height: 48px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  
+  .view-details-btn:hover {
+    background: #4845CC;
+  }
+  
+  
+  .like-button {
+    border: 2px solid #605DEC;
+    height: 48px;
+    width: 48px;
+    background: transparent;
+    border: 1px solid #605DEC;
+    padding: 10px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #5c595f;
+    font-weight: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .like-button i {
+    font-size: 16px;
+  }
+  
+  .like-button:hover {
+    background-color: #f5f6ff;
+  }
 
-.airline-logo {
-  width: 150px;
-  height: 180px;
-  object-fit: contain;
-  margin-top: 40px;
-  margin-left: 30px;
-  align-items: center;
-}
-
-.airline-name {
-  font-family: 'Poppins', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: #e11d48;
-  margin-top: 8px;
-  margin-bottom: 0;
-  letter-spacing: -1px;
-}
-
-.content-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.top-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 8px;
-}
-
-.rating-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fff;
-  padding: 4px 12px 4px 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #222;
-}
-.rating-score {
-  color: #5c63f2;
-  background: #f5f6ff;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 30px;
-  padding: 8px;
-  margin-right: 6px;
-  margin-bottom: 10px;
-}
-.reviews {
-  color: #222;
-  font-size: 18px;
-  font-weight: 400;
-  margin-left: 4px;
-}
-
-.price-box {
-  margin-left: auto;
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-start;
-}
-.price-box .from {
-  color: #888;
-  font-size: 15px;
-  margin-bottom: 2px;
-}
-
-.price-box .price {
-  color: #5c63f2;
-  font-weight: 800;
-  font-size: 26px;
-  letter-spacing: -1px;
-  margin-top: 0;
-}
-
-.schedule {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.flight-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 4px 0;
-}
-
-.flight-time {
-  display: flex;
-  padding-left: 20px;
-  gap: 60px; 
-  align-items: center;
-  font-weight: 600;
-  font-size: 18px;
-  color: #111;
-  flex-wrap: wrap;
-}
-.flight-meta {
-  font-size: 14px;
-  color: #333;
-  text-align: center;
-  margin-top: 10px;
-  margin-right: 40px;
-}
-
-
-.buttons-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-top: 1.5px solid #e5e7eb;
-  padding-top: 18px;
-}
-.heart-btn {
-  border: 1.5px solid #d1d5db;
-  background: #fff;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 22px;
-  margin-right: 8px;
-  transition: border 0.2s, background 0.2s;
-}
-.heart-btn i {
-  font-size: 22px;
-  color: #bbb;
-  transition: color 0.3s;
-}
-.heart-btn.favorited i,
-.heart-btn .fa-heart.liked {
-  color: #e11d48 !important;
-}
-
-.view-details-btn {
-  flex: 1;
-  background: #605DEC;
-  color: #fff;
-  border: none;
-  padding: 16px 0;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 20px;
-  box-shadow: 0 2px 8px rgba(96, 93, 236, 0.10);
-  transition: background 0.2s;
-  margin-left: 0;
-}
-.view-details-btn:hover {
-  background: #1513A0;
-}
-
-ul {
-  list-style: none;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
+  .like-button.liked i {
+    color: #605dec;
 }
 
 /* Gradient Text Style */
@@ -1631,13 +1584,6 @@ input:focus ~ .input-border {
 .rating-display {
   display: flex;
   align-items: center;
-}
-
-.rating-score {
-  font-size: 36px;
-  font-weight: 700;
-  color: #5c63f2;
-  margin-right: 15px;
 }
 
 .rating-details {

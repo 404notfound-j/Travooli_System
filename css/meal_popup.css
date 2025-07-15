@@ -152,7 +152,7 @@
     color: #FFFFFF;
 }
 
-.meal-price {
+.popup-meal-price {
     font-family: 'Nunito Sans', sans-serif;
     font-weight: 600;
     font-size: 12px;
@@ -161,7 +161,7 @@
     color: #919397;
 }
 
-.meal-price.free {
+.popup-meal-price.free {
     color: rgba(37, 40, 49, 0.5);
 }
 
