@@ -126,7 +126,7 @@ error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? '
                         All bookings made through <span>Travooli</span> are backed by our satisfaction guarantee. However, cancellation policies may vary based on the airline and ticket type. For full details, please review the cancellation policy for this flight during the booking process.
                         </p> 
                         <div class="back-button-container">
-                            <button class="back-button">Back to Seat Selection</button>
+                        <a href="seat_selection.php" class="back-button">Back to Seat Selection</a>
                         </div>
                     </div>
                 </div>
