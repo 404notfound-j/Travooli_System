@@ -36,8 +36,8 @@ error_log("DEBUG in payment.php: Session User ID: " . ($_SESSION['user_id'] ?? '
                     </p>
 
                     <div class="payment-methods-card">
-                        <div class="payment-methods" data-method="Card">
-                            <div class="payment-method selected">
+                        <div class="payment-methods">
+                            <div class="payment-method" data-method="card">
                                 <div class="method-content">
                                     <img src="icon/card.svg" alt="Credit Card" class="method-icon">
                                     <div class="method-name">Debit/Credit Card</div>

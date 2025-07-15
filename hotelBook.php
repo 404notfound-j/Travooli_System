@@ -416,7 +416,7 @@ $hotel_images = [
                 <h4>Price</h4>
                 <div id="price-slider"></div>
                 <div style="margin-top: 16px;">
-                  <span id="min-price-label"><?php echo htmlspecialchars($min_price); ?></span> - <span id="max-price-label"><?php echo htmlspecialchars($max_price); ?></span>
+                  <span id="min-price-label">RM <?php echo htmlspecialchars($min_price); ?></span> - <span id="max-price-label"><?php echo htmlspecialchars($max_price); ?></span>
                 </div>
                 <input type="hidden" name="minPrice" id="minPrice" value="<?php echo htmlspecialchars($min_price); ?>" data-slider-min="<?php echo htmlspecialchars($slider_min_price); ?>">
                 <input type="hidden" name="maxPrice" id="maxPrice" value="<?php echo htmlspecialchars($max_price); ?>" data-slider-max="<?php echo htmlspecialchars($slider_max_price); ?>">
